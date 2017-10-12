@@ -1,6 +1,6 @@
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKeyConstraint
 from app.database import Base
-
+from sqlalchemy.orm import relationship, backref
 
 class Book(Base):
     __tablename__ = 'books'
@@ -35,12 +35,11 @@ class StockExchanges(Base):
     url = Column(String(255), nullable=False)
     api_key = Column(String(45), nullable=True)
     api_secret = Column(String(45), nullable=True)
+    addresses = relationship('ExchangeRates', backref='StockExchanges', lazy=True)
 
 
 class ExchangeRates(Base):
     __tablename__ = 'exchange_rates'
-    __table_args__ = {'mysql_engine': 'MyISAM'}
-    # __table_args__ = tuple(UniqueConstraint('stock_exchange_id', 'current_currency_id', 'compare_currency_id'))
 
     id = Column(INTEGER, primary_key=True)
     stock_exchange_id = Column(INTEGER, nullable=False, index=True)
@@ -53,6 +52,8 @@ class ExchangeRates(Base):
     volume = Column(DECIMAL(precision=14, scale=5))
     bid = Column(DECIMAL(precision=14, scale=10))
     ask = Column(DECIMAL(precision=14, scale=10))
+    __table_args__ = (UniqueConstraint('stock_exchange_id', 'current_currency_id', 'compare_currency_id', name='_current_compare_stock'), {'mysql_engine': 'MyISAM'})
+
 
 # CREATE TABLE IF NOT EXISTS `exchange_rates` (
 #   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
