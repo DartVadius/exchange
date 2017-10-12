@@ -1,6 +1,8 @@
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKeyConstraint
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey
+from sqlalchemy.orm import relationship
+
 from app.database import Base
-from sqlalchemy.orm import relationship, backref
+
 
 class Book(Base):
     __tablename__ = 'books'
@@ -19,32 +21,40 @@ class Book(Base):
 
 class Currencies(Base):
     __tablename__ = 'currencies'
-    __table_args__ = {'mysql_engine': 'MyISAM'}
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(INTEGER, primary_key=True)
     name = Column(String(10), nullable=False, unique=True)
     description = Column(String(255), nullable=True)
+    # currency_current_rates = relationship('ExchangeRates', backref='currencies', lazy=True)
+    # currency_compare_rates = relationship('ExchangeRates', backref='currencies', lazy=True)
+    currencie = relationship('Currencies',
+                              primaryjoin="or_(Currencies.id==ExchangeRates.compare_currency_id, Currencies.id==ExchangeRates.current_currency_id)",
+                              lazy=True, backref='currencies', viewonly=True)
 
 
 class StockExchanges(Base):
     __tablename__ = 'stock_exchanges'
-    __table_args__ = {'mysql_engine': 'MyISAM'}
+    __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(INTEGER, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
     url = Column(String(255), nullable=False)
     api_key = Column(String(45), nullable=True)
     api_secret = Column(String(45), nullable=True)
-    addresses = relationship('ExchangeRates', backref='StockExchanges', lazy=True)
+    exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
 
 
 class ExchangeRates(Base):
     __tablename__ = 'exchange_rates'
 
     id = Column(INTEGER, primary_key=True)
-    stock_exchange_id = Column(INTEGER, nullable=False, index=True)
-    current_currency_id = Column(INTEGER, nullable=False, index=True)
-    compare_currency_id = Column(INTEGER, nullable=False, index=True)
+    stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='NO ACTION'),
+                               nullable=False, index=True)
+    current_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+                                 nullable=False, index=True)
+    compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+                                 nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
     high_price = Column(DECIMAL(precision=14, scale=10))
     low_price = Column(DECIMAL(precision=14, scale=10))
@@ -52,82 +62,8 @@ class ExchangeRates(Base):
     volume = Column(DECIMAL(precision=14, scale=5))
     bid = Column(DECIMAL(precision=14, scale=10))
     ask = Column(DECIMAL(precision=14, scale=10))
-    __table_args__ = (UniqueConstraint('stock_exchange_id', 'current_currency_id', 'compare_currency_id', name='_current_compare_stock'), {'mysql_engine': 'MyISAM'})
 
-
-# CREATE TABLE IF NOT EXISTS `exchange_rates` (
-#   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-#   `stock_exchange_id` INT(10) UNSIGNED NOT NULL,
-#   `date` TIMESTAMP NOT NULL,
-#   `current_currency_id` INT(10) UNSIGNED NOT NULL,
-#   `compare_currency_id` INT(10) UNSIGNED NOT NULL,
-#   `high_price` DECIMAL UNSIGNED NULL,
-#   `low_price` DECIMAL UNSIGNED NULL,
-#   `last_price` DECIMAL UNSIGNED NULL,
-#   `volume` DECIMAL UNSIGNED NULL,
-#   `bid` DECIMAL UNSIGNED NULL,
-#   `ask` DECIMAL UNSIGNED NULL,
-
-
-#   UNIQUE INDEX `current_compare_stock` (`current_currency_id` ASC, `compare_currency_id` ASC, `stock_exchange_id` ASC),
-#   CONSTRAINT `fk_exchange_rates_stocks`
-#     FOREIGN KEY (`stock_exchange_id`)
-#     REFERENCES `stock_exchenges` (`id`)
-#     ON DELETE NO ACTION
-#     ON UPDATE NO ACTION,
-#   CONSTRAINT `fk_exchange_rates_current`
-#     FOREIGN KEY (`current_currency_id`)
-#     REFERENCES `currencies` (`id`)
-#     ON DELETE NO ACTION
-#     ON UPDATE NO ACTION,
-#   CONSTRAINT `fk_exchange_rates_compare`
-#     FOREIGN KEY (`compare_currency_id`)
-#     REFERENCES `currencies` (`id`)
-#     ON DELETE NO ACTION
-#     ON UPDATE NO ACTION)
-# ENGINE = InnoDB
-# DEFAULT CHARACTER SET = utf8;
-#
-#
-# -- -----------------------------------------------------
-# -- Table `exchange_history`
-# -- -----------------------------------------------------
-# CREATE TABLE IF NOT EXISTS `exchange_history` (
-#   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-#   `stock_exchange_id` INT(10) UNSIGNED NOT NULL,
-#   `date` TIMESTAMP NOT NULL,
-#   `current_currency_id` INT(10) UNSIGNED NOT NULL,
-#   `compare_currency_id` INT(10) UNSIGNED NOT NULL,
-#   `high_price` DECIMAL UNSIGNED NULL,
-#   `low_price` DECIMAL UNSIGNED NULL,
-#   `last_price` DECIMAL UNSIGNED NULL,
-#   `volume` DECIMAL UNSIGNED NULL,
-#   `bid` DECIMAL UNSIGNED NULL,
-#   `ask` DECIMAL UNSIGNED NULL,
-#   PRIMARY KEY (`id`),
-#   UNIQUE INDEX `id_UNIQUE` (`id` ASC),
-#   INDEX `fk_exchange_history_current_idx` (`current_currency_id` ASC),
-#   INDEX `fk_exchange_history_compare_idx` (`compare_currency_id` ASC),
-#   INDEX `fk_exchange_stock_idx` (`stock_exchange_id` ASC),
-#   CONSTRAINT `fk_exchange_history_current`
-#     FOREIGN KEY (`current_currency_id`)
-#     REFERENCES `currencies` (`id`)
-#     ON DELETE NO ACTION
-#     ON UPDATE NO ACTION,
-#   CONSTRAINT `fk_exchange_history_compare`
-#     FOREIGN KEY (`compare_currency_id`)
-#     REFERENCES `currencies` (`id`)
-#     ON DELETE NO ACTION
-#     ON UPDATE NO ACTION,
-#   CONSTRAINT `fk_exchange_stock`
-#     FOREIGN KEY (`stock_exchange_id`)
-#     REFERENCES `stock_exchenges` (`id`)
-#     ON DELETE NO ACTION
-#     ON UPDATE NO ACTION)
-# ENGINE = InnoDB
-# DEFAULT CHARACTER SET = utf8;
-#
-#
-# SET SQL_MODE=@OLD_SQL_MODE;
-# SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-# SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+    __table_args__ = (
+        UniqueConstraint('stock_exchange_id', 'current_currency_id', 'compare_currency_id',
+                         name='_current_compare_stock'),
+        {'mysql_engine': 'InnoDB'})

@@ -11,6 +11,7 @@ def index():
         return render_template("books.html",
                                title='Home',
                                books=books)
+    print(books)
     return redirect(url_for('login'))
 
 
