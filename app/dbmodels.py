@@ -28,9 +28,9 @@ class Currencies(Base):
     description = Column(String(255), nullable=True)
     # currency_current_rates = relationship('ExchangeRates', backref='currencies', lazy=True)
     # currency_compare_rates = relationship('ExchangeRates', backref='currencies', lazy=True)
-    currencie = relationship('Currencies',
-                              primaryjoin="or_(Currencies.id==ExchangeRates.compare_currency_id, Currencies.id==ExchangeRates.current_currency_id)",
-                              lazy=True, backref='currencies', viewonly=True)
+    # currencie = relationship('Currencies',
+    #                           primaryjoin="or_(Currencies.id==ExchangeRates.compare_currency_id, Currencies.id==ExchangeRates.current_currency_id)",
+    #                           lazy=True, backref='currencies', viewonly=True)
 
 
 class StockExchanges(Base):
@@ -42,18 +42,18 @@ class StockExchanges(Base):
     url = Column(String(255), nullable=False)
     api_key = Column(String(45), nullable=True)
     api_secret = Column(String(45), nullable=True)
-    exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
+    # exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
 
 
 class ExchangeRates(Base):
     __tablename__ = 'exchange_rates'
 
     id = Column(INTEGER, primary_key=True)
-    stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    stock_exchange_id = Column(INTEGER,
                                nullable=False, index=True)
-    current_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    current_currency_id = Column(INTEGER,
                                  nullable=False, index=True)
-    compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    compare_currency_id = Column(INTEGER,
                                  nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
     high_price = Column(DECIMAL(precision=14, scale=10))
