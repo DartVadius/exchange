@@ -1,8 +1,25 @@
 from flask import render_template, flash, redirect, request, url_for, session, jsonify, Flask
 from app import app
 from app import forms
-from app.dbmodels import Book
+from app.dbmodels import Book, Currencies, StockExchanges, ExchangeHistory, ExchangeRates
 from app.database import db_session
+
+
+@app.route('/stock', methods=['GET', 'POST'])
+def stock():
+    form = forms.StockForm(request.form)
+    stocks = db_session.query(StockExchanges).all()
+    if request.method == 'POST' and form.validate():
+        name = form.name.data
+        url = form.url.data
+        api_key = form.api_key.data
+        api_secret = form.api_secret.data
+        exchange_stock = StockExchanges(name, url, api_key, api_secret)
+        db_session.add(exchange_stock)
+        db_session.commit()
+        stocks.append(exchange_stock)
+        return redirect(url_for('stock'))
+    return render_template("stock.html", title='Stocks', form=form, stocks=stocks)
 
 @app.route('/books')
 def index():
@@ -11,7 +28,7 @@ def index():
         return render_template("books.html",
                                title='Home',
                                books=books)
-    print(books)
+    # print(books)
     return redirect(url_for('login'))
 
 
