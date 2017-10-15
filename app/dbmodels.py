@@ -75,13 +75,13 @@ class ExchangeHistory(Base):
     compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
                                  nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
-    high_price = Column(DECIMAL(precision=14, scale=10))
-    low_price = Column(DECIMAL(precision=14, scale=10))
-    last_price = Column(DECIMAL(precision=14, scale=10))
-    volume = Column(DECIMAL(precision=14, scale=5))
+    high_price = Column(DECIMAL(precision=20, scale=10))
+    low_price = Column(DECIMAL(precision=20, scale=10))
+    last_price = Column(DECIMAL(precision=20, scale=10))
+    volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
-    bid = Column(DECIMAL(precision=14, scale=10))
-    ask = Column(DECIMAL(precision=14, scale=10))
+    bid = Column(DECIMAL(precision=20, scale=10))
+    ask = Column(DECIMAL(precision=20, scale=10))
 
     history_current_currency = relationship("Currencies", back_populates="history_current", uselist=False,
                                             foreign_keys=[current_currency_id])

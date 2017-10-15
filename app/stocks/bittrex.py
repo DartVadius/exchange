@@ -1,5 +1,6 @@
 from app.stocks.stock_base import StockBase
 import time
+import datetime
 
 
 class Bittrex(StockBase):
@@ -36,7 +37,7 @@ class Bittrex(StockBase):
             markets.append({
                 'current_currency': val[0],
                 'compare_currency': val[1],
-                'date': time.time(),
+                'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
                 'high_price': market['High'],
                 'low_price': market['Low'],
                 'last_price': market['Last'],

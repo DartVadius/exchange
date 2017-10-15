@@ -38,19 +38,40 @@ class ExchangeService:
                     market['compare_currency_id'] = self.get_currency_id_by_name(market['compare_currency'])
                     market['current_currency_id'] = self.get_currency_id_by_name(market['current_currency'])
                     market['stock_exchange_id'] = self.get_stock_id_by_name(stock.name)
-                    rate = ExchangeRates(market)
-                    history = ExchangeHistory(market)
-                    print(rate)
-                    print(history)
-                # local_currency = [item.name for item in self.currencies]
-                # result = [item for item in set(stock_currency).difference(local_currency)]
-                # for currency in result:
-                #     new_currency = Currencies(currency)
-                #     db_session.add(new_currency)
-                #     db_session.commit()
-                #     self.currencies.append(new_currency)
-        # self.currencies = db_session.query(Currencies).all()
+                    if market['compare_currency_id'] and market['current_currency_id']:
+                        self.update_rate(market)
+                        self.update_history(market)
+                        # else:
+                        #     print(market['compare_currency'])
+                        #     print(market['current_currency'])
         return self
+
+    def update_rate(self, market):
+        rate_to_update = db_session.query(ExchangeRates).filter_by(
+            stock_exchange_id=market['stock_exchange_id'],
+            current_currency_id=market['current_currency_id'],
+            compare_currency_id=market['compare_currency_id']
+        ).first()
+        if rate_to_update is None:
+            rate = ExchangeRates(market)
+            db_session.add(rate)
+        else:
+            rate_to_update.current_currency_id = market['current_currency_id'],
+            rate_to_update.compare_currency_id = market['compare_currency_id'],
+            rate_to_update.date = market['date'],
+            rate_to_update.high_price = market['high_price'],
+            rate_to_update.low_price = market['low_price'],
+            rate_to_update.last_price = market['last_price'],
+            rate_to_update.volume = market['volume'],
+            rate_to_update.base_volume = market['base_volume'],
+            rate_to_update.ask = market['ask'],
+            rate_to_update.bid = market['bid'],
+        db_session.commit()
+
+    def update_history(self, market):
+        history = ExchangeHistory(market)
+        db_session.add(history)
+        db_session.commit()
 
     def get_stock_id_by_name(self, name):
         for stock in self.stocks:
