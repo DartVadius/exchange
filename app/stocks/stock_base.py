@@ -4,6 +4,7 @@ import json
 
 class StockBase:
     currencies = []
+    markets = []
 
     def get_request(self, url):
         request = urllib.request.Request(url)
@@ -13,3 +14,6 @@ class StockBase:
 
     def get_currencies(self):
         return self.currencies
+
+    def get_markets(self):
+        return self.markets
