@@ -35,7 +35,7 @@ class Currencies(Base):
     history_compare = relationship("ExchangeHistory", foreign_keys='ExchangeHistory.compare_currency_id',
                                    back_populates="history_compare_currency")
 
-    def __init__(self, name, description):
+    def __init__(self, name, description=None):
         self.name = name
         self.description = description
 
@@ -52,6 +52,7 @@ class StockExchanges(Base):
     url = Column(String(255), nullable=False)
     api_key = Column(String(45), nullable=True)
     api_secret = Column(String(45), nullable=True)
+    active = Column(INTEGER, nullable=True, default=1)
     exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
     exchange_history = relationship('ExchangeHistory', backref='stock_history', lazy=True)
 

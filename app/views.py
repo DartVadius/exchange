@@ -14,10 +14,9 @@ def stock():
         url = form.url.data
         api_key = form.api_key.data
         api_secret = form.api_secret.data
-        exchange_stock = StockExchanges(name, url, api_key, api_secret)
+        exchange_stock = StockExchanges(name.lower(), url, api_key, api_secret)
         db_session.add(exchange_stock)
         db_session.commit()
-        stocks.append(exchange_stock)
         return redirect(url_for('stock'))
     return render_template("stock.html", title='Stocks', form=form, stocks=stocks)
 
