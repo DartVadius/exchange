@@ -6,6 +6,7 @@ import datetime
 class Bittrex(StockBase):
     STOCK_URL = 'https://bittrex.com'
     markets = []
+    currencies = []
 
     def __init__(self, stock=None):
         self.name = 'bittrex'

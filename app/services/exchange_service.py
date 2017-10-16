@@ -1,6 +1,7 @@
 from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory
 from app.database import db_session
 from app.stocks.class_map import classmap
+import threading
 
 
 class ExchangeService:
@@ -39,8 +40,14 @@ class ExchangeService:
                     market['current_currency_id'] = self.get_currency_id_by_name(market['current_currency'])
                     market['stock_exchange_id'] = self.get_stock_id_by_name(stock.name)
                     if market['compare_currency_id'] and market['current_currency_id']:
-                        self.update_rate(market)
-                        self.update_history(market)
+                        # self.update_rate(market)
+                        # self.update_history(market)
+                        thread_rate = threading.Thread(target=self.update_rate, args=(market,))
+                        thread_rate.daemon = True
+                        thread_rate.start()
+                        thread_history = threading.Thread(target=self.update_history, args=(market,))
+                        thread_history.daemon = True
+                        thread_history.start()
                         # else:
                         #     print(market['compare_currency'])
                         #     print(market['current_currency'])
