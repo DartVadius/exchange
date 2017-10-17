@@ -36,7 +36,7 @@
     <tbody>
     {% for stock in stocks %}
     <tr>
-        <td>{{stock.name}}</td>
+        <td><a href="/stock/{{stock.id}}">{{stock.name}}</a></td>
         <td>{{stock.url}}</td>
     </tr>
     {% endfor %}
