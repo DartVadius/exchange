@@ -1,10 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "layout.html" %}
 
-</body>
-</html>
+{% block content %}
+<p>Биржа: {{name}}</p>
+<p>Дата: {{date}}</p>
+<table class="table ">
+    <thead>
+    <tr>
+        <th>Пара</th>
+        <th>Максимальная цена</th>
+        <th>Минимальная цена</th>
+        <th>Последняя цена</th>
+        <th>Объем</th>
+        <th>Последнее предложение</th>
+        <th>Последний запрос</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for rate in rates %}
+    <tr>
+        <td>{{rate.current_currency_name}}/{{rate.compare_currency_name}}</td>
+        <td>{{'{0:f}'.format(rate.high_price)}}</td>
+        <td>{{'{0:f}'.format(rate.low_price)}}</td>
+        <td>{{'{0:f}'.format(rate.last_price)}}</td>
+        <td>{{'{0:f}'.format(rate.volume)}}</td>
+        <td>{{'{0:f}'.format(rate.bid)}}</td>
+        <td>{{'{0:f}'.format(rate.ask)}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

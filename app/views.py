@@ -1,20 +1,16 @@
 from flask import render_template, flash, redirect, request, url_for, session
-
-from app import app
-from app import forms
+from app import app, forms
 from app.database import db_session
-from app.dbmodels import Book, StockExchanges, ExchangeRates, Currencies
+from app.dbmodels import Book, StockExchanges
+from app.services import rate_repository, exchange_service, stock_repository
 
 
 @app.route('/stock/<int:stock_id>', methods=['GET'])
 def stock(stock_id):
-    # stock_id = request.form['id']
-    exchange_rates = db_session.query(ExchangeRates, StockExchanges).filter_by(stock_exchange_id=stock_id).join(
-        StockExchanges).add_columns(StockExchanges.name).join(
-        Currencies, ExchangeRates.compare_currency_id == Currencies.id).add_columns(Currencies.name).all()
-    for name in exchange_rates:
-        print(name.name)
-    return render_template("stock_view/stock_exchange.html", title='Stocks', rates=exchange_rates)
+    exchange_rates = rate_repository.get_rates_by_stock_id(stock_id)
+    date = rate_repository.get_date_by_stock_id(stock_id)
+    name = stock_repository.get_stock_name_by_id(stock_id)
+    return render_template("stock_view/stock_exchange.html", title='Stocks', rates=exchange_rates, date=date, name=name)
 
 
 @app.route('/stocks', methods=['GET', 'POST'])
