@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, request, url_for, session
 from app import app, forms
 from app.database import db_session
 from app.dbmodels import Book, StockExchanges
-from app.services import rate_repository, exchange_service, stock_repository
+from app.services import rate_repository, stock_repository
 
 
 @app.route('/stock/<int:stock_id>', methods=['GET'])
@@ -16,7 +16,7 @@ def stock(stock_id):
 @app.route('/stocks', methods=['GET', 'POST'])
 def stocks():
     form = forms.StockForm(request.form)
-    stocks = db_session.query(StockExchanges).all()
+    exchange_stocks = db_session.query(StockExchanges).all()
     if request.method == 'POST' and form.validate():
         name = form.name.data
         url = form.url.data
@@ -26,7 +26,7 @@ def stocks():
         db_session.add(exchange_stock)
         db_session.commit()
         return redirect(url_for('stocks'))
-    return render_template("stocks.html", title='Stocks', form=form, stocks=stocks)
+    return render_template("stocks.html", title='Stocks', form=form, stocks=exchange_stocks)
 
 
 @app.route('/books')
