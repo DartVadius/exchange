@@ -16,6 +16,7 @@
     </tr>
     </thead>
     <tbody>
+    {% if rates is not none %}
     {% for rate in rates %}
     <tr>
         <td>{{rate.current_currency_name}}/{{rate.compare_currency_name}}</td>
@@ -27,6 +28,7 @@
         <td>{{'{0:f}'.format(rate.ask)}}</td>
     </tr>
     {% endfor %}
+    {% endif %}
     </tbody>
 </table>
 {% endblock %}
