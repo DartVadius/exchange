@@ -1,22 +1,10 @@
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
-
+from flask_admin import Admin
+from app import app
 from app.database import Base
-
-
-class Book(Base):
-    __tablename__ = 'books'
-
-    id = Column(INTEGER, primary_key=True)
-    author = Column(String(255), index=True, unique=False)
-    title = Column(String(255), index=True, unique=True)
-
-    def __init__(self, author, title):
-        self.author = author
-        self.title = title
-
-    def __repr__(self):
-        return '<Book %r>' % (self.author + self.title)
+from flask_admin.contrib.sqla import ModelView
+from app.database import db_session
 
 
 class Currencies(Base):
@@ -143,3 +131,13 @@ class ExchangeRates(Base):
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
         self.ask = stock['ask']
+
+
+class CurrenciesAdmin(ModelView):
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['name', 'description', ]
+
+
+admin = Admin(app, name='exchange', template_mode='bootstrap3')
+admin.add_view(CurrenciesAdmin(Currencies, db_session))
