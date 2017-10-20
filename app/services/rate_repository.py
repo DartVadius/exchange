@@ -1,6 +1,7 @@
-from app.dbmodels import StockExchanges, ExchangeRates, Currencies
 from sqlalchemy.orm import aliased
+
 from app.database import db_session
+from app.dbmodels import StockExchanges, ExchangeRates, Currencies
 
 
 def get_rates_by_stock_id(stock_id):
@@ -9,4 +10,7 @@ def get_rates_by_stock_id(stock_id):
 
 
 def get_date_by_stock_id(stock_id):
-    return db_session.query(ExchangeRates.date).filter_by(stock_exchange_id=stock_id).first()[0]
+    result = db_session.query(ExchangeRates.date).filter_by(stock_exchange_id=stock_id).first()
+    if result is not None:
+        return result[0]
+    return None
