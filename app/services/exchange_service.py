@@ -2,6 +2,7 @@ from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHist
 from app.database import db_session
 from app.stocks.class_map import classmap
 import threading
+import sys
 
 
 class ExchangeService:
@@ -20,9 +21,9 @@ class ExchangeService:
                 if not stock_currency:
                     continue
                 local_currency = [item.name for item in self.currencies]
-                difference = [item for item in set(stock_currency).difference(local_currency)]
+                difference = [{'name': item} for item in set(stock_currency).difference(local_currency)]
                 for currency in difference:
-                    new_currency = Currencies(currency)
+                    new_currency = Currencies(currency['name'])
                     db_session.add(new_currency)
                     db_session.commit()
                     self.currencies.append(new_currency)

@@ -1,7 +1,5 @@
-from sqlalchemy.orm import aliased
-
 from app.database import db_session
-from app.dbmodels import StockExchanges, ExchangeRates, Currencies
+from app.dbmodels import ExchangeRates
 
 
 def get_rates_by_stock_id(stock_id):

@@ -17,15 +17,15 @@ def stock(stock_id):
 def stocks():
     form = forms.StockForm(request.form)
     all_stocks = db_session.query(StockExchanges).all()
-    if request.method == 'POST' and form.validate():
-        name = form.name.data
-        url = form.url.data
-        api_key = form.api_key.data
-        api_secret = form.api_secret.data
-        exchange_stock = StockExchanges(name.lower(), url, api_key, api_secret)
-        db_session.add(exchange_stock)
-        db_session.commit()
-        return redirect(url_for('stocks'))
+    # if request.method == 'POST' and form.validate():
+    #     name = form.name.data
+    #     url = form.url.data
+    #     api_key = form.api_key.data
+    #     api_secret = form.api_secret.data
+    #     exchange_stock = StockExchanges(name.lower(), url, api_key, api_secret)
+    #     db_session.add(exchange_stock)
+    #     db_session.commit()
+    #     return redirect(url_for('stocks'))
     return render_template("stocks.html", title='Stocks', form=form, stocks=all_stocks)
 
 
