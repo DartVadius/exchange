@@ -19,7 +19,7 @@
     {% if rates is not none %}
     {% for rate in rates %}
     <tr>
-        <td>{{rate.current_currency_name}}/{{rate.compare_currency_name}}</td>
+        <td>{{rate.rate_current_currency.name}}/{{rate.rate_compare_currency.name}}</td>
         <td>{{'{0:f}'.format(rate.high_price)}}</td>
         <td>{{'{0:f}'.format(rate.low_price)}}</td>
         <td>{{'{0:f}'.format(rate.last_price)}}</td>

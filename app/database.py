@@ -4,7 +4,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-engine = create_engine('mysql+pymysql://root:1111@localhost/mypy', convert_unicode=True)
+# engine = create_engine('mysql+pymysql://coins:VfytnrJ@localhost/coins', convert_unicode=True)
+engine = create_engine('mysql+pymysql://coins:VfytnrJ@localhost/coins')
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
