@@ -1,22 +1,11 @@
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
-
+from flask_admin import Admin
+from app import app
 from app.database import Base
-
-
-class Book(Base):
-    __tablename__ = 'books'
-
-    id = Column(INTEGER, primary_key=True)
-    author = Column(String(255), index=True, unique=False)
-    title = Column(String(255), index=True, unique=True)
-
-    def __init__(self, author, title):
-        self.author = author
-        self.title = title
-
-    def __repr__(self):
-        return '<Book %r>' % (self.author + self.title)
+from flask_admin.contrib.sqla import ModelView
+from app.database import db_session
+from flask_admin.form import rules, Select2Field
 
 
 class Currencies(Base):
@@ -56,11 +45,14 @@ class StockExchanges(Base):
     exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
     exchange_history = relationship('ExchangeHistory', backref='stock_history', lazy=True)
 
-    def __init__(self, name, url, api_key, api_secret):
-        self.name = name
-        self.url = url
-        self.api_key = api_key
-        self.api_secret = api_secret
+    # def __init__(self, name, url, api_key, api_secret):
+    #     self.name = name
+    #     self.url = url
+    #     self.api_key = api_key
+    #     self.api_secret = api_secret
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.url!r}>'.format(self)
 
 
 class ExchangeHistory(Base):
@@ -143,3 +135,40 @@ class ExchangeRates(Base):
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
         self.ask = stock['ask']
+
+
+class CurrenciesAdmin(ModelView):
+    page_size = 30
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['name', 'description', ]
+    can_edit = False
+    # form_create_rules = ('name', 'description',)
+    # form_edit_rules = [
+    #     rules.FieldSet(('description',), 'Edit currency')
+    # ]
+    column_editable_list = ('description',)
+
+
+class StockExchangesAdmin(ModelView):
+    column_list = ('name', 'url', 'api_key', 'api_secret', 'active')
+    # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['name', 'url', 'active', 'api_key', 'api_secret']
+    form_overrides = dict(
+        active=Select2Field
+    )
+    form_args = dict(
+        active=dict(
+            choices=[
+                ('1', 'Enable'),
+                ('0', 'Disable')
+            ]
+        )
+    )
+
+
+admin = Admin(app, name='exchange', template_mode='bootstrap3')
+admin.add_view(CurrenciesAdmin(Currencies, db_session))
+admin.add_view(StockExchangesAdmin(StockExchanges, db_session))

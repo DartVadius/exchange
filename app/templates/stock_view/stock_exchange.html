@@ -2,7 +2,7 @@
 
 {% block content %}
 <p>Биржа: {{name}}</p>
-<p>Дата: {{date}}</p>
+<p>Дата обновления информации: {{date}}</p>
 <table class="table ">
     <thead>
     <tr>
@@ -11,21 +11,21 @@
         <th>Минимальная цена</th>
         <th>Последняя цена</th>
         <th>Объем</th>
-        <th>Последнее предложение</th>
-        <th>Последний запрос</th>
+        <th>Последнее предложение продажи</th>
+        <th>Последнее предложение покупки</th>
     </tr>
     </thead>
     <tbody>
     {% if rates is not none %}
     {% for rate in rates %}
     <tr>
-        <td>{{rate.current_currency_name}}/{{rate.compare_currency_name}}</td>
+        <td>{{rate.rate_current_currency.name}}/{{rate.rate_compare_currency.name}}</td>
         <td>{{'{0:f}'.format(rate.high_price)}}</td>
         <td>{{'{0:f}'.format(rate.low_price)}}</td>
         <td>{{'{0:f}'.format(rate.last_price)}}</td>
         <td>{{'{0:f}'.format(rate.volume)}}</td>
-        <td>{{'{0:f}'.format(rate.bid)}}</td>
-        <td>{{'{0:f}'.format(rate.ask)}}</td>
+        <td>{% if rate.bid is not none %} {{'{0:f}'.format(rate.bid)}} {% endif %}</td>
+        <td>{% if rate.ask is not none %} {{'{0:f}'.format(rate.ask)}}  {% endif %}</td>
     </tr>
     {% endfor %}
     {% endif %}
