@@ -6,8 +6,9 @@ from app.dbmodels import StockExchanges
 from app.services import rate_repository, exchange_service, stock_repository
 
 
-@app.route('/stock/<int:stock_id>', methods=['GET'])
-def stock(stock_id):
+@app.route('/stock/<string:stock_slug>', methods=['GET'])
+def stock(stock_slug):
+    stock_id = stock_repository.get_stock_id_by_slug(stock_slug)
     exchange_rates = rate_repository.get_rates_by_stock_id(stock_id)
     date = rate_repository.get_date_by_stock_id(stock_id)
     name = stock_repository.get_stock_name_by_id(stock_id)
