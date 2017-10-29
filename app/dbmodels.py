@@ -8,6 +8,7 @@ from flask_admin.form import rules, Select2Field
 from flask_migrate import Migrate
 from app import db
 
+
 migrate = Migrate(app, db)
 
 
@@ -29,6 +30,9 @@ class Currencies(db.Model):
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return db_session.query(self).count()
 
 
 class StockExchanges(db.Model):

@@ -2,12 +2,9 @@ from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHist
 from app.database import db_session
 from app.stocks.class_map import classmap
 import threading
-import sys
 
 
 class ExchangeService:
-    # modules = {name: cls for name, cls in stocks.__dict__.items() if '__' not in name}
-
     def __init__(self):
         self.stocks = db_session.query(StockExchanges).all()
         self.currencies = db_session.query(Currencies).all()
@@ -49,9 +46,6 @@ class ExchangeService:
                         thread_history = threading.Thread(target=self.update_history, args=(market,))
                         thread_history.daemon = True
                         thread_history.start()
-                        # else:
-                        #     print(market['compare_currency'])
-                        #     print(market['current_currency'])
         return self
 
     def update_rate(self, market):
@@ -92,3 +86,9 @@ class ExchangeService:
             if name.lower() == currency.name.lower():
                 return currency.id
         return None
+
+    def get_currency_count(self):
+        return db_session.query(Currencies).count()
+
+    def get_market_count(self):
+        return db_session.query(StockExchanges).count()
