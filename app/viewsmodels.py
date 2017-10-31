@@ -22,13 +22,18 @@ class ViewsModels:
         exchange_rates = rate_repository.get_rates_by_stock_id(stock_id)
         date = rate_repository.get_date_by_stock_id(stock_id)
         name = stock_repository.get_stock_name_by_id(stock_id)
-        return render_template("stock_view/stock_exchange.html", title='Stocks', rates=exchange_rates, date=date,
-                               name=name)
+        type = stock_repository.get_type_by_id(stock_id)
+        if type == 'market':
+            return render_template("stock_view/stock_market.html", title=name.title(), rates=exchange_rates,
+                                   date=date, name=name.title())
+        if type == 'exchange':
+            return render_template("stock_view/stock_exchange.html", title=name.title(), rates=exchange_rates,
+                                   date=date, name=name.title())
 
     def stocks(self):
         form = forms.StockForm(request.form)
         all_stocks = db_session.query(StockExchanges).filter_by(active='1').all()
-        return render_template("stocks.html", title='Stocks', form=form, stocks=all_stocks)
+        return render_template("stocks.html", title='Market\'s list', form=form, stocks=all_stocks)
 
     @staticmethod
     def update_rates():

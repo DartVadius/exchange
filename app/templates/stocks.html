@@ -1,54 +1,13 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% block header %}{% include "header.html" %}{% endblock %}
+{% block navigation %}{% include "navigation.html" %}{% endblock %}
+
 <section class="table">
     <div class="container">
-        <ul class="dropdown-content" id="dropdown5">
-            <li><a href="#!">Top 100</a></li>
-            <li><a href="#!">Full List</a></li>
-        </ul>
-        <ul class="dropdown-content" id="dropdown6">
-            <li><a href="#!">Top 100</a></li>
-            <li><a href="#!">Full List</a></li>
-            <li class="divider"></li>
-            <li><a href="#!">Market Cap by Circulating Supply</a></li>
-            <li><a href="#!">Market Cap by Total Supply</a></li>
-            <li><a href="#!">Filter Non-Mineable</a></li>
-        </ul>
-        <ul class="dropdown-content" id="dropdown7">
-            <li><a href="#!">Top 100</a></li>
-            <li><a href="#!">Full List</a></li>
-            <li class="divider"></li>
-            <li><a href="#!">Market Cap by Circulating Supply</a></li>
-            <li><a href="#!">Market Cap by Total Supply</a></li>
-            <li><a href="#!">Gainers and Losers</a></li>
-            <li><a href="#!">Recently Added</a></li>
-        </ul>
-        <ul class="dropdown-content" id="dropdown8">
-            <li><a href="#!">BTC</a></li>
-            <li><a href="#!">ETH</a></li>
-            <li><a href="#!">AUD</a></li>
-            <li><a href="#!">USD</a></li>
-            <li><a href="#!">BRL</a></li>
-            <li><a href="#!">CAD</a></li>
-            <li><a href="#!">NOK</a></li>
-            <li><a href="#!">CLP</a></li>
-            <li><a href="#!">CZK</a></li>
-            <li><a href="#!">HUF</a></li>
-            <li><a href="#!">JPY</a></li>
-        </ul>
         <nav>
             <div class="nav-wrapper blue-grey lighten-5">
-                <ul class="left hide-on-med-and-down">
-                    <li><a class="dropdown-button" href="#!" data-activates="dropdown5">All<i
-                            class="material-icons right">arrow_drop_down</i></a></li>
-                    <li><a class="dropdown-button" href="#!" data-activates="dropdown6">Coins<i
-                            class="material-icons right">arrow_drop_down</i></a></li>
-                    <li><a class="dropdown-button" href="#!" data-activates="dropdown7">Token<i
-                            class="material-icons right">arrow_drop_down</i></a></li>
-                    <li><a class="dropdown-button" href="#!" data-activates="dropdown8">USD<i
-                            class="material-icons right">arrow_drop_down</i></a></li>
-                </ul>
                 <div class="right btns">
                     <button class="btn waves-effect waves-light">Next 100<i
                             class="material-icons right">arrow_forward</i></button>
@@ -92,20 +51,5 @@
         </div>
     </div>
 </section>
-<table class="table ">
-    <thead>
-    <tr>
-        <th>Биржа</th>
-        <th>url</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for stock in stocks %}
-    <tr>
-        <td><a href="/stock/{{stock.id}}">{{stock.name}}</a></td>
-        <td>{{stock.url}}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+{% block footer %}{% include "footer.html" %}{% endblock %}
 {% endblock %}

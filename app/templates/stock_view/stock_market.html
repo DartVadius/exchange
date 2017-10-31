@@ -59,9 +59,12 @@
             <thead>
             <tr>
                 <th>Pair</th>
-                <th>Average price (24h)</th>
+                <th>Max price</th>
+                <th>Min price</th>
                 <th>Last price</th>
                 <th>Value</th>
+                <th>Last bid</th>
+                <th>Last ask</th>
             </tr>
             </thead>
             <tbody>
@@ -70,8 +73,11 @@
             <tr>
                 <td>{{rate.rate_current_currency.name}}/{{rate.rate_compare_currency.name}}</td>
                 <td>{{'{0:f}'.format(rate.high_price)}}</td>
+                <td>{{'{0:f}'.format(rate.low_price)}}</td>
                 <td>{{'{0:f}'.format(rate.last_price)}}</td>
                 <td>{{'{0:f}'.format(rate.volume)}}</td>
+                <td>{% if rate.bid is not none %} {{'{0:f}'.format(rate.bid)}} {% endif %}</td>
+                <td>{% if rate.ask is not none %} {{'{0:f}'.format(rate.ask)}} {% endif %}</td>
             </tr>
             {% endfor %}
             {% endif %}

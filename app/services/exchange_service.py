@@ -50,6 +50,7 @@ class ExchangeService:
                         thread_history = threading.Thread(target=self.update_history, args=(market,))
                         thread_history.daemon = True
                         thread_history.start()
+        self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
         return self
 
     def update_rate(self, market):

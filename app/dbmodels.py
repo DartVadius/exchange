@@ -95,6 +95,7 @@ class StockExchanges(db.Model):
     api_key = Column(String(45), nullable=True)
     api_secret = Column(String(45), nullable=True)
     active = Column(INTEGER, nullable=True, default=1)
+    type = Column(String(45), nullable=False, default='market')
     exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
     exchange_history = relationship('ExchangeHistory', backref='stock_history', lazy=True)
 
@@ -204,13 +205,14 @@ class CurrenciesAdmin(ModelView):
 
 
 class StockExchangesAdmin(ModelView):
-    column_list = ('name', 'url', 'slug', 'meta_tags', 'meta_description', 'api_key', 'api_secret', 'active')
+    column_list = ('name', 'url', 'slug', 'type', 'active')
     # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'url', 'slug', 'meta_tags', 'meta_description', 'active', 'api_key', 'api_secret']
+    form_columns = ['name', 'url', 'slug', 'meta_tags', 'meta_description', 'active', 'type', 'api_key', 'api_secret']
     form_overrides = dict(
-        active=Select2Field
+        active=Select2Field,
+        type=Select2Field
     )
     form_args = dict(
         active=dict(
@@ -218,7 +220,13 @@ class StockExchangesAdmin(ModelView):
                 ('1', 'Enable'),
                 ('0', 'Disable')
             ]
-        )
+        ),
+        type=dict(
+            choices=[
+                ('market', 'Market'),
+                ('exchange', 'Exchange')
+            ]
+        ),
     )
 
 
