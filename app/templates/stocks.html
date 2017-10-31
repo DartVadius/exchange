@@ -1,30 +1,33 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<form action="" method="post" name="stock">
-    <div class="form-group">
-        <label for="name">Название биржи</label>
-        {{form.name(size=80, class_="form-control")}}
-        {% for error in form.errors.name %}
-        <span style="color: red;">{{error}}</span>
-        {% endfor %}<br>
-        <label for="url">url</label>
-        {{form.url(size=80, class_="form-control")}}
-        {% for error in form.errors.url %}
-        <span style="color: red;">{{error}}</span>
-        {% endfor %}<br>
-        <label for="api_key">api_key</label>
-        {{form.api_key(size=80, class_="form-control")}}
-        {% for error in form.errors.api_key %}
-        <span style="color: red;">{{error}}</span>
-        {% endfor %}<br>
-        <label for="api_secret">api_secret</label>
-        {{form.api_secret(size=80, class_="form-control")}}
-        {% for error in form.errors.api_secret %}
-        <span style="color: red;">{{error}}</span>
-        {% endfor %}<br>
-    </div>
-    <p><input type="submit" value="Add" class="btn btn-primary"></p>
+<!--<form action="" method="post" name="stock">-->
+    <!--<div class="form-group">-->
+        <!--<label for="name">Название биржи</label>-->
+        <!--{{form.name(size=80, class_="form-control")}}-->
+        <!--{% for error in form.errors.name %}-->
+        <!--<span style="color: red;">{{error}}</span>-->
+        <!--{% endfor %}<br>-->
+        <!--<label for="url">url</label>-->
+        <!--{{form.url(size=80, class_="form-control")}}-->
+        <!--{% for error in form.errors.url %}-->
+        <!--<span style="color: red;">{{error}}</span>-->
+        <!--{% endfor %}<br>-->
+        <!--<label for="api_key">api_key</label>-->
+        <!--{{form.api_key(size=80, class_="form-control")}}-->
+        <!--{% for error in form.errors.api_key %}-->
+        <!--<span style="color: red;">{{error}}</span>-->
+        <!--{% endfor %}<br>-->
+        <!--<label for="api_secret">api_secret</label>-->
+        <!--{{form.api_secret(size=80, class_="form-control")}}-->
+        <!--{% for error in form.errors.api_secret %}-->
+        <!--<span style="color: red;">{{error}}</span>-->
+        <!--{% endfor %}<br>-->
+    <!--</div>-->
+    <!--<p><input type="submit" value="Add" class="btn btn-primary"></p>-->
+<!--</form>-->
+<form method="get" action="/update">
+    <button class="btn btn-default">Update</button>
 </form>
 <table class="table ">
     <thead>

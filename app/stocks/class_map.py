@@ -1,6 +1,6 @@
-from app.stocks import bitfinex, bittrex
+from app.stocks import bitfinex, bittrex, localbitcoins
 
 classmap = {
     'bittrex': bittrex.Bittrex,
-    # 'bitfinex': bitfinex.Bitfinex
+    'localbitcoins': localbitcoins.Localbitcoins
 }

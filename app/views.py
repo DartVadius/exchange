@@ -1,4 +1,5 @@
-from flask import render_template, flash, redirect, request, url_for, session
+from flask import render_template, redirect, request, url_for
+
 from app import app, forms
 from app.database import db_session
 from app.dbmodels import StockExchanges
@@ -16,17 +17,31 @@ def stock(stock_id):
 @app.route('/', methods=['GET', 'POST'])
 def stocks():
     form = forms.StockForm(request.form)
-    all_stocks = db_session.query(StockExchanges).all()
-    if request.method == 'POST' and form.validate():
-        name = form.name.data
-        url = form.url.data
-        api_key = form.api_key.data
-        api_secret = form.api_secret.data
-        exchange_stock = StockExchanges(name.lower(), url, api_key, api_secret)
-        db_session.add(exchange_stock)
-        db_session.commit()
-        return redirect(url_for('stocks'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    all_stocks = db_session.query(StockExchanges).filter_by(active='1').all()
     return render_template("stocks.html", title='Stocks', form=form, stocks=all_stocks)
+
+
+@app.route('/update', methods=['GET'])
+def update_rates():
+    exchange_service_model = exchange_service.ExchangeService()
+    exchange_service_model.set_currencies()
+    exchange_service_model.set_markets()
+    return redirect(url_for('stocks'))
 
 
 # @app.route('/books')
