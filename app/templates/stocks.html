@@ -1,34 +1,97 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<!--<form action="" method="post" name="stock">-->
-    <!--<div class="form-group">-->
-        <!--<label for="name">Название биржи</label>-->
-        <!--{{form.name(size=80, class_="form-control")}}-->
-        <!--{% for error in form.errors.name %}-->
-        <!--<span style="color: red;">{{error}}</span>-->
-        <!--{% endfor %}<br>-->
-        <!--<label for="url">url</label>-->
-        <!--{{form.url(size=80, class_="form-control")}}-->
-        <!--{% for error in form.errors.url %}-->
-        <!--<span style="color: red;">{{error}}</span>-->
-        <!--{% endfor %}<br>-->
-        <!--<label for="api_key">api_key</label>-->
-        <!--{{form.api_key(size=80, class_="form-control")}}-->
-        <!--{% for error in form.errors.api_key %}-->
-        <!--<span style="color: red;">{{error}}</span>-->
-        <!--{% endfor %}<br>-->
-        <!--<label for="api_secret">api_secret</label>-->
-        <!--{{form.api_secret(size=80, class_="form-control")}}-->
-        <!--{% for error in form.errors.api_secret %}-->
-        <!--<span style="color: red;">{{error}}</span>-->
-        <!--{% endfor %}<br>-->
-    <!--</div>-->
-    <!--<p><input type="submit" value="Add" class="btn btn-primary"></p>-->
-<!--</form>-->
-<form method="get" action="/update">
-    <button class="btn btn-default">Update</button>
-</form>
+<section class="table">
+    <div class="container">
+        <ul class="dropdown-content" id="dropdown5">
+            <li><a href="#!">Top 100</a></li>
+            <li><a href="#!">Full List</a></li>
+        </ul>
+        <ul class="dropdown-content" id="dropdown6">
+            <li><a href="#!">Top 100</a></li>
+            <li><a href="#!">Full List</a></li>
+            <li class="divider"></li>
+            <li><a href="#!">Market Cap by Circulating Supply</a></li>
+            <li><a href="#!">Market Cap by Total Supply</a></li>
+            <li><a href="#!">Filter Non-Mineable</a></li>
+        </ul>
+        <ul class="dropdown-content" id="dropdown7">
+            <li><a href="#!">Top 100</a></li>
+            <li><a href="#!">Full List</a></li>
+            <li class="divider"></li>
+            <li><a href="#!">Market Cap by Circulating Supply</a></li>
+            <li><a href="#!">Market Cap by Total Supply</a></li>
+            <li><a href="#!">Gainers and Losers</a></li>
+            <li><a href="#!">Recently Added</a></li>
+        </ul>
+        <ul class="dropdown-content" id="dropdown8">
+            <li><a href="#!">BTC</a></li>
+            <li><a href="#!">ETH</a></li>
+            <li><a href="#!">AUD</a></li>
+            <li><a href="#!">USD</a></li>
+            <li><a href="#!">BRL</a></li>
+            <li><a href="#!">CAD</a></li>
+            <li><a href="#!">NOK</a></li>
+            <li><a href="#!">CLP</a></li>
+            <li><a href="#!">CZK</a></li>
+            <li><a href="#!">HUF</a></li>
+            <li><a href="#!">JPY</a></li>
+        </ul>
+        <nav>
+            <div class="nav-wrapper blue-grey lighten-5">
+                <ul class="left hide-on-med-and-down">
+                    <li><a class="dropdown-button" href="#!" data-activates="dropdown5">All<i
+                            class="material-icons right">arrow_drop_down</i></a></li>
+                    <li><a class="dropdown-button" href="#!" data-activates="dropdown6">Coins<i
+                            class="material-icons right">arrow_drop_down</i></a></li>
+                    <li><a class="dropdown-button" href="#!" data-activates="dropdown7">Token<i
+                            class="material-icons right">arrow_drop_down</i></a></li>
+                    <li><a class="dropdown-button" href="#!" data-activates="dropdown8">USD<i
+                            class="material-icons right">arrow_drop_down</i></a></li>
+                </ul>
+                <div class="right btns">
+                    <button class="btn waves-effect waves-light">Next 100<i
+                            class="material-icons right">arrow_forward</i></button>
+                    <button class="btn waves-effect waves-light"> View All</button>
+                </div>
+            </div>
+        </nav>
+        <table class="responsive-table bordered centered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>URL</th>
+                <th>Volume (24h)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for stock in stocks %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td><a href="/stock/{{stock.slug}}">{{stock.name}}</a></td>
+                <td>{{stock.url}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="table-footer">
+            <div class="row"><i>*Not Mineable</i>
+                <div class="right btns">
+                    <button class="btn waves-effect waves-light">Next 100<i
+                            class="material-icons right">arrow_forward</i></button>
+                    <button class="btn waves-effect waves-light"> View All</button>
+                </div>
+            </div>
+            <div class="row">
+                <h2>Total Market Cap: $145,286,611,068</h2>
+            </div>
+            <div class="row">
+                <p>Last updated: Oct 04, 2017 9:30 AM UTC</p>
+            </div>
+        </div>
+    </div>
+</section>
 <table class="table ">
     <thead>
     <tr>
