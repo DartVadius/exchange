@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-dev = False
+dev = True
 if dev:
     connect = 'mysql+pymysql://root:1111@localhost/mypy?charset=utf8'
 else:
