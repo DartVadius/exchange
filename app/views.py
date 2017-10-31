@@ -8,7 +8,7 @@ def stock(stock_slug):
     return view.stock(stock_slug)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def stocks():
     view = ViewsModels()
     return view.stocks()
@@ -18,6 +18,18 @@ def stocks():
 def update_rates():
     view = ViewsModels()
     return view.update_rates()
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    view = ViewsModels()
+    return view.login()
+
+
+@app.route("/logout")
+def logout():
+    view = ViewsModels()
+    return view.logout()
 
 # @app.route('/books')
 # def index():

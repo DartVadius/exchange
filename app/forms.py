@@ -1,6 +1,6 @@
-from wtforms import Form, BooleanField, StringField, validators
+from wtforms import Form, BooleanField, StringField, validators, PasswordField
 from app.validators.db_validators import Unique
-from app.dbmodels import StockExchanges
+from app.dbmodels import StockExchanges, User
 
 
 class LoginForm(Form):
@@ -19,3 +19,18 @@ class StockForm(Form):
                               Unique(StockExchanges, StockExchanges.url)])
     api_key = StringField('api_key', [validators.Length(min=0, max=45)])
     api_secret = StringField('api_secret', [validators.Length(min=0, max=45)])
+
+
+class LoginForm(Form):
+    login = StringField("Login", validators=[validators.DataRequired(), validators.Length(min=6, max=25)])
+    password = PasswordField("Password", validators=[validators.DataRequired(), validators.Length(min=8, max=25)])
+    remember_me = BooleanField("Remember me?", default=True)
+
+    def validate(self):
+        if not super(LoginForm, self).validate():
+            return False
+        self.user = User.authenticate(self.login.data, self.password.data)
+        if not self.user:
+            self.password.errors.append("Invalid login or password.")
+            return False
+        return True

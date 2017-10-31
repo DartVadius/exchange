@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, flash
 from app import forms
 from app.database import db_session
 from app.dbmodels import StockExchanges
@@ -6,6 +6,8 @@ from app.services import exchange_service
 from app.services.rate_repository import RateRepository
 from app.services.stock_repository import StockRepository
 from app.services.session_service import SessionService
+from app.forms import LoginForm
+from flask_login import login_user, logout_user
 
 
 class ViewsModels:
@@ -34,6 +36,22 @@ class ViewsModels:
         exchange_service_model.set_currencies()
         exchange_service_model.set_markets()
         return redirect(url_for('stocks'))
+
+    def login(self):
+        if request.method == "POST":
+            form = LoginForm(request.form)
+            if form.validate():
+                login_user(form.user, remember=form.remember_me.data)
+                flash("Successfully logged in as %s." % form.user.email, "success")
+                return redirect(request.args.get("next") or url_for("stocks"))
+        else:
+            form = LoginForm()
+        return render_template("login.html", form=form)
+
+    def logout(self):
+        logout_user()
+        flash('You have been logged out.', 'success')
+        return redirect(request.args.get('next') or url_for('stocks'))
 
 # @app.route('/books')
 # def index():
