@@ -1,12 +1,10 @@
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from flask_admin import Admin
-from app import app
+from app import app, db
 from flask_admin.contrib.sqla import ModelView
-from app.database import db_session
 from flask_admin.form import rules, Select2Field
 from flask_migrate import Migrate
-from app import db
 
 
 migrate = Migrate(app, db)
@@ -33,7 +31,7 @@ class Currencies(db.Model):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
 
     def count(self):
-        return db_session.query(self).count()
+        return self.query.count()
 
 
 class StockExchanges(db.Model):
@@ -173,5 +171,5 @@ class StockExchangesAdmin(ModelView):
 db.create_all()
 
 admin = Admin(app, name='exchange', template_mode='bootstrap3')
-admin.add_view(CurrenciesAdmin(Currencies, db_session))
-admin.add_view(StockExchangesAdmin(StockExchanges, db_session))
+admin.add_view(CurrenciesAdmin(Currencies, db.session))
+admin.add_view(StockExchangesAdmin(StockExchanges, db.session))

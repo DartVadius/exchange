@@ -12,13 +12,7 @@ db = SQLAlchemy(app)
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    database.db_session.remove()
+    db.session.remove()
 
-
-from app import dbmodels
-from app.services.exchange_service import ExchangeService
-
-# global currency_counter
-# currency_counter = ExchangeService.get_count(dbmodels.Currencies)
 
 from app import views
