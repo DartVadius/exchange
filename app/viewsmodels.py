@@ -1,5 +1,4 @@
-from flask import render_template, redirect, request, url_for, flash
-from app import forms
+from flask import render_template, redirect, request, url_for
 from app.database import db_session
 from app.dbmodels import StockExchanges
 from app.services import exchange_service
@@ -31,9 +30,8 @@ class ViewsModels:
                                    date=date, name=name.title())
 
     def stocks(self):
-        form = forms.StockForm(request.form)
         all_stocks = db_session.query(StockExchanges).filter_by(active='1').all()
-        return render_template("stocks.html", title='Market\'s list', form=form, stocks=all_stocks)
+        return render_template("stocks.html", title='Market\'s list', stocks=all_stocks)
 
     @staticmethod
     def update_rates():
@@ -47,16 +45,14 @@ class ViewsModels:
             form = LoginForm(request.form)
             if form.validate():
                 login_user(form.user, remember=form.remember_me.data)
-                flash("Successfully logged in as %s." % form.user.email, "success")
-                return redirect(request.args.get("next") or url_for("stocks"))
+                return redirect('admin')
         else:
             form = LoginForm()
         return render_template("login.html", form=form)
 
     def logout(self):
         logout_user()
-        flash('You have been logged out.', 'success')
-        return redirect(request.args.get('next') or url_for('stocks'))
+        return redirect('/')
 
 # @app.route('/books')
 # def index():

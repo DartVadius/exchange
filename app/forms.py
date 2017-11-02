@@ -3,22 +3,13 @@ from app.validators.db_validators import Unique
 from app.dbmodels import StockExchanges, User
 
 
-class LoginForm(Form):
-    name = StringField('name', [validators.DataRequired(), validators.Length(min=4, max=25)])
-
-
-class Book(Form):
-    author = StringField('author', [validators.DataRequired(), validators.Length(min=1, max=255)])
-    title = StringField('title', [validators.DataRequired(), validators.Length(min=1, max=255)])
-
-
-class StockForm(Form):
-    name = StringField('name', [validators.DataRequired(), validators.Length(min=1, max=255),
-                                Unique(StockExchanges, StockExchanges.name)])
-    url = StringField('url', [validators.DataRequired(), validators.Length(min=1, max=255),
-                              Unique(StockExchanges, StockExchanges.url)])
-    api_key = StringField('api_key', [validators.Length(min=0, max=45)])
-    api_secret = StringField('api_secret', [validators.Length(min=0, max=45)])
+# class StockForm(Form):
+#     name = StringField('name', [validators.DataRequired(), validators.Length(min=1, max=255),
+#                                 Unique(StockExchanges, StockExchanges.name)])
+#     url = StringField('url', [validators.DataRequired(), validators.Length(min=1, max=255),
+#                               Unique(StockExchanges, StockExchanges.url)])
+#     api_key = StringField('api_key', [validators.Length(min=0, max=45)])
+#     api_secret = StringField('api_secret', [validators.Length(min=0, max=45)])
 
 
 class LoginForm(Form):
@@ -30,7 +21,7 @@ class LoginForm(Form):
         if not super(LoginForm, self).validate():
             return False
         self.user = User.authenticate(self.login.data, self.password.data)
-        if not self.user:
-            self.password.errors.append("Invalid login or password.")
+        if not self.user or self.user.admin != 1 or self.user.active != 1:
+            self.password.errors.append("Access denied")
             return False
         return True
