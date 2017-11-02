@@ -1,6 +1,7 @@
 from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory
 from app import db
 from app.stocks.class_map import classmap
+from werkzeug.contrib.cache import SimpleCache
 import threading
 
 
@@ -9,6 +10,8 @@ class ExchangeService:
         self.stocks = StockExchanges.query.all()
         self.currencies = Currencies.query.all()
         self.classmap = classmap
+        self.cache = SimpleCache()
+        self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
 
     def set_currencies(self):
         for stock in self.stocks:
@@ -25,6 +28,7 @@ class ExchangeService:
                     # db_session.add(new_currency)
                     db.session.commit()
                     self.currencies.append(new_currency)
+        self.cache.set('currency_count', self.currencies.count(self), timeout=60 * 60 * 24 * 30)
         return self
 
     def set_markets(self):
@@ -47,6 +51,7 @@ class ExchangeService:
                         thread_history = threading.Thread(target=self.update_history, args=(market,))
                         thread_history.daemon = True
                         thread_history.start()
+        self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
         return self
 
     def update_rate(self, market):

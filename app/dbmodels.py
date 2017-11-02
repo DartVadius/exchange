@@ -1,14 +1,60 @@
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
 from sqlalchemy.orm import relationship
 from flask_admin import Admin
-from app import app, db
+from app import app, login_manager, bcrypt, db
 from flask_admin.contrib.sqla import ModelView
-from flask_admin.form import rules, Select2Field
+from flask_admin.form import Select2Field
 from flask_migrate import Migrate
-
 
 migrate = Migrate(app, db)
 
+
+@login_manager.user_loader
+def _user_loader(user_id):
+    return User.query.get(int(user_id))
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    login = Column(String(25), nullable=False, unique=True)
+    password = Column(String(100), nullable=False)
+    admin = db.Column(db.Boolean, default=False)
+    active = db.Column(db.Boolean, default=False)
+
+    def get_id(self):
+        return self.id
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return self.active
+
+    def is_admin(self):
+        return self.admin
+
+    def is_anonymous(self):
+        return False
+
+    @staticmethod
+    def make_password(plaintext):
+        return bcrypt.generate_password_hash(plaintext)
+
+    def check_password(self, raw_password):
+        return bcrypt.check_password_hash(self.password_hash, raw_password)
+
+    @classmethod
+    def create(cls, login, password, **kwargs):
+        return User(login=login, password_hash=User.make_password(password), **kwargs)
+
+    @staticmethod
+    def authenticate(login, password):
+        user = User.query.filter(User.login == login).first()
+        if user and user.check_password(password):
+            return user
+        return False
 
 
 class Currencies(db.Model):
@@ -47,6 +93,7 @@ class StockExchanges(db.Model):
     api_key = Column(String(45), nullable=True)
     api_secret = Column(String(45), nullable=True)
     active = Column(INTEGER, nullable=True, default=1)
+    type = Column(String(45), nullable=False, default='market')
     exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
     exchange_history = relationship('ExchangeHistory', backref='stock_history', lazy=True)
 
@@ -136,6 +183,12 @@ class ExchangeRates(db.Model):
         self.ask = stock['ask']
 
 
+class UserAdmin(ModelView):
+    column_hide_backrefs = True
+    can_edit = False
+    can_delete = False
+
+
 class CurrenciesAdmin(ModelView):
     page_size = 30
     column_hide_backrefs = True
@@ -150,13 +203,14 @@ class CurrenciesAdmin(ModelView):
 
 
 class StockExchangesAdmin(ModelView):
-    column_list = ('name', 'url', 'slug', 'meta_tags', 'meta_description', 'api_key', 'api_secret', 'active')
+    column_list = ('name', 'url', 'slug', 'type', 'active')
     # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'url', 'slug', 'meta_tags', 'meta_description', 'active', 'api_key', 'api_secret']
+    form_columns = ['name', 'url', 'slug', 'meta_tags', 'meta_description', 'active', 'type', 'api_key', 'api_secret']
     form_overrides = dict(
-        active=Select2Field
+        active=Select2Field,
+        type=Select2Field
     )
     form_args = dict(
         active=dict(
@@ -164,7 +218,13 @@ class StockExchangesAdmin(ModelView):
                 ('1', 'Enable'),
                 ('0', 'Disable')
             ]
-        )
+        ),
+        type=dict(
+            choices=[
+                ('market', 'Market'),
+                ('exchange', 'Exchange')
+            ]
+        ),
     )
 
 
@@ -173,3 +233,4 @@ db.create_all()
 admin = Admin(app, name='exchange', template_mode='bootstrap3')
 admin.add_view(CurrenciesAdmin(Currencies, db.session))
 admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
+admin.add_view(UserAdmin(User, db.session))
