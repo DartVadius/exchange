@@ -27,7 +27,7 @@ def _before_request():
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    database.db_session.remove()
+    db.session.remove()
 
 
 from app import views

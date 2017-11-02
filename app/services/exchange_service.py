@@ -1,5 +1,5 @@
 from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory
-from app.database import db_session
+from app import db
 from app.stocks.class_map import classmap
 from werkzeug.contrib.cache import SimpleCache
 import threading
@@ -7,8 +7,8 @@ import threading
 
 class ExchangeService:
     def __init__(self):
-        self.stocks = db_session.query(StockExchanges).all()
-        self.currencies = db_session.query(Currencies).all()
+        self.stocks = StockExchanges.query.all()
+        self.currencies = Currencies.query.all()
         self.classmap = classmap
         self.cache = SimpleCache()
         self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
@@ -24,8 +24,9 @@ class ExchangeService:
                 difference = [{'name': item} for item in set(stock_currency).difference(local_currency)]
                 for currency in difference:
                     new_currency = Currencies(name=currency['name'])
-                    db_session.add(new_currency)
-                    db_session.commit()
+                    db.session.add(new_currency)
+                    # db_session.add(new_currency)
+                    db.session.commit()
                     self.currencies.append(new_currency)
         self.cache.set('currency_count', self.currencies.count(self), timeout=60 * 60 * 24 * 30)
         return self
@@ -54,14 +55,14 @@ class ExchangeService:
         return self
 
     def update_rate(self, market):
-        rate_to_update = db_session.query(ExchangeRates).filter_by(
+        rate_to_update = ExchangeRates.query.filter_by(
             stock_exchange_id=market['stock_exchange_id'],
             current_currency_id=market['current_currency_id'],
             compare_currency_id=market['compare_currency_id']
         ).first()
         if rate_to_update is None:
             rate = ExchangeRates(market)
-            db_session.add(rate)
+            db.session.add(rate)
         else:
             rate_to_update.current_currency_id = market['current_currency_id'],
             rate_to_update.compare_currency_id = market['compare_currency_id'],
@@ -73,12 +74,12 @@ class ExchangeService:
             rate_to_update.base_volume = market['base_volume'],
             rate_to_update.ask = market['ask'],
             rate_to_update.bid = market['bid'],
-        db_session.commit()
+        db.session.commit()
 
     def update_history(self, market):
         history = ExchangeHistory(market)
-        db_session.add(history)
-        db_session.commit()
+        db.session.add(history)
+        db.session.commit()
 
     def get_stock_id_by_name(self, name):
         for stock in self.stocks:
@@ -93,7 +94,7 @@ class ExchangeService:
         return None
 
     def get_currency_count(self):
-        return db_session.query(Currencies).count()
+        return Currencies.query.count()
 
     def get_market_count(self):
-        return db_session.query(StockExchanges).count()
+        return StockExchanges.query.count()

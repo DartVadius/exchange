@@ -1,14 +1,13 @@
-from app.database import db_session
 from app.dbmodels import ExchangeRates
 
 
 class RateRepository:
     def get_rates_by_stock_id(self, stock_id):
-        exchange_rates = db_session.query(ExchangeRates).filter_by(stock_exchange_id=stock_id).all()
+        exchange_rates = ExchangeRates.query.filter_by(stock_exchange_id=stock_id).all()
         return exchange_rates
 
     def get_date_by_stock_id(self, stock_id):
-        result = db_session.query(ExchangeRates.date).filter_by(stock_exchange_id=stock_id).first()
+        result = ExchangeRates.query.filter_by(stock_exchange_id=stock_id).first()
         if result is not None:
-            return result[0]
+            return result.date
         return None

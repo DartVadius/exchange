@@ -3,11 +3,9 @@ from sqlalchemy.orm import relationship
 from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_login import current_user
 from flask import g, request, redirect, url_for
-from app import app, login_manager, bcrypt
+from app import app, login_manager, bcrypt, db
 from flask_admin.contrib.sqla import ModelView
-from app.database import db_session
 from flask_admin.form import Select2Field
-from app import db
 
 
 @login_manager.user_loader
@@ -78,7 +76,7 @@ class Currencies(db.Model):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
 
     def count(self):
-        return db_session.query(self).count()
+        return self.query.count()
 
 
 class StockExchanges(db.Model):
@@ -254,6 +252,6 @@ class StockExchangesAdmin(AdminModelView):
 db.create_all()
 
 admin = Admin(app, index_view=AdminHomeView(), name='exchange', template_mode='bootstrap3')
-admin.add_view(CurrenciesAdmin(Currencies, db_session))
-admin.add_view(StockExchangesAdmin(StockExchanges, db_session))
-admin.add_view(UserAdmin(User, db_session))
+admin.add_view(CurrenciesAdmin(Currencies, db.session))
+admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
+admin.add_view(UserAdmin(User, db.session))
