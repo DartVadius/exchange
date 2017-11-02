@@ -4,10 +4,9 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-
 dev = False
 if dev:
-    connect = 'mysql+pymysql://root:1111@localhost/mypy?charset=utf8'
+    connect = 'mysql+pymysql://root:@localhost/mypy?charset=utf8'
 else:
     connect = 'mysql+pymysql://coins:VfytnrJ@localhost/coins?charset=utf8'
 
