@@ -1,12 +1,11 @@
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from flask_admin import Admin
+from flask_admin import Admin, BaseView, expose, AdminIndexView
+from flask_login import current_user
+from flask import g, request, redirect, url_for
 from app import app, login_manager, bcrypt, db
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
-from flask_migrate import Migrate
-
-migrate = Migrate(app, db)
 
 
 @login_manager.user_loader
@@ -20,8 +19,8 @@ class User(db.Model):
     id = Column(INTEGER, primary_key=True)
     login = Column(String(25), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
-    admin = db.Column(db.Boolean, default=False)
-    active = db.Column(db.Boolean, default=False)
+    admin = Column(INTEGER, nullable=False, default=0)
+    active = Column(INTEGER, nullable=False, default=0)
 
     def get_id(self):
         return self.id
@@ -43,11 +42,11 @@ class User(db.Model):
         return bcrypt.generate_password_hash(plaintext)
 
     def check_password(self, raw_password):
-        return bcrypt.check_password_hash(self.password_hash, raw_password)
+        return bcrypt.check_password_hash(self.password, raw_password)
 
     @classmethod
     def create(cls, login, password, **kwargs):
-        return User(login=login, password_hash=User.make_password(password), **kwargs)
+        return User(login=login, password=User.make_password(password), admin=False, active=False, **kwargs)
 
     @staticmethod
     def authenticate(login, password):
@@ -116,6 +115,7 @@ class ExchangeHistory(db.Model):
     high_price = Column(DECIMAL(precision=20, scale=10))
     low_price = Column(DECIMAL(precision=20, scale=10))
     last_price = Column(DECIMAL(precision=20, scale=10))
+    average_price = Column(DECIMAL(precision=20, scale=10))
     volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
     bid = Column(DECIMAL(precision=20, scale=10))
@@ -134,6 +134,7 @@ class ExchangeHistory(db.Model):
         self.high_price = stock['high_price']
         self.low_price = stock['low_price']
         self.last_price = stock['last_price']
+        self.average_price = stock['average_price']
         self.volume = stock['volume']
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
@@ -154,6 +155,7 @@ class ExchangeRates(db.Model):
     high_price = Column(DECIMAL(precision=20, scale=10))
     low_price = Column(DECIMAL(precision=20, scale=10))
     last_price = Column(DECIMAL(precision=20, scale=10))
+    average_price = Column(DECIMAL(precision=20, scale=10))
     volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
     bid = Column(DECIMAL(precision=20, scale=10))
@@ -177,19 +179,42 @@ class ExchangeRates(db.Model):
         self.high_price = stock['high_price']
         self.low_price = stock['low_price']
         self.last_price = stock['last_price']
+        self.average_price = stock['average_price']
         self.volume = stock['volume']
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
         self.ask = stock['ask']
 
 
-class UserAdmin(ModelView):
+class AdminModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+class AdminHomeView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/index.html')
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+class UserAdmin(AdminModelView):
     column_hide_backrefs = True
     can_edit = False
     can_delete = False
 
 
-class CurrenciesAdmin(ModelView):
+class CurrenciesAdmin(AdminModelView):
     page_size = 30
     column_hide_backrefs = True
     column_display_all_relations = False
@@ -202,7 +227,7 @@ class CurrenciesAdmin(ModelView):
     column_editable_list = ('description',)
 
 
-class StockExchangesAdmin(ModelView):
+class StockExchangesAdmin(AdminModelView):
     column_list = ('name', 'url', 'slug', 'type', 'active')
     # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
     column_hide_backrefs = True
@@ -230,7 +255,7 @@ class StockExchangesAdmin(ModelView):
 
 db.create_all()
 
-admin = Admin(app, name='exchange', template_mode='bootstrap3')
+admin = Admin(app, index_view=AdminHomeView(), name='exchange', template_mode='bootstrap3')
 admin.add_view(CurrenciesAdmin(Currencies, db.session))
 admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
 admin.add_view(UserAdmin(User, db.session))
