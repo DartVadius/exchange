@@ -7,7 +7,8 @@ from app.services.session_service import SessionService
 from app.services.stock_repository import StockRepository
 from app.forms import LoginForm
 from flask_login import login_user, logout_user
-
+import urllib.request
+import json
 
 class ViewsModels:
     def __init__(self):
@@ -19,6 +20,10 @@ class ViewsModels:
         stock_repository = StockRepository()
         stock_id = stock_repository.get_stock_id_by_slug(stock_slug)
         exchange_rates = rate_repository.get_rates_by_stock_id(stock_id)
+        # for rate in exchange_rates:
+        #     if rate.rate_current_currency.name == 'USDT' and rate.rate_compare_currency.name == 'BTC':
+        #         btc_usd_price =
+        #         print(rate)
         date = rate_repository.get_date_by_stock_id(stock_id)
         name = stock_repository.get_stock_name_by_id(stock_id)
         type = stock_repository.get_type_by_id(stock_id)
