@@ -1,14 +1,11 @@
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from flask_admin import Admin
-from app import app, login_manager, bcrypt
+from flask_admin import Admin, BaseView, expose, AdminIndexView
+from flask_login import current_user
+from flask import g, request, redirect, url_for
+from app import app, login_manager, bcrypt, db
 from flask_admin.contrib.sqla import ModelView
-from app.database import db_session
 from flask_admin.form import Select2Field
-from flask_migrate import Migrate
-from app import db
-
-migrate = Migrate(app, db)
 
 
 @login_manager.user_loader
@@ -21,9 +18,9 @@ class User(db.Model):
     __table_args__ = {'mysql_engine': 'InnoDB'}
     id = Column(INTEGER, primary_key=True)
     login = Column(String(25), nullable=False, unique=True)
-    password = Column(String(25), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False)
-    is_active = db.Column(db.Boolean, default=False)
+    password = Column(String(100), nullable=False)
+    admin = Column(INTEGER, nullable=False, default=0)
+    active = Column(INTEGER, nullable=False, default=0)
 
     def get_id(self):
         return self.id
@@ -32,10 +29,10 @@ class User(db.Model):
         return True
 
     def is_active(self):
-        return self.is_active
+        return self.active
 
     def is_admin(self):
-        return self.is_admin()
+        return self.admin
 
     def is_anonymous(self):
         return False
@@ -45,11 +42,11 @@ class User(db.Model):
         return bcrypt.generate_password_hash(plaintext)
 
     def check_password(self, raw_password):
-        return bcrypt.check_password_hash(self.password_hash, raw_password)
+        return bcrypt.check_password_hash(self.password, raw_password)
 
     @classmethod
     def create(cls, login, password, **kwargs):
-        return User(login=login, password_hash=User.make_password(password), **kwargs)
+        return User(login=login, password=User.make_password(password), admin=False, active=False, **kwargs)
 
     @staticmethod
     def authenticate(login, password):
@@ -79,7 +76,7 @@ class Currencies(db.Model):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
 
     def count(self):
-        return db_session.query(self).count()
+        return self.query.count()
 
 
 class StockExchanges(db.Model):
@@ -185,13 +182,35 @@ class ExchangeRates(db.Model):
         self.ask = stock['ask']
 
 
-class UserAdmin(ModelView):
+class AdminModelView(ModelView):
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+class AdminHomeView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        return self.render('admin/index.html')
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        # redirect to login page if user doesn't have access
+        return redirect(url_for('login', next=request.url))
+
+
+class UserAdmin(AdminModelView):
     column_hide_backrefs = True
     can_edit = False
     can_delete = False
 
 
-class CurrenciesAdmin(ModelView):
+class CurrenciesAdmin(AdminModelView):
     page_size = 30
     column_hide_backrefs = True
     column_display_all_relations = False
@@ -204,7 +223,7 @@ class CurrenciesAdmin(ModelView):
     column_editable_list = ('description',)
 
 
-class StockExchangesAdmin(ModelView):
+class StockExchangesAdmin(AdminModelView):
     column_list = ('name', 'url', 'slug', 'type', 'active')
     # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
     column_hide_backrefs = True
@@ -232,7 +251,7 @@ class StockExchangesAdmin(ModelView):
 
 db.create_all()
 
-admin = Admin(app, name='exchange', template_mode='bootstrap3')
-admin.add_view(CurrenciesAdmin(Currencies, db_session))
-admin.add_view(StockExchangesAdmin(StockExchanges, db_session))
-admin.add_view(UserAdmin(User, db_session))
+admin = Admin(app, index_view=AdminHomeView(), name='exchange', template_mode='bootstrap3')
+admin.add_view(CurrenciesAdmin(Currencies, db.session))
+admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
+admin.add_view(UserAdmin(User, db.session))
