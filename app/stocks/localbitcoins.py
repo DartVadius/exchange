@@ -43,8 +43,9 @@ class Localbitcoins(StockBase):
                 'high_price': val['avg_24h'],
                 'low_price': val['avg_24h'],
                 'last_price': val['rates']['last'],
+                'average_price': val['avg_24h'],
                 'volume': val['volume_btc'],
-                'base_volume': None,
+                'base_volume': val['volume_btc'],
                 'ask': None,
                 'bid': None
             })

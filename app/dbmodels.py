@@ -115,6 +115,7 @@ class ExchangeHistory(db.Model):
     high_price = Column(DECIMAL(precision=20, scale=10))
     low_price = Column(DECIMAL(precision=20, scale=10))
     last_price = Column(DECIMAL(precision=20, scale=10))
+    average_price = Column(DECIMAL(precision=20, scale=10))
     volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
     bid = Column(DECIMAL(precision=20, scale=10))
@@ -133,6 +134,7 @@ class ExchangeHistory(db.Model):
         self.high_price = stock['high_price']
         self.low_price = stock['low_price']
         self.last_price = stock['last_price']
+        self.average_price = stock['average_price']
         self.volume = stock['volume']
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
@@ -153,6 +155,7 @@ class ExchangeRates(db.Model):
     high_price = Column(DECIMAL(precision=20, scale=10))
     low_price = Column(DECIMAL(precision=20, scale=10))
     last_price = Column(DECIMAL(precision=20, scale=10))
+    average_price = Column(DECIMAL(precision=20, scale=10))
     volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
     bid = Column(DECIMAL(precision=20, scale=10))
@@ -176,6 +179,7 @@ class ExchangeRates(db.Model):
         self.high_price = stock['high_price']
         self.low_price = stock['low_price']
         self.last_price = stock['last_price']
+        self.average_price = stock['average_price']
         self.volume = stock['volume']
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']

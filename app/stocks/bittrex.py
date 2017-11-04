@@ -35,6 +35,7 @@ class Bittrex(StockBase):
         markets = []
         for market in response['result']:
             val = market['MarketName'].split('-')
+            average_price = (float(market['High']) + float(market['Low'])) / 2.0
             markets.append({
                 'current_currency': val[0],
                 'compare_currency': val[1],
@@ -42,6 +43,7 @@ class Bittrex(StockBase):
                 'high_price': market['High'],
                 'low_price': market['Low'],
                 'last_price': market['Last'],
+                'average_price': average_price,
                 'volume': market['Volume'],
                 'base_volume': market['BaseVolume'],
                 'ask': market['Ask'],

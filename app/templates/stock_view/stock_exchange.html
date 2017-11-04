@@ -58,19 +58,19 @@
         <table class="table ">
             <thead>
             <tr>
+                <th>Currency</th>
                 <th>Pair</th>
-                <th>Average price (24h)</th>
-                <th>Last price</th>
-                <th>Value</th>
+                <th>Price</th>
+                <th>Volume(24h)</th>
             </tr>
             </thead>
             <tbody>
             {% if rates is not none %}
             {% for rate in rates %}
             <tr>
+                <td>{{rate.rate_compare_currency.name}}</td>
                 <td>{{rate.rate_current_currency.name}}/{{rate.rate_compare_currency.name}}</td>
-                <td>{{'{0:f}'.format(rate.high_price)}}</td>
-                <td>{{'{0:f}'.format(rate.last_price)}}</td>
+                <td>{{'{0:f}'.format(rate.average_price)}}</td>
                 <td>{{'{0:f}'.format(rate.volume)}}</td>
             </tr>
             {% endfor %}

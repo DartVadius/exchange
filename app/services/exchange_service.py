@@ -70,6 +70,7 @@ class ExchangeService:
             rate_to_update.high_price = market['high_price'],
             rate_to_update.low_price = market['low_price'],
             rate_to_update.last_price = market['last_price'],
+            rate_to_update.average_price = market['average_price'],
             rate_to_update.volume = market['volume'],
             rate_to_update.base_volume = market['base_volume'],
             rate_to_update.ask = market['ask'],
