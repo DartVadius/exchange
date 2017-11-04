@@ -37,15 +37,16 @@ class Localbitcoins(StockBase):
         for market in response:
             val = response[market]
             markets.append({
-                'current_currency': market,
+                'base_currency': market,
                 'compare_currency': 'BTC',
                 'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
                 'high_price': val['avg_24h'],
                 'low_price': val['avg_24h'],
                 'last_price': val['rates']['last'],
                 'average_price': val['avg_24h'],
+                'btc_price': 1,
                 'volume': val['volume_btc'],
-                'base_volume': val['volume_btc'],
+                'base_volume': None,
                 'ask': None,
                 'bid': None
             })

@@ -40,9 +40,9 @@ class ExchangeService:
                     continue
                 for market in stock_markets:
                     market['compare_currency_id'] = self.get_currency_id_by_name(market['compare_currency'])
-                    market['current_currency_id'] = self.get_currency_id_by_name(market['current_currency'])
+                    market['base_currency_id'] = self.get_currency_id_by_name(market['base_currency'])
                     market['stock_exchange_id'] = self.get_stock_id_by_name(stock.name)
-                    if market['compare_currency_id'] and market['current_currency_id']:
+                    if market['compare_currency_id'] and market['base_currency_id']:
                         # self.update_rate(market)
                         # self.update_history(market)
                         thread_rate = threading.Thread(target=self.update_rate, args=(market,))
@@ -57,20 +57,21 @@ class ExchangeService:
     def update_rate(self, market):
         rate_to_update = ExchangeRates.query.filter_by(
             stock_exchange_id=market['stock_exchange_id'],
-            current_currency_id=market['current_currency_id'],
+            base_currency_id=market['base_currency_id'],
             compare_currency_id=market['compare_currency_id']
         ).first()
         if rate_to_update is None:
             rate = ExchangeRates(market)
             db.session.add(rate)
         else:
-            rate_to_update.current_currency_id = market['current_currency_id'],
+            rate_to_update.base_currency_id = market['base_currency_id'],
             rate_to_update.compare_currency_id = market['compare_currency_id'],
             rate_to_update.date = market['date'],
             rate_to_update.high_price = market['high_price'],
             rate_to_update.low_price = market['low_price'],
             rate_to_update.last_price = market['last_price'],
             rate_to_update.average_price = market['average_price'],
+            rate_to_update.btc_price = market['btc_price'],
             rate_to_update.volume = market['volume'],
             rate_to_update.base_volume = market['base_volume'],
             rate_to_update.ask = market['ask'],
