@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% block header %}{% include "header.html" %}{% endblock %}
+{% block navigation %}{% include "navigation.html" %}{% endblock %}
+
+<section class="table">
+    <div class="container">
+        <nav>
+            <div class="nav-wrapper blue-grey lighten-5">
+                <div class="right btns">
+                    <button class="btn waves-effect waves-light">Next 100<i
+                            class="material-icons right">arrow_forward</i></button>
+                    <button class="btn waves-effect waves-light"> View All</button>
+                </div>
+            </div>
+        </nav>
+        <table class="responsive-table bordered centered">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Currency</th>
+                <th>Name</th>
+                <th>Volume, BTC (24h)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for currency in currencies %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td><a href="/currency/{{currency.slug}}">{{currency.name}}</a></td>
+                <td>{{currency.description}}</td>
+                <td>{{currency.volume}}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="table-footer">
+            <div class="row"><i>*Not Mineable</i>
+                <div class="right btns">
+                    <button class="btn waves-effect waves-light">Next 100<i
+                            class="material-icons right">arrow_forward</i></button>
+                    <button class="btn waves-effect waves-light"> View All</button>
+                </div>
+            </div>
+            <div class="row">
+                <h2>Total Market Cap: $145,286,611,068</h2>
+            </div>
+            <div class="row">
+                <p>Last updated: Oct 04, 2017 9:30 AM UTC</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% block footer %}{% include "footer.html" %}{% endblock %}
+{% endblock %}

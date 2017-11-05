@@ -1,4 +1,3 @@
-from sqlalchemy import func
 from app.dbmodels import StockExchanges, ExchangeRates
 
 

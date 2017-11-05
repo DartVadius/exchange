@@ -23,7 +23,7 @@ class ExchangeService:
                 local_currency = [item.name for item in self.currencies]
                 difference = [{'name': item} for item in set(stock_currency).difference(local_currency)]
                 for currency in difference:
-                    new_currency = Currencies(name=currency['name'])
+                    new_currency = Currencies(name=currency['name'], slug=currency['name'])
                     db.session.add(new_currency)
                     # db_session.add(new_currency)
                     db.session.commit()

@@ -63,6 +63,9 @@ class Currencies(db.Model):
     id = Column(INTEGER, primary_key=True)
     name = Column(String(10), nullable=False, unique=True)
     description = Column(String(255), nullable=True)
+    slug = Column(String(255), nullable=False, unique=True)
+    meta_tags = Column(String(255), nullable=True, unique=False)
+    meta_description = Column(Text(), nullable=True, unique=False)
     rate_base = relationship("ExchangeRates", foreign_keys='ExchangeRates.base_currency_id',
                              back_populates="rate_base_currency")
     rate_compare = relationship("ExchangeRates", foreign_keys='ExchangeRates.compare_currency_id',
@@ -222,13 +225,13 @@ class CurrenciesAdmin(AdminModelView):
     page_size = 30
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'description', ]
-    can_edit = False
+    form_columns = ['name', 'description', 'slug', 'meta_tags', 'meta_description', ]
+    can_edit = True
     # form_create_rules = ('name', 'description',)
     # form_edit_rules = [
     #     rules.FieldSet(('description',), 'Edit currency')
     # ]
-    column_editable_list = ('description',)
+    column_editable_list = ('description', 'slug', 'meta_tags', 'meta_description',)
 
 
 class StockExchangesAdmin(AdminModelView):
