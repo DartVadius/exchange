@@ -1,4 +1,4 @@
-import urllib.request
+import urllib3.request
 import json
 
 
@@ -7,8 +7,9 @@ class StockBase:
     markets = []
 
     def get_request(self, url):
-        request = urllib.request.Request(url)
-        response = urllib.request.urlopen(request).read()
+        http = urllib3.PoolManager()
+        request = http.request('GET', url)
+        response = request.data
         response = json.loads(response.decode('utf-8'))
         return response
 
