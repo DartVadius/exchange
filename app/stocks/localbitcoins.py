@@ -45,6 +45,15 @@ class Localbitcoins(StockBase):
                     'name': response['data']['methods'][method]['name']} for method in response['data']['methods']]
         return methods
 
+    def set_payment_methods_for_country(self, country_code):
+        url = 'https://localbitcoins.com/api/payment_methods/' + country_code + '/'
+        response = self.get_request(url)
+        if not response['data']:
+            return False
+        methods = [{'method': method, 'code': response['data']['methods'][method]['code'],
+                    'name': response['data']['methods'][method]['name']} for method in response['data']['methods']]
+        return methods
+
     def set_markets(self):
         url = 'https://localbitcoins.com/bitcoinaverage/ticker-all-currencies/'
         response = self.get_request(url)

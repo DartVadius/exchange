@@ -57,10 +57,10 @@ class ViewsModels:
 
     @staticmethod
     def test():
-        test = Localbitcoins()
-        result = test.set_payment_methods()
-        for val in result:
-            print(val)
+        test = ExchangeService()
+        result = test.set_countries()
+        # for val in result:
+        #     print(val)
         return redirect(url_for('stocks'))
 
     def login(self):

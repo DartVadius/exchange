@@ -31,6 +31,12 @@ class Bittrex(StockBase):
     def set_countries(self):
         return None
 
+    def set_payment_methods(self):
+        return None
+
+    def set_payment_methods_for_country(self, country_code):
+        return None
+
     def set_markets(self):
         url = 'https://bittrex.com/api/v1.1/public/getmarketsummaries'
         response = self.get_request(url)

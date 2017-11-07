@@ -1,5 +1,6 @@
-from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory
+from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods
 from app import db
+from flask import session
 from app.stocks.class_map import classmap
 from werkzeug.contrib.cache import SimpleCache
 import threading
@@ -9,6 +10,8 @@ class ExchangeService:
     def __init__(self):
         self.stocks = StockExchanges.query.all()
         self.currencies = Currencies.query.all()
+        self.countries = Countries.query.all()
+        self.payment_methods = PaymentMethods.query.all()
         self.classmap = classmap
         self.cache = SimpleCache()
         self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
@@ -25,7 +28,6 @@ class ExchangeService:
                 for currency in difference:
                     new_currency = Currencies(name=currency['name'], slug=currency['name'])
                     db.session.add(new_currency)
-                    # db_session.add(new_currency)
                     db.session.commit()
                     self.currencies.append(new_currency)
         self.cache.set('currency_count', self.currencies.count(self), timeout=60 * 60 * 24 * 30)
@@ -84,6 +86,41 @@ class ExchangeService:
         db.session.commit()
 
     def set_countries(self):
+        for stock in self.stocks:
+            if stock.name in self.classmap and stock.active == 1:
+                model = self.classmap[stock.name](stock)
+                stock_country = model.set_countries()
+                if not stock_country:
+                    continue
+                local_country = [item.name_alpha2.title() for item in self.countries]
+                difference = [{'code': item} for item in set(stock_country).difference(local_country)]
+                for country in difference:
+                    new_country = Countries(name_alpha2=country['code'].upper(), slug=country['code'].lower())
+                    db.session.add(new_country)
+                    db.session.commit()
+                    self.countries.append(new_country)
+        self.cache.set('country_count', self.countries.count(self), timeout=60 * 60 * 24 * 30)
+        return self
+
+    def set_payment_methods(self):
+        for stock in self.stocks:
+            if stock.name in self.classmap and stock.active == 1:
+                model = self.classmap[stock.name](stock)
+                stock_methods = model.set_payment_methods()
+                if not stock_methods:
+                    continue
+                local_methods = [item.code.title() for item in self.payment_methods]
+        #         difference = [{'code': item} for item in set(stock_methods).difference(local_methods)]
+        #         for method in difference:
+        #             new_country = Countries(name_alpha2=country['code'].title(), slug=country['code'].lower())
+        #             db.session.add(new_country)
+        #             db.session.commit()
+        #             self.countries.append(new_country)
+        # self.cache.set('country_count', self.countries.count(self), timeout=60 * 60 * 24 * 30)
+        return self
+
+
+    def set_payment_methods(self):
         return None
 
 
