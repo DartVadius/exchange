@@ -19,18 +19,18 @@
             <thead>
             <tr>
                 <th>#</th>
+                <th>Currency</th>
                 <th>Name</th>
-                <th>URL</th>
                 <th>Volume, BTC (24h)</th>
             </tr>
             </thead>
             <tbody>
-            {% for stock in stocks %}
+            {% for currency in currencies %}
             <tr>
                 <td>{{loop.index}}</td>
-                <td><a href="/stock/{{stock.slug}}">{{stock.name}}</a></td>
-                <td>{{stock.url}}</td>
-                <td>{{stock.volume}}</td>
+                <td><a href="/currency/{{currency.slug.lower()}}">{{currency.name}}</a></td>
+                <td>{{currency.description}}</td>
+                <td>{{currency.volume}}</td>
             </tr>
             {% endfor %}
             </tbody>

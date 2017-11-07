@@ -1,11 +1,12 @@
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
-from sqlalchemy.orm import relationship
-from flask_admin import Admin, BaseView, expose, AdminIndexView
-from flask_login import current_user
-from flask import g, request, redirect, url_for
-from app import app, login_manager, bcrypt, db
+from flask import request, redirect, url_for
+from flask_admin import Admin, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
+from flask_login import current_user
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
+from sqlalchemy.orm import relationship
+
+from app import app, login_manager, bcrypt, db
 
 
 @login_manager.user_loader
@@ -63,14 +64,61 @@ class Currencies(db.Model):
     id = Column(INTEGER, primary_key=True)
     name = Column(String(10), nullable=False, unique=True)
     description = Column(String(255), nullable=True)
-    rate_current = relationship("ExchangeRates", foreign_keys='ExchangeRates.current_currency_id',
-                                back_populates="rate_current_currency")
+    slug = Column(String(255), nullable=False, unique=True)
+    meta_tags = Column(String(255), nullable=True, unique=False)
+    meta_description = Column(Text(), nullable=True, unique=False)
+    rate_base = relationship("ExchangeRates", foreign_keys='ExchangeRates.base_currency_id',
+                             back_populates="rate_base_currency")
     rate_compare = relationship("ExchangeRates", foreign_keys='ExchangeRates.compare_currency_id',
                                 back_populates="rate_compare_currency")
-    history_current = relationship("ExchangeHistory", foreign_keys='ExchangeHistory.current_currency_id',
-                                   back_populates="history_current_currency")
+    history_base = relationship("ExchangeHistory", foreign_keys='ExchangeHistory.base_currency_id',
+                                back_populates="history_base_currency")
     history_compare = relationship("ExchangeHistory", foreign_keys='ExchangeHistory.compare_currency_id',
                                    back_populates="history_compare_currency")
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return self.query.count()
+
+
+country_method = db.Table('country_method',
+                          db.Column('country_id', db.Integer, db.ForeignKey('countries.id'), primary_key=True),
+                          db.Column('method_id', db.Integer, db.ForeignKey('payment_methods.id'), primary_key=True)
+                          )
+
+
+class Countries(db.Model):
+    __tablename__ = 'countries'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    name_alpha2 = Column(String(10), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    slug = Column(String(255), nullable=False, unique=True)
+    meta_tags = Column(String(255), nullable=True, unique=False)
+    meta_description = Column(Text(), nullable=True, unique=False)
+    methods = db.relationship('PaymentMethods', secondary=country_method, lazy='subquery',
+                              backref=db.backref('countries', lazy=True))
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return self.query.count()
+
+
+class PaymentMethods(db.Model):
+    __tablename__ = 'payment_methods'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    name = Column(String(255), nullable=False, unique=True)
+    method = Column(String(255), nullable=False, unique=True)
+    code = Column(String(255), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    slug = Column(String(255), nullable=False, unique=True)
+    meta_tags = Column(String(255), nullable=True, unique=False)
+    meta_description = Column(Text(), nullable=True, unique=False)
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
@@ -107,8 +155,8 @@ class ExchangeHistory(db.Model):
     id = Column(INTEGER, primary_key=True)
     stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='NO ACTION'),
                                nullable=False, index=True)
-    current_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
-                                 nullable=False, index=True)
+    base_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+                              nullable=False, index=True)
     compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
                                  nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
@@ -116,25 +164,27 @@ class ExchangeHistory(db.Model):
     low_price = Column(DECIMAL(precision=20, scale=10))
     last_price = Column(DECIMAL(precision=20, scale=10))
     average_price = Column(DECIMAL(precision=20, scale=10))
+    btc_price = Column(DECIMAL(precision=20, scale=10))
     volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
     bid = Column(DECIMAL(precision=20, scale=10))
     ask = Column(DECIMAL(precision=20, scale=10))
 
-    history_current_currency = relationship("Currencies", back_populates="history_current", uselist=False,
-                                            foreign_keys=[current_currency_id])
+    history_base_currency = relationship("Currencies", back_populates="history_base", uselist=False,
+                                         foreign_keys=[base_currency_id])
     history_compare_currency = relationship("Currencies", back_populates="history_compare", uselist=False,
                                             foreign_keys=[compare_currency_id])
 
     def __init__(self, stock):
         self.stock_exchange_id = stock['stock_exchange_id']
-        self.current_currency_id = stock['current_currency_id']
+        self.base_currency_id = stock['base_currency_id']
         self.compare_currency_id = stock['compare_currency_id']
         self.date = stock['date']
         self.high_price = stock['high_price']
         self.low_price = stock['low_price']
         self.last_price = stock['last_price']
         self.average_price = stock['average_price']
+        self.btc_price = stock['btc_price']
         self.volume = stock['volume']
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
@@ -147,8 +197,8 @@ class ExchangeRates(db.Model):
     id = Column(INTEGER, primary_key=True)
     stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='NO ACTION'),
                                nullable=False, index=True)
-    current_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
-                                 nullable=False, index=True)
+    base_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+                              nullable=False, index=True)
     compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
                                  nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
@@ -156,30 +206,32 @@ class ExchangeRates(db.Model):
     low_price = Column(DECIMAL(precision=20, scale=10))
     last_price = Column(DECIMAL(precision=20, scale=10))
     average_price = Column(DECIMAL(precision=20, scale=10))
+    btc_price = Column(DECIMAL(precision=20, scale=10))
     volume = Column(DECIMAL(precision=20, scale=10))
     base_volume = Column(DECIMAL(precision=20, scale=10))
     bid = Column(DECIMAL(precision=20, scale=10))
     ask = Column(DECIMAL(precision=20, scale=10))
 
-    rate_current_currency = relationship("Currencies", back_populates="rate_current", uselist=False,
-                                         foreign_keys=[current_currency_id])
+    rate_base_currency = relationship("Currencies", back_populates="rate_base", uselist=False,
+                                      foreign_keys=[base_currency_id])
     rate_compare_currency = relationship("Currencies", back_populates="rate_compare", uselist=False,
                                          foreign_keys=[compare_currency_id])
 
     __table_args__ = (
-        UniqueConstraint('stock_exchange_id', 'current_currency_id', 'compare_currency_id',
-                         name='_current_compare_stock'),
+        UniqueConstraint('stock_exchange_id', 'base_currency_id', 'compare_currency_id',
+                         name='_base_compare_stock'),
         {'mysql_engine': 'InnoDB'})
 
     def __init__(self, stock):
         self.stock_exchange_id = stock['stock_exchange_id']
-        self.current_currency_id = stock['current_currency_id']
+        self.base_currency_id = stock['base_currency_id']
         self.compare_currency_id = stock['compare_currency_id']
         self.date = stock['date']
         self.high_price = stock['high_price']
         self.low_price = stock['low_price']
         self.last_price = stock['last_price']
         self.average_price = stock['average_price']
+        self.btc_price = stock['btc_price']
         self.volume = stock['volume']
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
@@ -218,13 +270,13 @@ class CurrenciesAdmin(AdminModelView):
     page_size = 30
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'description', ]
-    can_edit = False
+    form_columns = ['name', 'description', 'slug', 'meta_tags', 'meta_description', ]
+    can_edit = True
     # form_create_rules = ('name', 'description',)
     # form_edit_rules = [
     #     rules.FieldSet(('description',), 'Edit currency')
     # ]
-    column_editable_list = ('description',)
+    column_editable_list = ('description', 'slug', 'meta_tags', 'meta_description',)
 
 
 class StockExchangesAdmin(AdminModelView):

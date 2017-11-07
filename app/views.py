@@ -14,6 +14,12 @@ def stocks():
     return view.stocks()
 
 
+@app.route('/currencies', methods=['GET'])
+def currencies():
+    view = ViewsModels()
+    return view.currencies()
+
+
 @app.route('/update', methods=['GET'])
 def update_rates():
     view = ViewsModels()
@@ -30,6 +36,12 @@ def login():
 def logout():
     view = ViewsModels()
     return view.logout()
+
+
+@app.route("/test")
+def test():
+    view = ViewsModels()
+    return view.test()
 
 # @app.route('/books')
 # def index():

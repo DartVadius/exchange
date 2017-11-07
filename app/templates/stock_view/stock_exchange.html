@@ -61,6 +61,7 @@
                 <th>Currency</th>
                 <th>Pair</th>
                 <th>Price</th>
+                <th>Price, BTC</th>
                 <th>Volume(24h)</th>
             </tr>
             </thead>
@@ -69,8 +70,9 @@
             {% for rate in rates %}
             <tr>
                 <td>{{rate.rate_compare_currency.name}}</td>
-                <td>{{rate.rate_current_currency.name}}/{{rate.rate_compare_currency.name}}</td>
+                <td>{{rate.rate_base_currency.name}}/{{rate.rate_compare_currency.name}}</td>
                 <td>{{'{0:f}'.format(rate.average_price)}}</td>
+                <td>{{'{0:f}'.format(rate.btc_price)}}</td>
                 <td>{{'{0:f}'.format(rate.volume)}}</td>
             </tr>
             {% endfor %}

@@ -1,6 +1,7 @@
-from app.stocks.stock_base import StockBase
-import time
 import datetime
+import time
+
+from app.stocks.stock_base import StockBase
 
 
 class Bittrex(StockBase):
@@ -27,6 +28,9 @@ class Bittrex(StockBase):
         self.currencies = [currency['Currency'].upper() for currency in response['result'] if currency['IsActive']]
         return self
 
+    def set_countries(self):
+        return None
+
     def set_markets(self):
         url = 'https://bittrex.com/api/v1.1/public/getmarketsummaries'
         response = self.get_request(url)
@@ -35,15 +39,21 @@ class Bittrex(StockBase):
         markets = []
         for market in response['result']:
             val = market['MarketName'].split('-')
+            btc = self.getByBaseCompareCurrency(response['result'], 'BTC', val[1])
+            if btc is not None:
+                btc_price = (float(btc['High']) + float(btc['Low'])) / 2.0
+            else:
+                btc_price = 1
             average_price = (float(market['High']) + float(market['Low'])) / 2.0
             markets.append({
-                'current_currency': val[0],
+                'base_currency': val[0],
                 'compare_currency': val[1],
                 'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
                 'high_price': market['High'],
                 'low_price': market['Low'],
                 'last_price': market['Last'],
                 'average_price': average_price,
+                'btc_price': btc_price,
                 'volume': market['Volume'],
                 'base_volume': market['BaseVolume'],
                 'ask': market['Ask'],
@@ -51,3 +61,9 @@ class Bittrex(StockBase):
             })
         self.markets = markets
         return self
+
+    def getByBaseCompareCurrency(self, list_of_dict, base_currency, compare_currency):
+        for current_dict in list_of_dict:
+            if current_dict['MarketName'] == base_currency + '-' + compare_currency:
+                return current_dict
+        return None

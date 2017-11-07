@@ -1,12 +1,13 @@
 from flask import render_template, redirect, request, url_for
 from flask_login import login_user, logout_user, current_user
 
-from app.dbmodels import StockExchanges
 from app.forms import LoginForm
 from app.services.exchange_service import ExchangeService
 from app.services.rate_repository import RateRepository
 from app.services.session_service import SessionService
 from app.services.stock_repository import StockRepository
+from app.services.currency_repository import CurrencyRepository
+from app.stocks.localbitcoins import Localbitcoins
 
 
 class ViewsModels:
@@ -14,18 +15,20 @@ class ViewsModels:
         user_session = SessionService()
         user_session.set_count()
 
+    def currencies(self):
+        currency_repository = CurrencyRepository()
+        currencies = currency_repository.get_currencies_with_btc_volume()
+        return render_template("currencies.html", title='Currencies', currencies=currencies)
+
+
     def stock(self, stock_slug):
         rate_repository = RateRepository()
         stock_repository = StockRepository()
         stock_id = stock_repository.get_stock_id_by_slug(stock_slug)
         exchange_rates = rate_repository.get_rates_by_stock_id(stock_id)
-        # for rate in exchange_rates:
-        #     if rate.rate_current_currency.name == 'USDT' and rate.rate_compare_currency.name == 'BTC':
-        #         btc_usd_price =
-        #         print(rate)
         date = rate_repository.get_date_by_stock_id(stock_id)
         name = stock_repository.get_stock_name_by_id(stock_id)
-        market_type = stock_repository.get_type_by_id(stock_id)
+        # market_type = stock_repository.get_type_by_id(stock_id)
         # if market_type == 'market':
         #     return render_template("stock_view/stock_market.html", title=name.title(), rates=exchange_rates,
         #                            date=date, name=name.title())
@@ -34,8 +37,8 @@ class ViewsModels:
                                date=date, name=name.title())
 
     def stocks(self):
-        StockModel = StockRepository()
-        all_stocks =StockModel.get_stocks_with_volume_summary()
+        stock_model = StockRepository()
+        all_stocks = stock_model.get_stocks_with_volume_summary()
         # all_stocks = StockExchanges.query.filter_by(active='1').all()
         return render_template("stocks.html", title='Market\'s list', stocks=all_stocks)
 
@@ -44,6 +47,20 @@ class ViewsModels:
         exchange_service_model = ExchangeService()
         exchange_service_model.set_currencies()
         exchange_service_model.set_markets()
+        return redirect(url_for('stocks'))
+
+    @staticmethod
+    def update_countries():
+        exchange_service_model = ExchangeService()
+        exchange_service_model.set_countries()
+        return redirect(url_for('stocks'))
+
+    @staticmethod
+    def test():
+        test = Localbitcoins()
+        result = test.set_payment_methods()
+        for val in result:
+            print(val)
         return redirect(url_for('stocks'))
 
     def login(self):

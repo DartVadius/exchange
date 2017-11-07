@@ -1,4 +1,3 @@
-from sqlalchemy import func
 from app.dbmodels import StockExchanges, ExchangeRates
 
 
@@ -15,7 +14,9 @@ class StockRepository:
     def get_stocks_with_volume_summary(self):
         all_stocks = StockExchanges.query.filter_by(active='1').all()
         for stock in all_stocks:
-            volume = ExchangeRates.query.with_entities(func.sum(ExchangeRates.volume).label('volume')).filter(
-                ExchangeRates.stock_exchange_id == stock.id).one()
-            stock.volume = volume[0]
+            rates = ExchangeRates.query.filter(ExchangeRates.stock_exchange_id == stock.id).all()
+            volume = 0
+            for rate in rates:
+                volume += float(rate.volume) * float(rate.btc_price)
+            stock.volume = volume
         return all_stocks
