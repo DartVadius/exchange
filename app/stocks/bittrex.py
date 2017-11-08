@@ -32,7 +32,7 @@ class Bittrex(StockBase):
         return None
 
     def set_payment_methods(self):
-        return None
+        return {}
 
     def set_payment_methods_for_country(self, country_code):
         return None

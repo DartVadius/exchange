@@ -58,10 +58,10 @@ class ViewsModels:
     @staticmethod
     def test():
         test = ExchangeService()
-        result = test.set_countries()
+        result = test.set_payment_methods()
         # for val in result:
         #     print(val)
-        return redirect(url_for('stocks'))
+        return redirect(url_for('admin.index'))
 
     def login(self):
         if current_user.is_authenticated:

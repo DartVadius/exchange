@@ -1,9 +1,10 @@
-from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods
-from app import db
-from flask import session
-from app.stocks.class_map import classmap
-from werkzeug.contrib.cache import SimpleCache
 import threading
+
+from werkzeug.contrib.cache import SimpleCache
+
+from app import db
+from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods
+from app.stocks.class_map import classmap
 
 
 class ExchangeService:
@@ -90,9 +91,10 @@ class ExchangeService:
             if stock.name in self.classmap and stock.active == 1:
                 model = self.classmap[stock.name](stock)
                 stock_country = model.set_countries()
+
                 if not stock_country:
                     continue
-                local_country = [item.name_alpha2.title() for item in self.countries]
+                local_country = [item.name_alpha2.upper() for item in self.countries]
                 difference = [{'code': item} for item in set(stock_country).difference(local_country)]
                 for country in difference:
                     new_country = Countries(name_alpha2=country['code'].upper(), slug=country['code'].lower())
@@ -109,20 +111,20 @@ class ExchangeService:
                 stock_methods = model.set_payment_methods()
                 if not stock_methods:
                     continue
-                local_methods = [item.code.title() for item in self.payment_methods]
-        #         difference = [{'code': item} for item in set(stock_methods).difference(local_methods)]
-        #         for method in difference:
-        #             new_country = Countries(name_alpha2=country['code'].title(), slug=country['code'].lower())
-        #             db.session.add(new_country)
-        #             db.session.commit()
-        #             self.countries.append(new_country)
-        # self.cache.set('country_count', self.countries.count(self), timeout=60 * 60 * 24 * 30)
+                stock_methods_compare = [key for key in stock_methods.keys()]
+                local_methods = [item.code for item in self.payment_methods]
+                difference = [item for item in set(stock_methods_compare).difference(local_methods)]
+                for method in difference:
+                    new_method = PaymentMethods(name=stock_methods[method]['name'],
+                                                code=stock_methods[method]['code'],
+                                                slug=stock_methods[method]['method'].lower(),
+                                                method=stock_methods[method]['method']
+                                                )
+                    db.session.add(new_method)
+                    db.session.commit()
+                    self.payment_methods.append(new_method)
+        self.cache.set('method_count', self.payment_methods.count(self), timeout=60 * 60 * 24 * 30)
         return self
-
-
-    def set_payment_methods(self):
-        return None
-
 
     def get_stock_id_by_name(self, name):
         for stock in self.stocks:

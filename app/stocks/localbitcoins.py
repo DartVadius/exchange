@@ -41,8 +41,8 @@ class Localbitcoins(StockBase):
         response = self.get_request(url)
         if not response['data']:
             return False
-        methods = [{'method': method, 'code': response['data']['methods'][method]['code'],
-                    'name': response['data']['methods'][method]['name']} for method in response['data']['methods']]
+        methods = {response['data']['methods'][method]['code']: {'method': method, 'code': response['data']['methods'][method]['code'],
+                    'name': response['data']['methods'][method]['name']} for method in response['data']['methods']}
         return methods
 
     def set_payment_methods_for_country(self, country_code):
