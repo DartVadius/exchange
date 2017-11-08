@@ -58,7 +58,7 @@ class ViewsModels:
     @staticmethod
     def test():
         test = ExchangeService()
-        result = test.set_payment_methods()
+        result = test.set_payment_methods_by_country_codes()
         # for val in result:
         #     print(val)
         return redirect(url_for('admin.index'))

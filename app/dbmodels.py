@@ -83,7 +83,7 @@ class Currencies(db.Model):
         return self.query.count()
 
 
-country_method = db.Table('country_method',
+country_method = db.Table('country_method', db.Model.metadata,
                           db.Column('country_id', db.Integer, db.ForeignKey('countries.id'), primary_key=True),
                           db.Column('method_id', db.Integer, db.ForeignKey('payment_methods.id'), primary_key=True)
                           )

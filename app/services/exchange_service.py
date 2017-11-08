@@ -108,6 +108,7 @@ class ExchangeService:
         for stock in self.stocks:
             if stock.name in self.classmap and stock.active == 1:
                 model = self.classmap[stock.name](stock)
+
                 stock_methods = model.set_payment_methods()
                 if not stock_methods:
                     continue
@@ -125,6 +126,22 @@ class ExchangeService:
                     self.payment_methods.append(new_method)
         self.cache.set('method_count', self.payment_methods.count(self), timeout=60 * 60 * 24 * 30)
         return self
+
+    def set_payment_methods_by_country_codes(self):
+        for stock in self.stocks:
+            if stock.name in self.classmap and stock.active == 1:
+                model = self.classmap[stock.name](stock)
+                for country in self.countries:
+                    aviable_methods = model.set_payment_methods_for_country(country.name_alpha2)
+                    if aviable_methods is None:
+                        continue
+                    for aviable_method in aviable_methods:
+                        method = PaymentMethods.query.filter_by(code=aviable_method['code']).first()
+                        country.methods.append(method)
+                        db.session.add(country)
+                        db.session.commit()
+        return self
+
 
     def get_stock_id_by_name(self, name):
         for stock in self.stocks:
