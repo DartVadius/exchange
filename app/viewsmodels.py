@@ -7,7 +7,8 @@ from app.services.rate_repository import RateRepository
 from app.services.session_service import SessionService
 from app.services.stock_repository import StockRepository
 from app.services.currency_repository import CurrencyRepository
-from app.stocks.localbitcoins import Localbitcoins
+from app.services.country_repository import CountryRepository
+from app.services.payment_method_repository import PaymentMethodRepository
 
 
 class ViewsModels:
@@ -19,7 +20,6 @@ class ViewsModels:
         currency_repository = CurrencyRepository()
         currencies = currency_repository.get_currencies_with_btc_volume()
         return render_template("currencies.html", title='Currencies', currencies=currencies)
-
 
     def stock(self, stock_slug):
         rate_repository = RateRepository()
@@ -50,17 +50,17 @@ class ViewsModels:
         return redirect(url_for('stocks'))
 
     @staticmethod
-    def update_countries():
-        exchange_service_model = ExchangeService()
-        exchange_service_model.set_countries()
-        return redirect(url_for('stocks'))
+    def exchange():
+        countries = CountryRepository.get_all()
+        methods = PaymentMethodRepository.get_all()
+        return render_template('exchange.html', title='Exchange', countries=countries, methods=methods)
 
     @staticmethod
-    def test():
+    def update_countries():
         test = ExchangeService()
-        result = test.set_payment_methods_by_country_codes()
-        # for val in result:
-        #     print(val)
+        test.set_countries()
+        test.set_payment_methods()
+        test.set_payment_methods_by_country_codes()
         return redirect(url_for('admin.index'))
 
     def login(self):

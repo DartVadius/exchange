@@ -32,7 +32,7 @@ class Localbitcoins(StockBase):
         url = 'https://localbitcoins.com/api/countrycodes/'
         response = self.get_request(url)
         if not response['data']:
-            return False
+            return None
         countries = [country for country in response['data']['cc_list']]
         return countries
 
@@ -40,7 +40,7 @@ class Localbitcoins(StockBase):
         url = 'https://localbitcoins.com/api/payment_methods/'
         response = self.get_request(url)
         if not response['data']:
-            return False
+            return None
         methods = {response['data']['methods'][method]['code']: {'method': method, 'code': response['data']['methods'][method]['code'],
                     'name': response['data']['methods'][method]['name']} for method in response['data']['methods']}
         return methods
@@ -49,7 +49,7 @@ class Localbitcoins(StockBase):
         url = 'https://localbitcoins.com/api/payment_methods/' + country_code + '/'
         response = self.get_request(url)
         if not response['data']:
-            return False
+            return None
         methods = [{'method': method, 'code': response['data']['methods'][method]['code'],
                     'name': response['data']['methods'][method]['name']} for method in response['data']['methods']]
         return methods

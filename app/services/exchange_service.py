@@ -5,6 +5,7 @@ from werkzeug.contrib.cache import SimpleCache
 from app import db
 from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods
 from app.stocks.class_map import classmap
+from time import sleep
 
 
 class ExchangeService:
@@ -91,7 +92,6 @@ class ExchangeService:
             if stock.name in self.classmap and stock.active == 1:
                 model = self.classmap[stock.name](stock)
                 stock_country = model.set_countries()
-
                 if not stock_country:
                     continue
                 local_country = [item.name_alpha2.upper() for item in self.countries]
@@ -108,7 +108,6 @@ class ExchangeService:
         for stock in self.stocks:
             if stock.name in self.classmap and stock.active == 1:
                 model = self.classmap[stock.name](stock)
-
                 stock_methods = model.set_payment_methods()
                 if not stock_methods:
                     continue
@@ -133,13 +132,14 @@ class ExchangeService:
                 model = self.classmap[stock.name](stock)
                 for country in self.countries:
                     aviable_methods = model.set_payment_methods_for_country(country.name_alpha2)
-                    if aviable_methods is None:
+                    if not aviable_methods:
                         continue
                     for aviable_method in aviable_methods:
                         method = PaymentMethods.query.filter_by(code=aviable_method['code']).first()
                         country.methods.append(method)
                         db.session.add(country)
                         db.session.commit()
+                    # sleep(10)
         return self
 
 

@@ -1,7 +1,7 @@
 {% extends 'admin/master.html' %}
 {% block body %}
 <a href="/" class="btn btn-default">Index</a>
-<a href="/update" class="btn btn-default">Update currencies</a>
+<a href="/update-rates" class="btn btn-default">Update currencies</a>
 <a href="{{ url_for('logout', next=request.path) }}" class="btn btn-default">Log out</a>
-<a href="/test" class="btn btn-default">Test</a>
+<a href="/update-countries" class="btn btn-default">update_countries and payment methods</a>
 {% endblock %}
