@@ -1,6 +1,7 @@
-from app.stocks.stock_base import StockBase
-import time
 import datetime
+import time
+
+from app.stocks.stock_base import StockBase
 
 
 class Bittrex(StockBase):
@@ -26,6 +27,15 @@ class Bittrex(StockBase):
             return False
         self.currencies = [currency['Currency'].upper() for currency in response['result'] if currency['IsActive']]
         return self
+
+    def set_countries(self):
+        return None
+
+    def set_payment_methods(self):
+        return None
+
+    def set_payment_methods_for_country(self, country_code):
+        return None
 
     def set_markets(self):
         url = 'https://bittrex.com/api/v1.1/public/getmarketsummaries'

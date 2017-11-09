@@ -1,11 +1,12 @@
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
-from sqlalchemy.orm import relationship
-from flask_admin import Admin, BaseView, expose, AdminIndexView
-from flask_login import current_user
-from flask import g, request, redirect, url_for
-from app import app, login_manager, bcrypt, db
+from flask import request, redirect, url_for
+from flask_admin import Admin, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
+from flask_login import current_user
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
+from sqlalchemy.orm import relationship
+
+from app import app, login_manager, bcrypt, db
 
 
 @login_manager.user_loader
@@ -74,6 +75,50 @@ class Currencies(db.Model):
                                 back_populates="history_base_currency")
     history_compare = relationship("ExchangeHistory", foreign_keys='ExchangeHistory.compare_currency_id',
                                    back_populates="history_compare_currency")
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return self.query.count()
+
+
+country_method = db.Table('country_method', db.Model.metadata,
+                          db.Column('country_id', db.Integer, db.ForeignKey('countries.id'), primary_key=True),
+                          db.Column('method_id', db.Integer, db.ForeignKey('payment_methods.id'), primary_key=True)
+                          )
+
+
+class Countries(db.Model):
+    __tablename__ = 'countries'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    name_alpha2 = Column(String(10), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    slug = Column(String(255), nullable=False, unique=True)
+    meta_tags = Column(String(255), nullable=True, unique=False)
+    meta_description = Column(Text(), nullable=True, unique=False)
+    methods = db.relationship('PaymentMethods', secondary=country_method, lazy='subquery',
+                              backref=db.backref('countries', lazy=True))
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return self.query.count()
+
+
+class PaymentMethods(db.Model):
+    __tablename__ = 'payment_methods'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    name = Column(String(255), nullable=False, unique=True)
+    method = Column(String(255), nullable=False, unique=True)
+    code = Column(String(255), nullable=False, unique=True)
+    description = Column(String(255), nullable=True)
+    slug = Column(String(255), nullable=False, unique=True)
+    meta_tags = Column(String(255), nullable=True, unique=False)
+    meta_description = Column(Text(), nullable=True, unique=False)
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% block header %}{% include "header.html" %}{% endblock %}
+
+<section class="table">
+    <div class="container">
+        <h3>Countries</h3>
+        <table class="responsive-table bordered centered">
+            {% for country in countries %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{country.name_alpha2}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h3>Methods</h3>
+        <table class="responsive-table bordered centered">
+            {% for method in methods %}
+            <tr>
+                <td>{{loop.index}}</td>
+                <td>{{method.name}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% block footer %}{% include "footer.html" %}{% endblock %}
+{% endblock %}

@@ -20,7 +20,7 @@ def currencies():
     return view.currencies()
 
 
-@app.route('/update', methods=['GET'])
+@app.route('/update-rates', methods=['GET'])
 def update_rates():
     view = ViewsModels()
     return view.update_rates()
@@ -36,6 +36,18 @@ def login():
 def logout():
     view = ViewsModels()
     return view.logout()
+
+
+@app.route("/update-countries", methods=['GET'])
+def update_countries():
+    view = ViewsModels()
+    return view.update_countries()
+
+
+@app.route("/exchange", methods=['GET'])
+def exchange():
+    view = ViewsModels()
+    return view.exchange()
 
 # @app.route('/books')
 # def index():

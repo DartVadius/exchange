@@ -28,7 +28,7 @@
             {% for currency in currencies %}
             <tr>
                 <td>{{loop.index}}</td>
-                <td><a href="/currency/{{currency.slug}}">{{currency.name}}</a></td>
+                <td><a href="/currency/{{currency.slug.lower()}}">{{currency.name}}</a></td>
                 <td>{{currency.description}}</td>
                 <td>{{currency.volume}}</td>
             </tr>
