@@ -49,6 +49,12 @@ def exchange():
     view = ViewsModels()
     return view.exchange()
 
+
+@app.route("/test", methods=['GET'])
+def test():
+    view = ViewsModels()
+    return view.test()
+
 # @app.route('/books')
 # def index():
 #     books = db_session.query(Book).all()
