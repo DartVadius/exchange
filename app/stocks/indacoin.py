@@ -63,7 +63,7 @@ class Indacoin(StockBase):
                 'low_price': 1 / float(response[market]['last_price']),
                 'last_price': 1 / float(response[market]['last_price']),
                 'average_price': 1 / float(response[market]['last_price']),
-                'btc_price': btc_price,
+                'btc_price': 1 / float(btc_price),
                 'volume': 0,
                 'base_volume': 0,
                 'ask': 0,

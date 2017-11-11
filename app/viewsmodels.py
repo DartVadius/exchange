@@ -9,7 +9,7 @@ from app.services.stock_repository import StockRepository
 from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
-from app.stocks.indacoin import Indacoin
+from app.stocks.spectrocoin import Spectrocoin
 
 
 class ViewsModels:
@@ -40,8 +40,7 @@ class ViewsModels:
     @staticmethod
     def update_rates():
         exchange_service_model = ExchangeService()
-        exchange_service_model.set_currencies()
-        exchange_service_model.set_markets()
+        exchange_service_model.set_rates()
         session.clear()
         return redirect(url_for('stocks'))
 
@@ -78,7 +77,8 @@ class ViewsModels:
 
     @staticmethod
     def test():
-        model = Indacoin()
-        # model.set_currencies()
+        model = Spectrocoin()
+        model.set_currencies()
         model.set_markets()
+        print(model.get_markets())
         return redirect(url_for('admin.index'))
