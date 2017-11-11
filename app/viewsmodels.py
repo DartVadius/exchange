@@ -9,6 +9,7 @@ from app.services.stock_repository import StockRepository
 from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
+from app.stocks.coinbase import Coinbase
 
 
 class ViewsModels:
@@ -78,3 +79,10 @@ class ViewsModels:
     def logout(self):
         logout_user()
         return redirect('/')
+
+    @staticmethod
+    def test():
+        model = Coinbase()
+        # model.set_currencies()
+        model.set_markets()
+        return redirect(url_for('admin.index'))
