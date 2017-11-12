@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for
+from flask import render_template, redirect, request, url_for, session
 from flask_login import login_user, logout_user, current_user
 
 from app.forms import LoginForm
@@ -9,7 +9,7 @@ from app.services.stock_repository import StockRepository
 from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
-from app.stocks.coinbase import Coinbase
+from app.stocks.spectrocoin import Spectrocoin
 
 
 class ViewsModels:
@@ -29,25 +29,19 @@ class ViewsModels:
         exchange_rates = rate_repository.get_rates_by_stock_id(stock_id)
         date = rate_repository.get_date_by_stock_id(stock_id)
         name = stock_repository.get_stock_name_by_id(stock_id)
-        # market_type = stock_repository.get_type_by_id(stock_id)
-        # if market_type == 'market':
-        #     return render_template("stock_view/stock_market.html", title=name.title(), rates=exchange_rates,
-        #                            date=date, name=name.title())
-        # if market_type == 'exchange':
         return render_template("stock_view/stock_exchange.html", title=name.title(), rates=exchange_rates,
                                date=date, name=name.title())
 
     def stocks(self):
         stock_model = StockRepository()
         all_stocks = stock_model.get_stocks_with_volume_summary()
-        # all_stocks = StockExchanges.query.filter_by(active='1').all()
         return render_template("stocks.html", title='Market\'s list', stocks=all_stocks)
 
     @staticmethod
     def update_rates():
         exchange_service_model = ExchangeService()
-        exchange_service_model.set_currencies()
-        exchange_service_model.set_markets()
+        exchange_service_model.set_rates()
+        session.clear()
         return redirect(url_for('stocks'))
 
     @staticmethod
@@ -62,6 +56,7 @@ class ViewsModels:
         test.set_countries()
         test.set_payment_methods()
         test.set_payment_methods_by_country_codes()
+        session.clear()
         return redirect(url_for('admin.index'))
 
     def login(self):
@@ -82,7 +77,8 @@ class ViewsModels:
 
     @staticmethod
     def test():
-        model = Coinbase()
-        # model.set_currencies()
+        model = Spectrocoin()
+        model.set_currencies()
         model.set_markets()
+        print(model.get_markets())
         return redirect(url_for('admin.index'))

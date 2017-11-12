@@ -19,7 +19,6 @@ login_manager.login_view = "login"
 
 bcrypt = Bcrypt(app)
 
-
 @app.before_request
 def _before_request():
     g.user = current_user

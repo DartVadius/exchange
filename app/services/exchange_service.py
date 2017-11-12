@@ -18,43 +18,45 @@ class ExchangeService:
         self.cache = SimpleCache()
         self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
 
-    def set_currencies(self):
+    def set_rates(self):
         for stock in self.stocks:
             if stock.name in self.classmap and stock.active == 1:
                 model = self.classmap[stock.name](stock)
-                stock_currency = model.set_currencies().get_currencies()
-                if not stock_currency:
-                    continue
-                local_currency = [item.name for item in self.currencies]
-                difference = [{'name': item} for item in set(stock_currency).difference(local_currency)]
-                for currency in difference:
-                    new_currency = Currencies(name=currency['name'], slug=currency['name'])
-                    db.session.add(new_currency)
-                    db.session.commit()
-                    self.currencies.append(new_currency)
+                model.set_currencies()
+                model.set_markets()
+                stock_currency = model.get_currencies()
+                if stock_currency:
+                    self.set_currencies(stock_currency)
+                stock_markets = model.get_markets()
+                if stock_markets:
+                    self.set_markets(stock_markets, stock)
+        return self
+
+    def set_currencies(self, stock_currency):
+        local_currency = [item.name for item in self.currencies]
+        difference = [{'name': item} for item in set(stock_currency).difference(local_currency)]
+        for currency in difference:
+            new_currency = Currencies(name=currency['name'], slug=currency['name'])
+            db.session.add(new_currency)
+            db.session.commit()
+            self.currencies.append(new_currency)
         self.cache.set('currency_count', self.currencies.count(self), timeout=60 * 60 * 24 * 30)
         return self
 
-    def set_markets(self):
-        for stock in self.stocks:
-            if stock.name in self.classmap and stock.active == 1:
-                model = self.classmap[stock.name](stock)
-                stock_markets = model.set_markets().get_markets()
-                if not stock_markets:
-                    continue
-                for market in stock_markets:
-                    market['compare_currency_id'] = self.get_currency_id_by_name(market['compare_currency'])
-                    market['base_currency_id'] = self.get_currency_id_by_name(market['base_currency'])
-                    market['stock_exchange_id'] = self.get_stock_id_by_name(stock.name)
-                    if market['compare_currency_id'] and market['base_currency_id']:
-                        # self.update_rate(market)
-                        # self.update_history(market)
-                        thread_rate = threading.Thread(target=self.update_rate, args=(market,))
-                        thread_rate.daemon = True
-                        thread_rate.start()
-                        thread_history = threading.Thread(target=self.update_history, args=(market,))
-                        thread_history.daemon = True
-                        thread_history.start()
+    def set_markets(self, stock_markets, stock):
+        for market in stock_markets:
+            market['compare_currency_id'] = self.get_currency_id_by_name(market['compare_currency'])
+            market['base_currency_id'] = self.get_currency_id_by_name(market['base_currency'])
+            market['stock_exchange_id'] = self.get_stock_id_by_name(stock.name)
+            if market['compare_currency_id'] and market['base_currency_id']:
+                # self.update_rate(market)
+                # self.update_history(market)
+                thread_rate = threading.Thread(target=self.update_rate, args=(market,))
+                thread_rate.daemon = True
+                thread_rate.start()
+                thread_history = threading.Thread(target=self.update_history, args=(market,))
+                thread_history.daemon = True
+                thread_history.start()
         self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
         return self
 
@@ -139,9 +141,8 @@ class ExchangeService:
                         country.methods.append(method)
                         db.session.add(country)
                         db.session.commit()
-                    # sleep(10)
+                        # sleep(10)
         return self
-
 
     def get_stock_id_by_name(self, name):
         for stock in self.stocks:
@@ -159,4 +160,4 @@ class ExchangeService:
         return Currencies.query.count()
 
     def get_market_count(self):
-        return StockExchanges.query.count()
+        return StockExchanges.query.filter_by(active='1').count()

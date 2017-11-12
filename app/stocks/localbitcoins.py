@@ -41,8 +41,10 @@ class Localbitcoins(StockBase):
         response = self.get_request(url)
         if not response['data']:
             return None
-        methods = {response['data']['methods'][method]['code']: {'method': method, 'code': response['data']['methods'][method]['code'],
-                    'name': response['data']['methods'][method]['name']} for method in response['data']['methods']}
+        methods = {response['data']['methods'][method]['code']: {'method': method,
+                                                                 'code': response['data']['methods'][method]['code'],
+                                                                 'name': response['data']['methods'][method]['name']}
+                   for method in response['data']['methods']}
         return methods
 
     def set_payment_methods_for_country(self, country_code):
@@ -63,14 +65,14 @@ class Localbitcoins(StockBase):
         for market in response:
             val = response[market]
             markets.append({
-                'base_currency': market,
-                'compare_currency': 'BTC',
+                'base_currency': 'BTC',
+                'compare_currency': market,
                 'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
-                'high_price': val['avg_24h'],
-                'low_price': val['avg_24h'],
-                'last_price': val['rates']['last'],
-                'average_price': val['avg_24h'],
-                'btc_price': 1,
+                'high_price': 1 / float(val['avg_24h']),
+                'low_price': 1 / float(val['avg_24h']),
+                'last_price': 1 / float(val['avg_24h']),
+                'average_price': 1 / float(val['avg_24h']),
+                'btc_price': 1 / float(val['avg_24h']),
                 'volume': val['volume_btc'],
                 'base_volume': None,
                 'ask': None,
