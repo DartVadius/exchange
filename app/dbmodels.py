@@ -75,6 +75,64 @@ class Currencies(db.Model):
                                 back_populates="history_base_currency")
     history_compare = relationship("ExchangeHistory", foreign_keys='ExchangeHistory.compare_currency_id',
                                    back_populates="history_compare_currency")
+    statistic = relationship("CurrencyStatistic", foreign_keys='CurrencyStatistic.symbol',
+                             back_populates="statistic_currency")
+    statistic_history = relationship("CurrencyStatisticHistory", foreign_keys='CurrencyStatisticHistory.symbol',
+                                     back_populates="statistic_currency_history")
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return self.query.count()
+
+
+class CurrencyStatistic(db.Model):
+    __tablename__ = 'currency_statistic'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    symbol = Column(String(10), ForeignKey('currencies.name', ondelete='CASCADE', onupdate='CASCADE'),
+                    nullable=False, unique=True)
+    name = Column(String(255), nullable=False, unique=False)
+    rank = Column(INTEGER, nullable=False)
+    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=False)
+    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=False)
+    volume_usd_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    market_cap_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    date = Column(TIMESTAMP, nullable=False)
+
+    statistic_currency = relationship("Currencies", back_populates="statistic", uselist=False,
+                                      foreign_keys=[symbol])
+
+    def __repr__(self):
+        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+
+    def count(self):
+        return self.query.count()
+
+
+class CurrencyStatisticHistory(db.Model):
+    __tablename__ = 'currency_statistic_history'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    id = Column(INTEGER, primary_key=True)
+    symbol = Column(String(10), ForeignKey('currencies.name', ondelete='CASCADE', onupdate='CASCADE'), nullable=False,
+                    unique=True)
+    name = Column(String(255), nullable=False, unique=False)
+    rank = Column(INTEGER, nullable=False)
+    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=False)
+    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=False)
+    volume_usd_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    market_cap_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    date = Column(TIMESTAMP, nullable=False)
+
+    statistic_currency_history = relationship("Currencies", back_populates="statistic_history", uselist=False,
+                                              foreign_keys=[symbol])
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
@@ -153,11 +211,11 @@ class ExchangeHistory(db.Model):
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
     id = Column(INTEGER, primary_key=True)
-    stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=False, index=True)
-    base_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    base_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='CASCADE'),
                               nullable=False, index=True)
-    compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='CASCADE'),
                                  nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
     high_price = Column(DECIMAL(precision=20, scale=10))
@@ -195,11 +253,11 @@ class ExchangeRates(db.Model):
     __tablename__ = 'exchange_rates'
 
     id = Column(INTEGER, primary_key=True)
-    stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    stock_exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='CASCADE'),
                                nullable=False, index=True)
-    base_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    base_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='CASCADE'),
                               nullable=False, index=True)
-    compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='NO ACTION'),
+    compare_currency_id = Column(INTEGER, ForeignKey('currencies.id', ondelete='CASCADE', onupdate='CASCADE'),
                                  nullable=False, index=True)
     date = Column(TIMESTAMP, nullable=False)
     high_price = Column(DECIMAL(precision=20, scale=10))

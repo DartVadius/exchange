@@ -9,6 +9,7 @@ from app.services.stock_repository import StockRepository
 from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
+from app.services.statistic_service import StatisticService
 from app.stocks.shapeshift import Shapeshift
 
 
@@ -77,8 +78,8 @@ class ViewsModels:
 
     @staticmethod
     def test():
-        model = Shapeshift()
-        model.set_currencies()
+        model = StatisticService()
+        model.set_statistic()
         # model.set_markets()
-        print(model.set_markets())
+        # print(model.set_markets())
         return redirect(url_for('admin.index'))
