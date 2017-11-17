@@ -1,4 +1,4 @@
-from app.dbmodels import Currencies
+from app.dbmodels import Currencies, CurrencyStatistic
 from app.services.rate_repository import RateRepository
 
 
@@ -10,3 +10,9 @@ class CurrencyRepository:
             volume = rate_repository.get_currency_volume(currency.id)
             currency.volume = volume
         return currencies
+
+    def get_currencies_statistic(self):
+        return CurrencyStatistic.query.order_by(CurrencyStatistic.rank).all()
+
+    def get_currencies_statistic_paginate(self, page, item_per_page):
+        return CurrencyStatistic.query.order_by(CurrencyStatistic.rank).paginate(page, item_per_page, False)

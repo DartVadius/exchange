@@ -10,6 +10,7 @@ from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
+from app.dbmodels import Currencies
 from app.stocks.shapeshift import Shapeshift
 
 
@@ -18,10 +19,16 @@ class ViewsModels:
         user_session = SessionService()
         user_session.set_count()
 
-    def currencies(self):
+    def currencies(self, page, all_currencies):
         currency_repository = CurrencyRepository()
-        currencies = currency_repository.get_currencies_with_btc_volume()
-        return render_template("currencies.html", title='Currencies', currencies=currencies)
+        if all_currencies == 'all':
+            curr = Currencies()
+            currencies = currency_repository.get_currencies_statistic_paginate(1, curr.count())
+            all_pages = True
+        else:
+            currencies = currency_repository.get_currencies_statistic_paginate(page, 100)
+            all_pages = False
+        return render_template("currencies.html", title='Currencies', currencies=currencies, all=all_pages)
 
     def stock(self, stock_slug):
         rate_repository = RateRepository()

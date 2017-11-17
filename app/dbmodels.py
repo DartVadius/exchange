@@ -67,6 +67,7 @@ class Currencies(db.Model):
     slug = Column(String(255), nullable=False, unique=True)
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
+    type = Column(INTEGER, nullable=True, default=1)
     rate_base = relationship("ExchangeRates", foreign_keys='ExchangeRates.base_currency_id',
                              back_populates="rate_base_currency")
     rate_compare = relationship("ExchangeRates", foreign_keys='ExchangeRates.compare_currency_id',
@@ -95,10 +96,10 @@ class CurrencyStatistic(db.Model):
                     nullable=False, unique=True)
     name = Column(String(255), nullable=False, unique=False)
     rank = Column(INTEGER, nullable=False)
-    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=False)
-    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=False)
+    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=True)
     volume_usd_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    market_cap_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    market_cap_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
@@ -108,7 +109,7 @@ class CurrencyStatistic(db.Model):
                                       foreign_keys=[symbol])
 
     def __repr__(self):
-        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+        return '<Stats: name={0.symbol!r}, description={0.name!r}>'.format(self)
 
     def count(self):
         return self.query.count()
@@ -119,13 +120,13 @@ class CurrencyStatisticHistory(db.Model):
     __table_args__ = {'mysql_engine': 'InnoDB'}
     id = Column(INTEGER, primary_key=True)
     symbol = Column(String(10), ForeignKey('currencies.name', ondelete='CASCADE', onupdate='CASCADE'), nullable=False,
-                    unique=True)
+                    unique=False)
     name = Column(String(255), nullable=False, unique=False)
     rank = Column(INTEGER, nullable=False)
-    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=False)
-    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=False)
+    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=True)
     volume_usd_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    market_cap_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    market_cap_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
@@ -328,13 +329,20 @@ class CurrenciesAdmin(AdminModelView):
     page_size = 30
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'description', 'slug', 'meta_tags', 'meta_description', ]
+    form_columns = ['name', 'description', 'slug', 'type', 'meta_tags', 'meta_description', ]
     can_edit = True
-    # form_create_rules = ('name', 'description',)
-    # form_edit_rules = [
-    #     rules.FieldSet(('description',), 'Edit currency')
-    # ]
-    column_editable_list = ('description', 'slug', 'meta_tags', 'meta_description',)
+    column_editable_list = ('description', 'slug', 'type', 'meta_tags', 'meta_description',)
+    form_overrides = dict(
+        type=Select2Field
+    )
+    form_args = dict(
+        type=dict(
+            choices=[
+                ('1', 'Coin'),
+                ('2', 'Token')
+            ]
+        ),
+    )
 
 
 class StockExchangesAdmin(AdminModelView):
