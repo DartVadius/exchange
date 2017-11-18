@@ -103,6 +103,9 @@ class CurrencyStatistic(db.Model):
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    available_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    total_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    max_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
     date = Column(TIMESTAMP, nullable=False)
 
     statistic_currency = relationship("Currencies", back_populates="statistic", uselist=False,
@@ -130,6 +133,9 @@ class CurrencyStatisticHistory(db.Model):
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    available_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    total_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    max_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
     date = Column(TIMESTAMP, nullable=False)
 
     statistic_currency_history = relationship("Currencies", back_populates="statistic_history", uselist=False,

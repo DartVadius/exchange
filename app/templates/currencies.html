@@ -23,33 +23,38 @@
                         <a href="/currencies/{{currencies.pages}}" class="btn waves-effect waves-light"> Last</a>
                         {% endif %}
                         {% if all %}
-                        <a href="/currencies/1" class="btn waves-effect waves-light"> View 100</a>
+                        <a href="/currencies/1" class="btn waves-effect waves-light"> Back to TOP 100</a>
                         {% else %}
                         <a href="/currencies/all" class="btn waves-effect waves-light"> View All</a>
                         {% endif %}
                     </div>
                 </div>
-
             </div>
         </nav>
         <table class="responsive-table bordered centered">
             <thead>
             <tr>
-                <th>#</th>
                 <th>Rank</th>
                 <th>Currency</th>
                 <th>Name</th>
-                <th>Volume, BTC (24h)</th>
+                <th>Market cup</th>
+                <th>Price, USD</th>
+                <th>Volume, USD (24h)</th>
+                <th>Circulating Supply</th>
+                <th>Change (24h)</th>
             </tr>
             </thead>
             <tbody>
             {% for currency in currencies.items %}
             <tr>
-                <td>{{loop.index + (currencies.per_page * (currencies.page - 1))}}</td>
                 <td>{{currency.rank}}</td>
                 <td><a href="/currency/{{currency.symbol.lower()}}">{{currency.symbol}}</a></td>
                 <td>{{currency.name}}</td>
-                <td>{{currency.volume_usd_day}}</td>
+                <td>{{'%0.0f'| format(currency.market_cap_usd|float)}}</td>
+                <td>{{'%g'| format(currency.price_usd|float)}}</td>
+                <td>{{'%0.0f'| format(currency.volume_usd_day|float)}}</td>
+                <td>{{'%0.0f'| format(currency.available_supply|float)}}</td>
+                <td>{{'%0.2f'| format(currency.percent_change_day|float)}}%</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -70,7 +75,7 @@
                     <a href="/currencies/{{currencies.pages}}" class="btn waves-effect waves-light"> Last</a>
                     {% endif %}
                     {% if all %}
-                    <a href="/currencies/1" class="btn waves-effect waves-light"> View 100</a>
+                    <a href="/currencies/1" class="btn waves-effect waves-light"> Back to TOP 100</a>
                     {% else %}
                     <a href="/currencies/all" class="btn waves-effect waves-light"> View All</a>
                     {% endif %}
