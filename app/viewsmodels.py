@@ -9,7 +9,7 @@ from app.services.stock_repository import StockRepository
 from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
-from app.stocks.spectrocoin import Spectrocoin
+from app.stocks.shapeshift import Shapeshift
 
 
 class ViewsModels:
@@ -77,8 +77,8 @@ class ViewsModels:
 
     @staticmethod
     def test():
-        model = Spectrocoin()
+        model = Shapeshift()
         model.set_currencies()
-        model.set_markets()
-        print(model.get_markets())
+        # model.set_markets()
+        print(model.set_markets())
         return redirect(url_for('admin.index'))
