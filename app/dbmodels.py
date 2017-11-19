@@ -142,7 +142,7 @@ class CurrencyStatisticHistory(db.Model):
                                               foreign_keys=[symbol])
 
     def __repr__(self):
-        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+        return '<Stats: name={0.symbol!r}, description={0.name!r}>'.format(self)
 
     def count(self):
         return self.query.count()

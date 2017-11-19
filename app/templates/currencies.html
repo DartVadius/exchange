@@ -3,7 +3,6 @@
 {% block content %}
 {% block header %}{% include "header.html" %}{% endblock %}
 {% block navigation %}{% include "navigation.html" %}{% endblock %}
-
 <section class="table">
     <div class="container">
         <nav>
@@ -42,6 +41,7 @@
                 <th>Volume, USD (24h)</th>
                 <th>Circulating Supply</th>
                 <th>Change (24h)</th>
+                <th>Price Graph (7d)</th>
             </tr>
             </thead>
             <tbody>
@@ -55,6 +55,7 @@
                 <td>{{'%0.0f'| format(currency.volume_usd_day|float)}}</td>
                 <td>{{'%0.0f'| format(currency.available_supply|float)}}</td>
                 <td>{{'%0.2f'| format(currency.percent_change_day|float)}}%</td>
+                <td><a href="#"><img src="/static/img/graphs/{{currency.symbol}}.png"></a></td>
             </tr>
             {% endfor %}
             </tbody>

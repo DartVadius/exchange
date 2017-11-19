@@ -1,4 +1,6 @@
 import json
+import pygal
+from pygal.style import LightStyle
 import urllib3.request
 import datetime
 import time
@@ -13,14 +15,11 @@ class StatisticService:
         request = http.request('GET', url)
         response = request.data
         response = json.loads(response.decode('utf-8'))
+        date_end = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
         for currency in response:
             currency_model = Currencies.query.filter_by(name=currency['symbol']).first()
             if currency_model is None:
                 continue
-                # new_currency = Currencies(name=currency['symbol'], slug=currency['symbol'].lower(),
-                #                           description=currency['name'])
-                # db.session.add(new_currency)
-                # db.session.commit()
             stat_to_update = CurrencyStatistic.query.filter_by(symbol=currency['symbol']).first()
             if stat_to_update is None:
                 statistic_model = CurrencyStatistic(
@@ -37,7 +36,7 @@ class StatisticService:
                     available_supply=currency['available_supply'],
                     total_supply=currency['total_supply'],
                     max_supply=currency['max_supply'],
-                    date=datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                    date=date_end
                 )
                 db.session.add(statistic_model)
             else:
@@ -54,7 +53,7 @@ class StatisticService:
                 stat_to_update.available_supply = currency['available_supply'],
                 stat_to_update.total_supply = currency['total_supply'],
                 stat_to_update.max_supply = currency['max_supply'],
-                stat_to_update.date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                stat_to_update.date = date_end
                 db.session.add(stat_to_update)
         db.session.commit()
         statistic = CurrencyStatistic.query.order_by(CurrencyStatistic.rank).all()
@@ -76,8 +75,24 @@ class StatisticService:
                 available_supply=statistic_item.available_supply,
                 total_supply=statistic_item.total_supply,
                 max_supply=statistic_item.max_supply,
-                date=datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+                date=date_end
             )
             db.session.add(statistic_history_model)
             rank += 1
         db.session.commit()
+        date_start = datetime.date.today() + datetime.timedelta(days=-7)
+        date_start = date_start.strftime('%Y-%m-%d %H:%M:%S')
+        for statistic_item in statistic:
+            self.create_graph_main(statistic_item.symbol, date_start, date_end)
+
+    def create_graph_main(self, symbol, start=None, end=None):
+        stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol)
+        if start is not None and end is not None:
+            stats.filter(CurrencyStatisticHistory.date >= start).filter(CurrencyStatisticHistory.date <= end)
+        stats = stats.all()
+        prices = [float(stat.price_usd) for stat in stats]
+        # times = ['%s' % stat.date for stat in stats]
+        bar_chart = pygal.Line(show_legend=False, show_y_labels=False, width=166, height=50, explicit_size=True,
+                               style=LightStyle)
+        bar_chart.add('USD', prices)
+        bar_chart.render_to_png('app/static/img/graphs/' + symbol + '.png')

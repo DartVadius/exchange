@@ -21,6 +21,7 @@ class ViewsModels:
 
     def currencies(self, page, all_currencies):
         currency_repository = CurrencyRepository()
+        stat_serv = StatisticService()
         if all_currencies == 'all':
             curr = Currencies()
             currencies = currency_repository.get_currencies_statistic_paginate(1, curr.count())
@@ -28,6 +29,8 @@ class ViewsModels:
         else:
             currencies = currency_repository.get_currencies_statistic_paginate(page, 100)
             all_pages = False
+        # for currency in currencies.items:
+        #     currency.graph = stat_serv.create_graph_main(currency.symbol)
         return render_template("currencies.html", title='Currencies', currencies=currencies, all=all_pages)
 
     def stock(self, stock_slug):
@@ -86,6 +89,7 @@ class ViewsModels:
     @staticmethod
     def test():
         model = StatisticService()
+        # model.create_graph('BTC')
         model.set_statistic()
         # model.set_markets()
         # print(model.set_markets())
