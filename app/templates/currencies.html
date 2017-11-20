@@ -3,44 +3,83 @@
 {% block content %}
 {% block header %}{% include "header.html" %}{% endblock %}
 {% block navigation %}{% include "navigation.html" %}{% endblock %}
-
 <section class="table">
     <div class="container">
         <nav>
             <div class="nav-wrapper blue-grey lighten-5">
-                <div class="right btns">
-                    <button class="btn waves-effect waves-light">Next 100<i
-                            class="material-icons right">arrow_forward</i></button>
-                    <button class="btn waves-effect waves-light"> View All</button>
+                <div class="row">
+                    <div class="right btns">
+                        {% if currencies.has_prev %}
+                        <a href="/currencies/1" class="btn waves-effect waves-light"> First</a>
+                        <a href="/currencies/{{currencies.prev_num}}" class="btn waves-effect waves-light">Previous 100
+                            <i class="material-icons left">arrow_backward</i>
+                        </a>
+                        {% endif %}
+                        {% if currencies.has_next %}
+                        <a href="/currencies/{{currencies.next_num}}" class="btn waves-effect waves-light">Next 100
+                            <i class="material-icons right">arrow_forward</i>
+                        </a>
+                        <a href="/currencies/{{currencies.pages}}" class="btn waves-effect waves-light"> Last</a>
+                        {% endif %}
+                        {% if all %}
+                        <a href="/currencies/1" class="btn waves-effect waves-light"> Back to TOP 100</a>
+                        {% else %}
+                        <a href="/currencies/all" class="btn waves-effect waves-light"> View All</a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </nav>
         <table class="responsive-table bordered centered">
             <thead>
             <tr>
-                <th>#</th>
+                <th>Rank</th>
                 <th>Currency</th>
                 <th>Name</th>
-                <th>Volume, BTC (24h)</th>
+                <th>Market cup</th>
+                <th>Price, USD</th>
+                <th>Volume, USD (24h)</th>
+                <th>Circulating Supply</th>
+                <th>Change (24h)</th>
+                <th>Price Graph (7d)</th>
             </tr>
             </thead>
             <tbody>
-            {% for currency in currencies %}
+            {% for currency in currencies.items %}
             <tr>
-                <td>{{loop.index}}</td>
-                <td><a href="/currency/{{currency.slug.lower()}}">{{currency.name}}</a></td>
-                <td>{{currency.description}}</td>
-                <td>{{currency.volume}}</td>
+                <td>{{currency.rank}}</td>
+                <td><a href="/currency/{{currency.symbol.lower()}}">{{currency.symbol}}</a></td>
+                <td>{{currency.name}}</td>
+                <td>{{'%0.0f'| format(currency.market_cap_usd|float)}}</td>
+                <td>{{'%g'| format(currency.price_usd|float)}}</td>
+                <td>{{'%0.0f'| format(currency.volume_usd_day|float)}}</td>
+                <td>{{'%0.0f'| format(currency.available_supply|float)}}</td>
+                <td>{{'%0.2f'| format(currency.percent_change_day|float)}}%</td>
+                <td><a href="#"><img src="/static/img/graphs/{{currency.symbol}}.png"></a></td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
         <div class="table-footer">
-            <div class="row"><i>*Not Mineable</i>
+            <div class="row">
                 <div class="right btns">
-                    <button class="btn waves-effect waves-light">Next 100<i
-                            class="material-icons right">arrow_forward</i></button>
-                    <button class="btn waves-effect waves-light"> View All</button>
+                    {% if currencies.has_prev %}
+                    <a href="/currencies/1" class="btn waves-effect waves-light"> First</a>
+                    <a href="/currencies/{{currencies.prev_num}}" class="btn waves-effect waves-light">Previous 100
+                        <i class="material-icons left">arrow_backward</i>
+                    </a>
+                    {% endif %}
+                    {% if currencies.has_next %}
+                    <a href="/currencies/{{currencies.next_num}}" class="btn waves-effect waves-light">Next 100
+                        <i class="material-icons right">arrow_forward</i>
+                    </a>
+                    <a href="/currencies/{{currencies.pages}}" class="btn waves-effect waves-light"> Last</a>
+                    {% endif %}
+                    {% if all %}
+                    <a href="/currencies/1" class="btn waves-effect waves-light"> Back to TOP 100</a>
+                    {% else %}
+                    <a href="/currencies/all" class="btn waves-effect waves-light"> View All</a>
+                    {% endif %}
                 </div>
             </div>
             <div class="row">
