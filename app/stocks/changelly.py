@@ -11,8 +11,8 @@ from app.stocks.stock_base import StockBase
 
 class Changelly(StockBase):
     STOCK_URL = 'https://changelly.com/'
-    API_KEY = 'b67925c2f53647af9f837f43e851047c'
-    API_SECRET = 'b4598e2136e8c893074374d9101a7e2ed07495c79ebf7970c938c46b17608ee7'
+    # API_KEY = 'b67925c2f53647af9f837f43e851047c'
+    # API_SECRET = 'b4598e2136e8c893074374d9101a7e2ed07495c79ebf7970c938c46b17608ee7'
     markets = []
     currencies = []
 
@@ -27,19 +27,15 @@ class Changelly(StockBase):
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.url!r}>'.format(self)
 
-    def get_request(self, method):
+    def set_currencies(self):
         http = urllib3.PoolManager()
-        data = {"id": "test", "jsonrpc": "2.0", "method": method, "params": {}}
+        data = {"id": "test", "jsonrpc": "2.0", "method": 'getCurrenciesFull', "params": {}}
         data = json.dumps(data)
-        sign = hmac.new(self.API_SECRET.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
-        headers = {'api-key': self.API_KEY, 'sign': sign, 'content-type': 'application/json'}
+        sign = hmac.new(self.api_secret.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
+        headers = {'api-key': self.api_key, 'sign': sign, 'content-type': 'application/json'}
         request = http.request('POST', 'http://api.changelly.com', body=data, headers=headers)
         response = request.data
         response = json.loads(response.decode('utf-8'))
-        return response
-
-    def set_currencies(self):
-        response = self.get_request('getCurrenciesFull')
         if not response['result']:
             return False
         currencies = []
@@ -62,29 +58,32 @@ class Changelly(StockBase):
 
     def set_markets(self):
         markets = []
-        url = 'https://indacoin.com/api/ticker'
-        response = self.get_request(url)
-        for market in response:
-            val = market.split('_')
-            if response[market]['last_price'] == '' or val[0] == 'LXC':
-                continue
-            if val[1] == 'BTC':
-                btc_price = 1
-            else:
-                btc_price = response['BTC_USD']['last_price']
+        data_currency = []
+        for currency in self.currencies:
+            data_currency.append({"from": currency, "to": "btc", "amount": "1"})
+        http = urllib3.PoolManager()
+        for params in data_currency:
+            data = {"id": "test", "jsonrpc": "2.0", "method": 'getExchangeAmount', "params": params}
+            data = json.dumps(data)
+            sign = hmac.new(self.api_secret.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
+            headers = {'api-key': self.api_key, 'sign': sign, 'content-type': 'application/json'}
+            request = http.request('POST', 'http://api.changelly.com', body=data, headers=headers)
+            response = request.data
+            response = json.loads(response.decode('utf-8'))
             markets.append({
-                'base_currency': val[0],
-                'compare_currency': val[1],
+                'base_currency': 'BTC',
+                'compare_currency': params['from'],
                 'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
-                'high_price': 1 / float(response[market]['last_price']),
-                'low_price': 1 / float(response[market]['last_price']),
-                'last_price': 1 / float(response[market]['last_price']),
-                'average_price': 1 / float(response[market]['last_price']),
-                'btc_price': 1 / float(btc_price),
+                'high_price': float(response['result']),
+                'low_price': float(response['result']),
+                'last_price': float(response['result']),
+                'average_price': float(response['result']),
+                'btc_price': float(response['result']),
                 'volume': 0,
                 'base_volume': 0,
                 'ask': 0,
                 'bid': 0
             })
+        # print(markets)
         self.markets = markets
         return self

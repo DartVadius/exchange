@@ -1,5 +1,8 @@
 import datetime
+import hmac
 import time
+from urllib import parse
+from hashlib import sha256
 
 import urllib3.request
 
@@ -10,6 +13,8 @@ class Paxful(StockBase):
     STOCK_URL = 'https://paxful.com/'
     markets = []
     currencies = []
+    key = 'HEjnCYnypvQkvzH6-u5qMrHeTkKh87LI'
+    secret = 'F5LBsYIQRGQRFO5FNUN1hyGFbeHmrH8R'
 
     def __init__(self, stock=None):
         self.name = 'paxful'
@@ -24,14 +29,9 @@ class Paxful(StockBase):
 
     def set_currencies(self):
         http = urllib3.PoolManager()
-        url = 'https://www.paxful.com/api/currency/btc'
-        request = http.request('GET', url)
-        # headers = {'content-type': 'application/json'}
-        # payload = '{"id": "test", "jsonrpc": "2.0", "method": "getCurrenciesFull", "params": {}}'
-        # request = http.request('POST', 'http://api.changelly.com', fields=payload, headers=headers)
-        # # request = requests.request("POST", 'http://api.changelly.com', data=payload, headers=headers)
-        # http = urllib3.PoolManager()
-        # request = http.request('GET', url)
+        url = 'https://paxful.com/api/currency/rates'
+        headers = {'Accept': 'application/json', 'Content-Type': 'text/plain'}
+        request = http.request('POST', url, headers=headers)
         response = request.data
         # response = json.loads(response.decode('utf-8'))
         print(response)
