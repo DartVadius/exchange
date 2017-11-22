@@ -1,7 +1,0 @@
-. venv/bin/activate
-
-#миграции
-export FLASK_APP=dbmodels.py
-flask db init //при первом запуске
-flask db migrate -m 'описание' //создаем миграцию
-flask db upgrade  //применяем миграцию

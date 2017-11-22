@@ -46,6 +46,8 @@ class Shapeshift(StockBase):
                 continue
             new_url = url + currency.lower() + '_btc'
             response = self.get_request(new_url)
+            if 'error' in response:
+                continue
             markets.append({
                 'base_currency': 'BTC',
                 'compare_currency': currency,

@@ -9,15 +9,17 @@ def stock(stock_slug):
 
 
 @app.route('/', methods=['GET'])
-def stocks():
+@app.route('/currencies/<string:all_currencies>', methods=['GET'])
+@app.route('/currencies/<int:page>', methods=['GET'])
+def stocks(page=1, all_currencies=''):
     view = ViewsModels()
-    return view.stocks()
+    return view.currencies(page, all_currencies)
 
 
-@app.route('/currencies', methods=['GET'])
+@app.route('/stocks', methods=['GET'])
 def currencies():
     view = ViewsModels()
-    return view.currencies()
+    return view.stocks()
 
 
 @app.route('/update-rates', methods=['GET'])
@@ -54,64 +56,3 @@ def exchange():
 def test():
     view = ViewsModels()
     return view.test()
-
-# @app.route('/books')
-# def index():
-#     books = db_session.query(Book).all()
-#     if 'username' in session:
-#         return render_template("books.html",
-#                                title='Home',
-#                                books=books)
-#     # print(books)
-#     return redirect(url_for('login'))
-#
-#
-# @app.route('/', methods=['GET', 'POST'])
-# @app.route('/index', methods=['GET', 'POST'])
-# def login():
-#     form = forms.LoginForm(request.form)
-#     if request.method == 'POST' and form.validate():
-#         name = form.name.data
-#         session['username'] = name
-#         flash('Hi, ' + name + '!')
-#         return redirect(url_for('index'))
-#     return render_template('login.html',
-#                            title='Sign In',
-#                            form=form)
-#
-#
-# @app.route('/odminko', methods=['GET', 'POST'])
-# def odminko():
-#     books = db_session.query(Book).all()
-#     form = forms.Book(request.form)
-#
-#     if request.method == 'POST' and form.validate() and 'username' in session:
-#         author = form.author.data
-#         title = form.title.data
-#         book = Book(author, title)
-#         db_session.add(book)
-#         db_session.commit()
-#         return redirect(url_for('odminko'))
-#
-#     if 'username' in session:
-#         return render_template("odminko.html",
-#                                title='Odminko',
-#                                books=books,
-#                                form=form)
-#     return redirect(url_for('login'))
-#
-#
-# @app.route('/logout')
-# def logout():
-#     session.pop('username', None)
-#     return redirect(url_for('login'))
-#
-#
-# @app.route('/kill', methods=['GET', 'POST'])
-# def kill():
-#     if request.method == "POST":
-#         book_id = request.json
-#         book = db_session.query(Book).filter_by(id=book_id).first()
-#         db_session.delete(book)
-#         db_session.commit()
-#         return redirect(url_for('odminko'))
