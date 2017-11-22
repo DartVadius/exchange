@@ -1,5 +1,5 @@
 import datetime
-import hmac
+import json
 import time
 from urllib import parse
 from hashlib import sha256
@@ -33,8 +33,17 @@ class Paxful(StockBase):
         headers = {'Accept': 'application/json', 'Content-Type': 'text/plain'}
         request = http.request('POST', url, headers=headers)
         response = request.data
-        # response = json.loads(response.decode('utf-8'))
-        print(response)
+        response = json.loads(response.decode('utf-8'))
+        if not response['status'] or response['status'] != 'success':
+            return False
+        currencies = []
+        for rate in response['data']:
+            if rate['rate_USD'] == 0 or rate['rate_BTC'] == 0:
+                continue
+            currencies.append(rate['code'].upper())
+        filtered = set(currencies)
+        self.currencies = list(filtered)
+        return self
 
     def set_countries(self):
         return None
@@ -47,81 +56,30 @@ class Paxful(StockBase):
 
     def set_markets(self):
         markets = []
-        url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
-        response_btc = self.get_request(url)
-        if not response_btc['data']:
+        http = urllib3.PoolManager()
+        url = 'https://paxful.com/api/currency/rates'
+        headers = {'Accept': 'application/json', 'Content-Type': 'text/plain'}
+        request = http.request('POST', url, headers=headers)
+        response = request.data
+        response = json.loads(response.decode('utf-8'))
+        if not response['status'] or response['status'] != 'success':
             return False
-
-        for market in response_btc['data']['rates']:
-            if market == 'BTC':
-                continue
-            if response_btc['data']['rates'][market] == 0:
+        for rate in response['data']:
+            if rate['rate_USD'] == 0 or rate['rate_BTC'] == 0:
                 continue
             markets.append({
                 'base_currency': 'BTC',
-                'compare_currency': market,
+                'compare_currency': rate['code'],
                 'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
-                'high_price': 1 / float(response_btc['data']['rates'][market]),
-                'low_price': 1 / float(response_btc['data']['rates'][market]),
-                'last_price': 1 / float(response_btc['data']['rates'][market]),
-                'average_price': 1 / float(response_btc['data']['rates'][market]),
-                'btc_price': 1 / float(response_btc['data']['rates'][market]),
+                'high_price': 1 / float(rate['rate_BTC']),
+                'low_price': 1 / float(rate['rate_BTC']),
+                'last_price': 1 / float(rate['rate_BTC']),
+                'average_price': 1 / float(rate['rate_BTC']),
+                'btc_price': 1 / float(rate['rate_BTC']),
                 'volume': 0,
                 'base_volume': 0,
                 'ask': 0,
                 'bid': 0
             })
-
-        url = 'https://api.coinbase.com/v2/exchange-rates'
-        response_usd = self.get_request(url)
-        if not response_usd['data']:
-            return False
-
-        for market in response_usd['data']['rates']:
-            if market == 'USD':
-                continue
-            if float(response_usd['data']['rates'][market]) == 0:
-                continue
-            markets.append({
-                'base_currency': 'USD',
-                'compare_currency': market,
-                'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
-                'high_price': 1 / float(response_usd['data']['rates'][market]),
-                'low_price': 1 / float(response_usd['data']['rates'][market]),
-                'last_price': 1 / float(response_usd['data']['rates'][market]),
-                'average_price': 1 / float(response_usd['data']['rates'][market]),
-                'btc_price': 1 / float(response_btc['data']['rates'][market]),
-                'volume': 0,
-                'base_volume': 0,
-                'ask': 0,
-                'bid': 0
-            })
-
-        currencies = ['ETH', 'LTC']
-        for currency in currencies:
-            url_tmp = 'https://api.coinbase.com/v2/exchange-rates?currency=' + currency
-            response_tmp = self.get_request(url_tmp)
-            if not response_tmp['data']:
-                continue
-
-            for market in response_usd['data']['rates']:
-                if market == currency:
-                    continue
-                if float(response_tmp['data']['rates'][market]) == 0:
-                    continue
-                markets.append({
-                    'base_currency': currency,
-                    'compare_currency': market,
-                    'date': datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'),
-                    'high_price': 1 / float(response_tmp['data']['rates'][market]),
-                    'low_price': 1 / float(response_tmp['data']['rates'][market]),
-                    'last_price': 1 / float(response_tmp['data']['rates'][market]),
-                    'average_price': 1 / float(response_tmp['data']['rates'][market]),
-                    'btc_price': 1 / float(response_btc['data']['rates'][market]),
-                    'volume': 0,
-                    'base_volume': 0,
-                    'ask': 0,
-                    'bid': 0
-                })
         self.markets = markets
         return self

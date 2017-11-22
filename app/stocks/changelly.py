@@ -13,6 +13,8 @@ class Changelly(StockBase):
     STOCK_URL = 'https://changelly.com/'
     # API_KEY = 'b67925c2f53647af9f837f43e851047c'
     # API_SECRET = 'b4598e2136e8c893074374d9101a7e2ed07495c79ebf7970c938c46b17608ee7'
+    API_KEY = ''
+    API_SECRET = ''
     markets = []
     currencies = []
 
@@ -21,8 +23,8 @@ class Changelly(StockBase):
         self.url = 'https://changelly.com/'
         if stock is not None:
             self.id = stock.id
-            self.api_key = stock.api_key
-            self.api_secret = stock.api_secret
+            self.API_KEY = stock.api_key
+            self.API_SECRET = stock.api_secret
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.url!r}>'.format(self)
@@ -31,8 +33,8 @@ class Changelly(StockBase):
         http = urllib3.PoolManager()
         data = {"id": "test", "jsonrpc": "2.0", "method": 'getCurrenciesFull', "params": {}}
         data = json.dumps(data)
-        sign = hmac.new(self.api_secret.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
-        headers = {'api-key': self.api_key, 'sign': sign, 'content-type': 'application/json'}
+        sign = hmac.new(self.API_SECRET.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
+        headers = {'api-key': self.API_KEY, 'sign': sign, 'content-type': 'application/json'}
         request = http.request('POST', 'http://api.changelly.com', body=data, headers=headers)
         response = request.data
         response = json.loads(response.decode('utf-8'))
@@ -65,8 +67,8 @@ class Changelly(StockBase):
         for params in data_currency:
             data = {"id": "test", "jsonrpc": "2.0", "method": 'getExchangeAmount', "params": params}
             data = json.dumps(data)
-            sign = hmac.new(self.api_secret.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
-            headers = {'api-key': self.api_key, 'sign': sign, 'content-type': 'application/json'}
+            sign = hmac.new(self.API_SECRET.encode('utf-8'), data.encode('utf-8'), hashlib.sha512).hexdigest()
+            headers = {'api-key': self.API_KEY, 'sign': sign, 'content-type': 'application/json'}
             request = http.request('POST', 'http://api.changelly.com', body=data, headers=headers)
             response = request.data
             response = json.loads(response.decode('utf-8'))

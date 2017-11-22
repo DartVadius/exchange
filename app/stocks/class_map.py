@@ -1,4 +1,4 @@
-from app.stocks import bittrex, localbitcoins, coinbase, indacoin, spectrocoin, shapeshift, changelly
+from app.stocks import bittrex, localbitcoins, coinbase, indacoin, spectrocoin, shapeshift, changelly, paxful
 
 classmap = {
     'bittrex': bittrex.Bittrex,
@@ -7,5 +7,6 @@ classmap = {
     'indacoin': indacoin.Indacoin,
     'spectrocoin': spectrocoin.Spectrocoin,
     'shapeshift': shapeshift.Shapeshift,
-    'changelly': changelly.Changelly
+    'changelly': changelly.Changelly,
+    'paxful': paxful.Paxful
 }

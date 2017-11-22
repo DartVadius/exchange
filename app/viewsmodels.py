@@ -11,7 +11,7 @@ from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
 from app.dbmodels import Currencies
-from app.stocks.paxful import Paxful
+from app.stocks.changelly import Changelly
 
 
 class ViewsModels:
@@ -88,9 +88,9 @@ class ViewsModels:
 
     @staticmethod
     def test():
-        model = Paxful()
+        model = StatisticService()
         # model.create_graph('BTC')
-        model.set_currencies()
+        model.set_statistic()
         # model.set_markets()
         # model.set_markets()
         # print(model.set_markets())
