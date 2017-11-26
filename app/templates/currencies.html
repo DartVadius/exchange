@@ -48,7 +48,7 @@
             {% for currency in currencies.items %}
             <tr>
                 <td>{{currency.rank}}</td>
-                <td><a href="/currency/{{currency.symbol.lower()}}">{{currency.symbol}}</a></td>
+                <td><a href="/currencies/{{currency.symbol.lower()}}">{{currency.symbol}}</a></td>
                 <td>{{currency.name}}</td>
                 <td>{{'%0.0f'| format(currency.market_cap_usd|float)}}</td>
                 <td>{{'%g'| format(currency.price_usd|float)}}</td>

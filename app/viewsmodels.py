@@ -19,18 +19,19 @@ class ViewsModels:
         user_session = SessionService()
         user_session.set_count()
 
-    def currencies(self, page, all_currencies):
+    def currencies(self, page, currency):
         currency_repository = CurrencyRepository()
-        stat_serv = StatisticService()
-        if all_currencies == 'all':
+        if currency != 'all' and currency != '':
+            rate_repository = RateRepository()
+            currency_data = rate_repository.get_currency_rates_by_name(currency)
+            return render_template("currency.html", title=currency.upper(), currency_data=currency_data)
+        if currency == 'all':
             curr = Currencies()
             currencies = currency_repository.get_currencies_statistic_paginate(1, curr.count())
             all_pages = True
-        else:
+        if currency == '':
             currencies = currency_repository.get_currencies_statistic_paginate(page, 100)
             all_pages = False
-        # for currency in currencies.items:
-        #     currency.graph = stat_serv.create_graph_main(currency.symbol)
         return render_template("currencies.html", title='Currencies', currencies=currencies, all=all_pages)
 
     def stock(self, stock_slug):

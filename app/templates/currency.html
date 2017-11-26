@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% block header %}{% include "header.html" %}{% endblock %}
+{% block navigation %}{% include "navigation.html" %}{% endblock %}
+<section class="table">
+    <div class="container">
+        <table class="responsive-table bordered centered">
+            <thead>
+            <tr>
+                <th>Market</th>
+                <th>Pair</th>
+                <th>Currency</th>
+                <th>Price</th>
+                <th>Price, BTC</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for market in currency_data %}
+            <tr>
+                <td><b><a href="/stock/{{market.lower()}}">{{market.upper()}}</a></b></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            {% for currency in currency_data[market] %}
+            <tr>
+                <td><a href="/stock/{{market.lower()}}">{{market.title()}}</a></td>
+                <td>{{currency.rate_base_currency.name}}/{{currency.rate_compare_currency.name}}</td>
+                <td>{{currency.rate_compare_currency.name}}</td>
+                <td>{{'{0:f}'.format(currency.average_price)}}</td>
+                <td>{{'{0:f}'.format(currency.btc_price)}}</td>
+            </tr>
+            {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% block footer %}{% include "footer.html" %}{% endblock %}
+{% endblock %}
