@@ -11,7 +11,7 @@ from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
 from app.dbmodels import Currencies
-from app.stocks.shapeshift import Shapeshift
+from app.stocks.changelly import Changelly
 
 
 class ViewsModels:
@@ -91,6 +91,7 @@ class ViewsModels:
         model = StatisticService()
         # model.create_graph('BTC')
         model.set_statistic()
+        # model.set_markets()
         # model.set_markets()
         # print(model.set_markets())
         return redirect(url_for('admin.index'))
