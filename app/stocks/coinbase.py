@@ -23,7 +23,7 @@ class Coinbase(StockBase):
     def set_currencies(self):
         url = 'https://api.coinbase.com/v2/currencies'
         response = self.get_request(url)
-        if not response['data']:
+        if response['errors']:
             return False
         self.currencies = [currency['id'].upper() for currency in response['data']]
         return self
