@@ -335,9 +335,10 @@ class CurrenciesAdmin(AdminModelView):
     page_size = 30
     column_hide_backrefs = True
     column_display_all_relations = False
+    column_list = ('name', 'description', 'slug', 'type')
     form_columns = ['name', 'description', 'slug', 'type', 'meta_tags', 'meta_description', ]
     can_edit = True
-    column_editable_list = ('description', 'slug', 'type', 'meta_tags', 'meta_description',)
+    column_editable_list = ('description', 'slug', 'meta_tags', 'meta_description',)
     form_overrides = dict(
         type=Select2Field
     )

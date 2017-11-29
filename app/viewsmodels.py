@@ -12,6 +12,8 @@ from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
 from app.dbmodels import Currencies
 from app.stocks.changelly import Changelly
+import datetime
+import time
 
 
 class ViewsModels:
@@ -21,10 +23,15 @@ class ViewsModels:
 
     def currencies(self, page, currency):
         currency_repository = CurrencyRepository()
+        statistic_service = StatisticService()
         if currency != 'all' and currency != '':
             rate_repository = RateRepository()
             currency_data = rate_repository.get_currency_rates_by_name(currency)
-            return render_template("currency.html", title=currency.upper(), currency_data=currency_data)
+            date_end = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+            date_start = datetime.date.today() + datetime.timedelta(days=-7)
+            date_start = date_start.strftime('%Y-%m-%d %H:%M:%S')
+            graph = statistic_service.create_graph_strait(currency, date_start, date_end)
+            return render_template("currency.html", title=currency.upper(), currency_data=currency_data, graph=graph)
         if currency == 'all':
             curr = Currencies()
             currencies = currency_repository.get_currencies_statistic_paginate(1, curr.count())
