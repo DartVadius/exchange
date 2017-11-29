@@ -16,3 +16,5 @@ class CurrencyRepository:
 
     def get_currencies_statistic_paginate(self, page, item_per_page):
         return CurrencyStatistic.query.order_by(CurrencyStatistic.rank).paginate(page, item_per_page, False)
+
+

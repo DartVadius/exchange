@@ -1,5 +1,5 @@
 from app.dbmodels import ExchangeRates
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from app.dbmodels import Currencies
 
 
@@ -19,3 +19,15 @@ class RateRepository:
             func.sum(ExchangeRates.volume * ExchangeRates.btc_price).label('sum')).filter(
             (ExchangeRates.compare_currency_id == currency_id) | (ExchangeRates.base_currency_id == currency_id)).one()
         return result[0]
+
+    def get_currency_rates_by_name(self, name):
+        exchange_rates = ExchangeRates.query.filter(
+            or_(
+                ExchangeRates.base_currency_id == Currencies.query.filter_by(slug=name.lower()).first().id,
+                ExchangeRates.compare_currency_id == Currencies.query.filter_by(slug=name.lower()).first().id,
+            )
+        ).all()
+        m = {}
+        for rate in exchange_rates:
+            m.setdefault(rate.stock_exchanges.name, []).append(rate)
+        return m

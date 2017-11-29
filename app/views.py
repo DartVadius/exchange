@@ -9,11 +9,11 @@ def stock(stock_slug):
 
 
 @app.route('/', methods=['GET'])
-@app.route('/currencies/<string:all_currencies>', methods=['GET'])
+@app.route('/currencies/<string:currency>', methods=['GET'])
 @app.route('/currencies/<int:page>', methods=['GET'])
-def stocks(page=1, all_currencies=''):
+def stocks(page=1, currency=''):
     view = ViewsModels()
-    return view.currencies(page, all_currencies)
+    return view.currencies(page, currency)
 
 
 @app.route('/stocks', methods=['GET'])
