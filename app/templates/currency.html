@@ -3,6 +3,11 @@
 {% block content %}
 {% block header %}{% include "header.html" %}{% endblock %}
 {% block navigation %}{% include "navigation.html" %}{% endblock %}
+<div id="chart" class="container">
+    <section class="table">
+        <embed type="image/svg+xml" src= {{ graph|safe }} />
+    </section>
+</div>
 <section class="table">
     <div class="container">
         <table class="responsive-table bordered centered">
@@ -19,6 +24,7 @@
             {% for market in currency_data %}
             <tr>
                 <td><b><a href="/stock/{{market.lower()}}">{{market.upper()}}</a></b></td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>

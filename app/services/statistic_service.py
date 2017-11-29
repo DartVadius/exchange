@@ -6,6 +6,7 @@ import datetime
 import time
 from app import db
 from app.dbmodels import CurrencyStatistic, CurrencyStatisticHistory, Currencies
+from sqlalchemy import and_
 
 
 class StatisticService:
@@ -86,13 +87,30 @@ class StatisticService:
             self.create_graph_main(statistic_item.symbol, date_start, date_end)
 
     def create_graph_main(self, symbol, start=None, end=None):
-        stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol)
         if start is not None and end is not None:
-            stats.filter(CurrencyStatisticHistory.date >= start).filter(CurrencyStatisticHistory.date <= end)
-        stats = stats.all()
+            stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol).filter(
+                and_(CurrencyStatisticHistory.date >= start, CurrencyStatisticHistory.date <= end)
+            ).all()
+        else:
+            stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol).all()
         prices = [float(stat.price_usd) for stat in stats]
         # times = ['%s' % stat.date for stat in stats]
-        bar_chart = pygal.Line(show_legend=False, show_y_labels=False, width=166, height=50, explicit_size=True,
-                               style=LightStyle)
+        bar_chart = pygal.Line(show_legend=False, show_y_labels=False, width=166, height=100, explicit_size=True,
+                               show_dots=False, style=LightStyle)
         bar_chart.add('USD', prices)
         bar_chart.render_to_png('app/static/img/graphs/' + symbol + '.png')
+
+    def create_graph_strait(self, symbol, start=None, end=None):
+        if start is not None and end is not None:
+            stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol).filter(
+                and_(CurrencyStatisticHistory.date >= start, CurrencyStatisticHistory.date <= end)
+            ).all()
+        else:
+            stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol).all()
+        prices = [float(stat.price_usd) for stat in stats]
+        times = ['%s' % stat.date for stat in stats]
+        bar_chart = pygal.Line(width=800, height=500, explicit_size=True, style=LightStyle, x_label_rotation=70,
+                               dots_size=2)
+        bar_chart.add('USD', prices)
+        bar_chart.x_labels = times
+        return bar_chart.render_data_uri()
