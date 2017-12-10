@@ -56,3 +56,15 @@ def exchange():
 def test():
     view = ViewsModels()
     return view.test()
+
+
+@app.route('/api/v1.0/auth', methods=['POST', 'GET', 'PUT', 'DELETE', 'PATCH'])
+def auth():
+    view = ViewsModels()
+    return view.get_token()
+
+
+@app.route('/api/v1.0/statistic', methods=['POST', 'GET', 'PUT', 'DELETE', 'PATCH'])
+def get_statistic():
+    view = ViewsModels()
+    return view.get_statistic()

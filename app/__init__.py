@@ -1,5 +1,6 @@
 from flask import Flask, g
 from app import database
+from app.custom_session_interface import CustomSessionInterface
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_bcrypt import Bcrypt
@@ -16,6 +17,8 @@ migrate = Migrate(app, db)
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
+
+app.session_interface = CustomSessionInterface()
 
 bcrypt = Bcrypt(app)
 

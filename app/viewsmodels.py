@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, url_for, session
+from flask import render_template, redirect, request, url_for, session, make_response, abort, jsonify
 from flask_login import login_user, logout_user, current_user
 
 from app.forms import LoginForm
@@ -11,6 +11,7 @@ from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
 from app.dbmodels import Currencies
+from app.apiV10 import Api
 from app.stocks.changelly import Changelly
 import datetime
 import time
@@ -103,3 +104,13 @@ class ViewsModels:
         # model.set_markets()
         # print(model.set_markets())
         return redirect(url_for('admin.index'))
+
+    @staticmethod
+    def get_token():
+        model = Api()
+        return model.get_token()
+
+    @staticmethod
+    def get_statistic():
+        model = Api()
+        return model.get_statistic()

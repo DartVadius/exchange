@@ -1,0 +1,28 @@
+auth
+http://[hostname]/api/v1.0/auth POST get token
+
+
+statistic
+http://[hostname]/api/v1.0/statistic 	GET получить текущие даннные
+http://[hostname]/api/v1.0/statistic/[date_satart-date_end] GET получить историю за период
+
+stock_exchanges
+
+http://[hostname]/api/v1.0/stock_exchanges GET list of sites
+http://[hostname]/api/v1.0/stock_exchanges POST add site
+http://[hostname]/api/v1.0/stock_exchanges/[id] PATCH update site
+http://[hostname]/api/v1.0/stock_exchanges/[id] DELETE delete site
+
+currencies
+
+http://[hostname]/api/v1.0/currencies GET list of currencies
+http://[hostname]/api/v1.0/currencies POST add currency
+http://[hostname]/api/v1.0/currencies/[id] PATCH update currency
+http://[hostname]/api/v1.0/currencies/[id] DELETE delete currency
+
+exchange_rates
+
+http://[hostname]/api/v1.0/exchange_rates 	GET получить текущие даннные
+http://[hostname]/api/v1.0/exchange_rates/[stock_id]/[date_satart-date_end] GET получить историю за период
+
+curl -i -H "Content-Type: application/json" -X POST -d '{"password":"pass","login":"log"}' http://localhost:5000/api/v1.0/auth

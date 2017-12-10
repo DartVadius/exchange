@@ -57,6 +57,16 @@ class User(db.Model):
         return False
 
 
+class Tokens(db.Model):
+    __tablename__ = 'tokens'
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+
+    id = Column(INTEGER, primary_key=True)
+    token = Column(String(50), nullable=False, unique=True)
+    expired = Column(TIMESTAMP, nullable=False)
+    user_id = Column(INTEGER, nullable=False, index=True)
+
+
 class Currencies(db.Model):
     __tablename__ = 'currencies'
     __table_args__ = {'mysql_engine': 'InnoDB'}
