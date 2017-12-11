@@ -9,6 +9,7 @@ def stock(stock_slug):
 
 
 @app.route('/', methods=['GET'])
+@app.route('/currencies', methods=['GET'])
 @app.route('/currencies/<string:currency>', methods=['GET'])
 @app.route('/currencies/<int:page>', methods=['GET'])
 def stocks(page=1, currency=''):
@@ -65,6 +66,8 @@ def auth():
 
 
 @app.route('/api/v1.0/statistic', methods=['POST', 'GET', 'PUT', 'DELETE', 'PATCH'])
+# @app.route('/api/v1.0/statistic/<int:page>', methods=['POST', 'GET', 'PUT', 'DELETE', 'PATCH'])
+# @app.route('/api/v1.0/statistic/<int:page>/<int:page_count>', methods=['POST', 'GET', 'PUT', 'DELETE', 'PATCH'])
 def get_statistic():
     view = ViewsModels()
     return view.get_statistic()

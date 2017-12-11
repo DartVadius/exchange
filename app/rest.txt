@@ -9,7 +9,7 @@ statistic
 http://[hostname]/api/v1.0/statistic 	GET получить текущие даннные / данные за период
 http://[hostname]/api/v1.0/statistic/[page_num]
 
-curl -i -H "Authorization: Bearer QWxhZGRpbjpPcGVuU2VzYW1l" -H "Content-Type: application/json" -X POST -d '{"password":"pass","login":"log"}' http://localhost:5000/api/v1.0/auth
+curl -i -H "Authorization: Bearer ee4f6cc6-f3e2-44bb-8b09-57e16c8fafc9" -H "Content-Type: application/json" -X GET -d '{"date":{"from":"2017-12-11 00:00:00", "to":"2017-12-13 13:05:11"}, "page":"1", "page_count":"20"}' http://localhost:5000/api/v1.0/statistic
 
 stock_exchanges
 

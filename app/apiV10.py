@@ -4,7 +4,7 @@ import uuid
 
 from flask import jsonify, g, request, make_response
 
-from app.dbmodels import User, Tokens, db
+from app.dbmodels import User, Tokens, db, CurrencyStatistic, CurrencyStatisticHistory
 
 
 class Api:
@@ -21,15 +21,11 @@ class Api:
         # print(s)
         # print(base64.b64decode('YWRtaW5hZG1pbjpxd2VydHkxMjM0').decode('utf-8'))
         if request.method != "POST":
-            response = make_response(jsonify({'error': 'Method Not Allowed'}), 405)
-            response = self.set_no_cache(response)
-            return response
+            return self.set_error_405()
         auth = request.headers.get('Authorization')
         auth = self.parse_auth_header(auth)
         if auth is None or auth['auth_type'] != 'Basic':
-            response = make_response(jsonify({'error': 'bad request'}), 400)
-            response = self.set_no_cache(response)
-            return response
+            return self.set_error_400()
         auth = self.get_login_pass(auth['auth_info'])
         user = User()
         user_auth = user.authenticate(auth['login'], auth['password'])
@@ -57,22 +53,40 @@ class Api:
             response = make_response(jsonify({'token': token, 'expired': expired, 'success': True}), 200)
             response = self.set_no_cache(response)
             return response
+        return self.set_error_403()
+
+    def get_statistic(self):
+        if request.method != "GET":
+            return self.set_error_405()
+        auth = request.headers.get('Authorization')
+        auth = self.parse_auth_header(auth)
+        if auth is None or auth['auth_type'] != 'Bearer' or self.check_token(auth['auth_info']) is False:
+            return self.set_error_403()
+        if request.json is None:
+            return self.set_error_400()
+        data = request.json
+        stat_model = CurrencyStatistic()
+
+
+        print(data['date']['from'])
+        response = make_response(jsonify({'token': 'rrr', 'expired': 'rrr', 'success': True}), 200)
+        response = self.set_no_cache(response)
+        return response
+
+    def set_error_405(self):
+        response = make_response(jsonify({'error': 'Method Not Allowed'}), 405)
+        response = self.set_no_cache(response)
+        return response
+
+    def set_error_403(self):
         response = make_response(jsonify({'error': 'bad auth'}), 403)
         response = self.set_no_cache(response)
         return response
 
-    def get_statistic(self):
-        if request.method != "GET":
-            response = make_response(jsonify({'error': 'Method Not Allowed'}), 405)
-            response = self.set_no_cache(response)
-            return response
-        auth = request.headers.get('Authorization')
-        auth = self.parse_auth_header(auth)
-        if auth is None or auth['auth_type'] != 'Bearer' or self.check_token(auth['auth_info']) is False:
-            response = make_response(jsonify({'error': 'bad auth'}), 403)
-            response = self.set_no_cache(response)
-            return response
-        print(request.json)
+    def set_error_400(self):
+        response = make_response(jsonify({'error': 'bad request'}), 400)
+        response = self.set_no_cache(response)
+        return response
 
     def parse_auth_header(self, header):
         if header is None:
