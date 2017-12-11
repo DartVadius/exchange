@@ -1,10 +1,15 @@
+YWRtaW5hZG1pbjpxd2VydHkxMjM0
+
 auth
 http://[hostname]/api/v1.0/auth POST get token
+curl -i -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" -X POST http://localhost:5000/api/v1.0/auth
 
 
 statistic
-http://[hostname]/api/v1.0/statistic 	GET получить текущие даннные
-http://[hostname]/api/v1.0/statistic/[date_satart-date_end] GET получить историю за период
+http://[hostname]/api/v1.0/statistic 	GET получить текущие даннные / данные за период
+http://[hostname]/api/v1.0/statistic/[page_num]
+
+curl -i -H "Authorization: Bearer QWxhZGRpbjpPcGVuU2VzYW1l" -H "Content-Type: application/json" -X POST -d '{"password":"pass","login":"log"}' http://localhost:5000/api/v1.0/auth
 
 stock_exchanges
 

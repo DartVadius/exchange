@@ -1,7 +1,10 @@
-from flask import Flask, jsonify, g, request, make_response
-from app.dbmodels import User, Tokens, db
-import uuid
+import base64
 import datetime
+import uuid
+
+from flask import jsonify, g, request, make_response
+
+from app.dbmodels import User, Tokens, db
 
 
 class Api:
@@ -13,16 +16,23 @@ class Api:
         # x = self.parse_auth_header(auth)
         # print(x)
         # print(auth_info)
+        # s = 'adminadmin:qwerty1234'
+        # s = base64.b64encode(s.encode('utf-8'))
+        # print(s)
+        # print(base64.b64decode('YWRtaW5hZG1pbjpxd2VydHkxMjM0').decode('utf-8'))
         if request.method != "POST":
             response = make_response(jsonify({'error': 'Method Not Allowed'}), 405)
             response = self.set_no_cache(response)
             return response
-        if not request.json or not 'login' in request.json or not 'password' in request.json:
+        auth = request.headers.get('Authorization')
+        auth = self.parse_auth_header(auth)
+        if auth is None or auth['auth_type'] != 'Basic':
             response = make_response(jsonify({'error': 'bad request'}), 400)
             response = self.set_no_cache(response)
             return response
+        auth = self.get_login_pass(auth['auth_info'])
         user = User()
-        user_auth = user.authenticate(request.json['login'], request.json['password'])
+        user_auth = user.authenticate(auth['login'], auth['password'])
         if user_auth and user_auth.admin == 1 and user_auth.active == 1:
             token_model = Tokens()
             find_token = token_model.query.filter_by(user_id=user_auth.id).first()
@@ -58,17 +68,26 @@ class Api:
             return response
         auth = request.headers.get('Authorization')
         auth = self.parse_auth_header(auth)
-        if auth is None:
+        if auth is None or auth['auth_type'] != 'Bearer' or self.check_token(auth['auth_info']) is False:
             response = make_response(jsonify({'error': 'bad auth'}), 403)
             response = self.set_no_cache(response)
             return response
-
-
+        print(request.json)
 
     def parse_auth_header(self, header):
+        if header is None:
+            return None
         try:
             auth_type, auth_info = header.split(None, 1)
             return {'auth_type': auth_type, 'auth_info': auth_info}
+        except ValueError:
+            return None
+
+    def get_login_pass(self, value):
+        try:
+            value = base64.b64decode(value).decode('utf-8')
+            login, password = value.split(':', 1)
+            return {'login': login, 'password': password}
         except ValueError:
             return None
 
@@ -76,3 +95,10 @@ class Api:
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         return response
+
+    def check_token(self, token):
+        token_model = Tokens()
+        find_token = token_model.query.filter_by(token=token).first()
+        if find_token and find_token.expired > datetime.datetime.now():
+            return True
+        return False
