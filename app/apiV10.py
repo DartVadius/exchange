@@ -3,6 +3,7 @@ import datetime
 import uuid
 
 from flask import jsonify, g, request, make_response
+from sqlalchemy import and_
 
 from app.dbmodels import User, Tokens, db, CurrencyStatistic, CurrencyStatisticHistory
 
@@ -65,10 +66,65 @@ class Api:
         if request.json is None:
             return self.set_error_400()
         data = request.json
-        stat_model = CurrencyStatistic()
 
+        if 'page' in data:
+            page = data['page']
+        else:
+            page = None
 
-        print(data['date']['from'])
+        if 'page_count' in data:
+            page_count = data['page_count']
+        else:
+            page_count = 20
+
+        if 'date' in data and 'from' in data['date']:
+            date_from = data['date']['from']
+            date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d %H:%M:%S').date()
+        else:
+            date_from = None
+
+        if 'date' in data and 'to' in data['date']:
+            date_to = data['date']['to']
+            date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d %H:%M:%S').date()
+        else:
+            date_to = None
+
+        if date_from is None and date_to is None:
+            count = CurrencyStatistic.query.count()
+            select = CurrencyStatistic.query.order_by(CurrencyStatistic.rank)
+        elif date_to is not None and date_from is not None:
+            select = CurrencyStatisticHistory.query.filter(
+                and_(
+                    CurrencyStatisticHistory.date <= date_to,
+                    CurrencyStatisticHistory.date >= date_from,
+                )
+            )
+            count = select.count()
+        elif date_from is not None:
+            select = CurrencyStatisticHistory.query.filter(
+                    CurrencyStatisticHistory.date >= date_from
+            )
+            count = select.count()
+        elif date_to is not None:
+            select = CurrencyStatisticHistory.query.filter(
+                CurrencyStatisticHistory.date <= date_to
+            )
+            count = select.count()
+
+        if page is None:
+            select = select.paginate(1, int(count), False)
+        else:
+            if page_count is None:
+                select = select.paginate(1, 20, False)
+            else:
+                select = select.paginate(1, int(page_count), False)
+
+        print(select.pages)
+        print(select.has_next)
+        print(select.has_prev)
+        for item in select.items:
+            print(item.serialaze())
+
         response = make_response(jsonify({'token': 'rrr', 'expired': 'rrr', 'success': True}), 200)
         response = self.set_no_cache(response)
         return response

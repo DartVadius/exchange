@@ -6,10 +6,10 @@ curl -i -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" -X POST http://localh
 
 
 statistic
-http://[hostname]/api/v1.0/statistic 	GET получить текущие даннные / данные за период
-http://[hostname]/api/v1.0/statistic/[page_num]
+http://[hostname]/api/v1.0/statistic 	GET получить актуальные даннные
 
-curl -i -H "Authorization: Bearer ee4f6cc6-f3e2-44bb-8b09-57e16c8fafc9" -H "Content-Type: application/json" -X GET -d '{"date":{"from":"2017-12-11 00:00:00", "to":"2017-12-13 13:05:11"}, "page":"1", "page_count":"20"}' http://localhost:5000/api/v1.0/statistic
+curl -i -H "Authorization: Bearer 7383d996-4391-43bf-bd31-f414bae76513" -H "Content-Type: application/json" -X GET -d '{"date":{"from":"2017-12-11 00:00:00", "to":"2017-12-13 13:05:11"}, "page":"1", "page_count":"20"}' http://localhost:5000/api/v1.0/statistic
+
 
 stock_exchanges
 

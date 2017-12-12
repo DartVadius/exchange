@@ -157,6 +157,13 @@ class CurrencyStatisticHistory(db.Model):
     def count(self):
         return self.query.count()
 
+    def serialaze(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "symbol": self.symbol
+        }
+
 
 country_method = db.Table('country_method', db.Model.metadata,
                           db.Column('country_id', db.Integer, db.ForeignKey('countries.id'), primary_key=True),

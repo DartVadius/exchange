@@ -10,7 +10,7 @@ from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
-from app.dbmodels import Currencies
+from app.dbmodels import CurrencyStatistic
 from app.apiV10 import Api
 from app.stocks.changelly import Changelly
 import datetime
@@ -34,7 +34,7 @@ class ViewsModels:
             graph = statistic_service.create_graph_strait(currency, date_start, date_end)
             return render_template("currency.html", title=currency.upper(), currency_data=currency_data, graph=graph)
         if currency == 'all':
-            curr = Currencies()
+            curr = CurrencyStatistic()
             currencies = currency_repository.get_currencies_statistic_paginate(1, curr.count())
             all_pages = True
         if currency == '':
