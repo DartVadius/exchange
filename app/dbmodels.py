@@ -108,7 +108,7 @@ class CurrencyStatistic(db.Model):
     rank = Column(INTEGER, nullable=False)
     price_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
     price_btc = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    volume_usd_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    volume_usd_day = Column(DECIMAL(precision=30, scale=10), nullable=True)
     market_cap_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
@@ -138,7 +138,7 @@ class CurrencyStatisticHistory(db.Model):
     rank = Column(INTEGER, nullable=False)
     price_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
     price_btc = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    volume_usd_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
+    volume_usd_day = Column(DECIMAL(precision=30, scale=10), nullable=True)
     market_cap_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
@@ -156,6 +156,13 @@ class CurrencyStatisticHistory(db.Model):
 
     def count(self):
         return self.query.count()
+
+    def serialaze(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "symbol": self.symbol
+        }
 
 
 country_method = db.Table('country_method', db.Model.metadata,

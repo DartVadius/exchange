@@ -3,9 +3,9 @@ import threading
 from werkzeug.contrib.cache import SimpleCache
 
 from app import db
-from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods
+from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods, \
+    CurrencyStatistic
 from app.stocks.class_map import classmap
-from time import sleep
 
 
 class ExchangeService:
@@ -40,7 +40,7 @@ class ExchangeService:
             db.session.add(new_currency)
             db.session.commit()
             self.currencies.append(new_currency)
-        self.cache.set('currency_count', self.currencies.count(self), timeout=60 * 60 * 24 * 30)
+        self.cache.set('currency_count', self.get_currency_count(), timeout=60 * 60 * 24 * 30)
         return self
 
     def set_markets(self, stock_markets, stock):
@@ -157,7 +157,7 @@ class ExchangeService:
         return None
 
     def get_currency_count(self):
-        return Currencies.query.count()
+        return CurrencyStatistic.query.count()
 
     def get_market_count(self):
         return StockExchanges.query.filter_by(active='1').count()

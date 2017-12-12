@@ -1,12 +1,14 @@
-import json
-import pygal
-from pygal.style import LightStyle
-import urllib3.request
 import datetime
+import json
 import time
+
+import pygal
+import urllib3.request
+from pygal.style import LightStyle
+from sqlalchemy import and_
+
 from app import db
 from app.dbmodels import CurrencyStatistic, CurrencyStatisticHistory, Currencies
-from sqlalchemy import and_
 
 
 class StatisticService:
