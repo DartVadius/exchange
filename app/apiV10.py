@@ -13,14 +13,6 @@ class Api:
         g.login_via_header = True
 
     def get_token(self):
-        # auth = request.headers.get('Authorization')
-        # x = self.parse_auth_header(auth)
-        # print(x)
-        # print(auth_info)
-        # s = 'adminadmin:qwerty1234'
-        # s = base64.b64encode(s.encode('utf-8'))
-        # print(s)
-        # print(base64.b64decode('YWRtaW5hZG1pbjpxd2VydHkxMjM0').decode('utf-8'))
         if request.method != "POST":
             return self.set_error_405()
         auth = request.headers.get('Authorization')
@@ -56,15 +48,23 @@ class Api:
             return response
         return self.set_error_403()
 
-    def get_statistic(self):
-        if request.method != "GET":
-            return self.set_error_405()
+    def is_valid_request(self, method):
+        check = False
+        if request.method != method.upper():
+            check = self.set_error_405()
         auth = request.headers.get('Authorization')
         auth = self.parse_auth_header(auth)
         if auth is None or auth['auth_type'] != 'Bearer' or self.check_token(auth['auth_info']) is False:
-            return self.set_error_403()
+            check = self.set_error_403()
         if request.json is None:
-            return self.set_error_400()
+            check = self.set_error_400()
+        return check
+
+    def get_statistic(self):
+        check = self.is_valid_request('GET')
+        if check is not False:
+            return check
+
         data = request.json
 
         if 'page' in data:
@@ -79,13 +79,13 @@ class Api:
 
         if 'date' in data and 'from' in data['date']:
             date_from = data['date']['from']
-            date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d %H:%M:%S').date()
+            date_from = datetime.datetime.strptime(date_from, '%Y-%m-%d %H:%M:%S')
         else:
             date_from = None
 
         if 'date' in data and 'to' in data['date']:
             date_to = data['date']['to']
-            date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d %H:%M:%S').date()
+            date_to = datetime.datetime.strptime(date_to, '%Y-%m-%d %H:%M:%S')
         else:
             date_to = None
 
@@ -102,7 +102,7 @@ class Api:
             count = select.count()
         elif date_from is not None:
             select = CurrencyStatisticHistory.query.filter(
-                    CurrencyStatisticHistory.date >= date_from
+                CurrencyStatisticHistory.date >= date_from
             )
             count = select.count()
         elif date_to is not None:
@@ -111,21 +111,30 @@ class Api:
             )
             count = select.count()
 
-        if page is None:
-            select = select.paginate(1, int(count), False)
+        if page is None or page == '':
+            page = 1
+            select = select.paginate(page, int(count), False)
         else:
-            if page_count is None:
-                select = select.paginate(1, 20, False)
+            if page_count is None or page_count == '':
+                count = 20
+                select = select.paginate(int(page), count, False)
             else:
-                select = select.paginate(1, int(page_count), False)
+                count = page_count
+                select = select.paginate(int(page), int(count), False)
 
-        print(select.pages)
-        print(select.has_next)
-        print(select.has_prev)
-        for item in select.items:
-            print(item.serialaze())
+        # print(select.pages)
+        # print(select.has_next)
+        # print(select.has_prev)
 
-        response = make_response(jsonify({'token': 'rrr', 'expired': 'rrr', 'success': True}), 200)
+        val = [i.serialaze() for i in select.items]
+        res = {
+            'pages total': select.pages,
+            'current page': page,
+            'items per page': count,
+            'result': val
+        }
+
+        response = make_response(jsonify(res), 200)
         response = self.set_no_cache(response)
         return response
 
