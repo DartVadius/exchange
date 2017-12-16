@@ -14,6 +14,22 @@ def _user_loader(user_id):
     return User.query.get(int(user_id))
 
 
+class Content(db.Model):
+    __tablename__ = 'contents'
+
+    id        = db.Column(db.Integer, primary_key=True)
+    url         = db.Column(db.String(256))
+    template    = db.Column(db.String(256))
+    schema      = db.Column(db.Text)
+    data        = db.Column(db.Text)
+
+    def __unicode__(self):
+        return u'content for ' + self.url
+
+    def __str__(self):
+        return 'content for ' + self.url
+
+
 class User(db.Model):
     __tablename__ = 'users'
     __table_args__ = {'mysql_engine': 'InnoDB'}
@@ -376,6 +392,7 @@ class StockExchangesAdmin(AdminModelView):
             ]
         ),
     )
+
 
 
 db.create_all()
