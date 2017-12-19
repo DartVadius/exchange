@@ -1,10 +1,12 @@
 import threading
+import urllib3.request
+import json
 
 from werkzeug.contrib.cache import SimpleCache
 
 from app import db
 from app.dbmodels import StockExchanges, Currencies, ExchangeRates, ExchangeHistory, Countries, PaymentMethods, \
-    CurrencyStatistic
+    CurrencyStatistic, CountryMethod
 from app.stocks.class_map import classmap
 
 
@@ -98,8 +100,25 @@ class ExchangeService:
                     continue
                 local_country = [item.name_alpha2.upper() for item in self.countries]
                 difference = [{'code': item} for item in set(stock_country).difference(local_country)]
+
                 for country in difference:
-                    new_country = Countries(name_alpha2=country['code'].upper(), slug=country['code'].lower())
+                    url = 'https://restcountries.eu/rest/v2/alpha/' + country['code']
+                    http = urllib3.PoolManager()
+                    request = http.request('GET', url)
+                    response = request.data
+                    response = json.loads(response.decode('utf-8'))
+                    name = None
+                    if response['name']:
+                        name = response['name']
+                        name = name.lower()
+                        name = name.replace(" ", "-")
+                        name = name.replace("'", "")
+                        name = name.replace("(", "")
+                        name = name.replace(")", "")
+                        name = name.replace(",", "")
+                        name = name.replace(".", "")
+                    new_country = Countries(name_alpha2=country['code'].upper(), slug=country['code'].lower(),
+                                            description=name)
                     db.session.add(new_country)
                     db.session.commit()
                     self.countries.append(new_country)
@@ -138,8 +157,8 @@ class ExchangeService:
                         continue
                     for aviable_method in aviable_methods:
                         method = PaymentMethods.query.filter_by(code=aviable_method['code']).first()
-                        country.methods.append(method)
-                        db.session.add(country)
+                        link = CountryMethod(country.id, method.id, model.id)
+                        db.session.add(link)
                         db.session.commit()
                         # sleep(10)
         return self

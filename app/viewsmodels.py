@@ -10,7 +10,7 @@ from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
-from app.dbmodels import CurrencyStatistic
+from app.dbmodels import CurrencyStatistic, Countries, PaymentMethods
 from app.apiV10 import Api
 from app.stocks.changelly import Changelly
 import datetime
@@ -52,7 +52,31 @@ class ViewsModels:
         return render_template("stock_view/stock_exchange.html", title=name.title(), rates=exchange_rates,
                                date=date, name=name.title())
 
-    def stocks(self):
+    def buy_btc(self):
+        country = CountryRepository()
+        methods = PaymentMethodRepository()
+        currency = CurrencyRepository()
+        countries = country.get_all()
+        payment_methods = methods.get_all()
+        currencies = currency.get_fiat_currencies()
+        return render_template("buy_currency.html", title='Buy Bitcoin', data=countries, methods=payment_methods,
+                               currencies=currencies)
+
+    def get_payment_method(self):
+        country_id = request.json
+        country_find = Countries.query.filter(Countries.id == country_id).one()
+        h = []
+        for method_x in country_find.method_country:
+            h.append({method_x.id: method_x.name})
+        return jsonify(h)
+
+    def get_sellers(self):
+        data = request.json
+        print(data['currency_id'])
+        return jsonify('s')
+
+    @staticmethod
+    def stocks():
         stock_model = StockRepository()
         all_stocks = stock_model.get_stocks_with_volume_summary()
         return render_template("stocks.html", title='Market\'s list', stocks=all_stocks)
@@ -104,6 +128,8 @@ class ViewsModels:
         # model.set_markets()
         # print(model.set_markets())
         return redirect(url_for('admin.index'))
+
+    # api
 
     @staticmethod
     def get_token():

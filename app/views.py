@@ -29,6 +29,18 @@ def update_rates():
     return view.update_rates()
 
 
+@app.route('/buy-btc', methods=['GET'])
+def buy_btc():
+    view = ViewsModels()
+    return view.buy_btc()
+
+
+@app.route('/get-sellers', methods=['POST'])
+def get_sellers():
+    view = ViewsModels()
+    return view.get_sellers()
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     view = ViewsModels()

@@ -1,0 +1,70 @@
+{% extends "layout2.html" %}
+
+{% block content %}
+{% block header %}{% include "header.html" %}{% endblock %}
+<section>
+    <div class="container">
+        <h1>{{title}}</h1>
+        <div>
+            <form>
+                <h3>By Bitcoin online</h3>
+                <select class="country">
+                    <option value="">Select Country</option>
+                    {% for country in data %}
+                    <option value="{{country.id}}">{{country.description.title().replace("-", " ")}}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <select class="payment-method">
+                    <option value="">Select payment method</option>
+                    {% for method in methods %}
+                    <option value="{{method.id}}">{{method.name.title()}}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <select class="currency">
+                    <option value="">Select currency</option>
+                    {% for currency in currencies %}
+                    <option value="{{currency.id}}">{{currency.name}}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <button class="go">GO</button>
+            </form>
+        </div>
+        <div class="response">
+
+        </div>
+    </div>
+</section>
+
+{% block footer %}{% include "footer.html" %}{% endblock %}
+<script>
+    $(document).ready(function(){
+        $('.go').click(function(e){
+            e.preventDefault();
+            var country_id = $('.country').val();
+            var payment_method_id = $('.payment-method').val();
+            var currency_id = $('.currency').val();
+            console.log(country_id);
+            console.log(payment_method_id);
+            console.log(currency_id);
+            var val = {
+                country_id: country_id,
+                payment_method_id: payment_method_id,
+                currency_id: currency_id
+            }
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(val),
+                contentType: 'application/json',
+                url: '/get-sellers',
+                success: function (response) {
+                    console.log(response)
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
+

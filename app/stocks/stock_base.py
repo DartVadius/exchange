@@ -47,7 +47,6 @@ class StockBase:
                     etc...
                 }]"""
 
-
     @abstractmethod
     def set_countries(self):
         """Return list of available countries or None"""

@@ -11,10 +11,11 @@ class CurrencyRepository:
             currency.volume = volume
         return currencies
 
+    def get_fiat_currencies(self):
+        return Currencies.query.filter_by(type=Currencies.FIAT_MONEY).order_by(Currencies.name).all()
+
     def get_currencies_statistic(self):
         return CurrencyStatistic.query.order_by(CurrencyStatistic.rank).all()
 
     def get_currencies_statistic_paginate(self, page, item_per_page):
         return CurrencyStatistic.query.order_by(CurrencyStatistic.rank).paginate(page, item_per_page, False)
-
-

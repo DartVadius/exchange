@@ -71,6 +71,10 @@ class Currencies(db.Model):
     __tablename__ = 'currencies'
     __table_args__ = {'mysql_engine': 'InnoDB'}
 
+    COIN = '1'
+    TOKEN = '2'
+    FIAT_MONEY = '3'
+
     id = Column(INTEGER, primary_key=True)
     name = Column(String(10), nullable=False, unique=True)
     description = Column(String(255), nullable=True)
@@ -106,16 +110,16 @@ class CurrencyStatistic(db.Model):
                     nullable=False, unique=True)
     name = Column(String(255), nullable=False, unique=False)
     rank = Column(INTEGER, nullable=False)
-    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    volume_usd_day = Column(DECIMAL(precision=30, scale=10), nullable=True)
-    market_cap_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    price_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    price_btc = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    volume_usd_day = Column(DECIMAL(precision=60, scale=20), nullable=True)
+    market_cap_usd = Column(DECIMAL(precision=60, scale=20), nullable=True)
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    available_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
-    total_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
-    max_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    available_supply = Column(DECIMAL(precision=60, scale=20), nullable=True)
+    total_supply = Column(DECIMAL(precision=60, scale=20), nullable=True)
+    max_supply = Column(DECIMAL(precision=60, scale=20), nullable=True)
     date = Column(TIMESTAMP, nullable=False)
 
     statistic_currency = relationship("Currencies", back_populates="statistic", uselist=False,
@@ -136,16 +140,16 @@ class CurrencyStatisticHistory(db.Model):
                     unique=False)
     name = Column(String(255), nullable=False, unique=False)
     rank = Column(INTEGER, nullable=False)
-    price_usd = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    price_btc = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    volume_usd_day = Column(DECIMAL(precision=30, scale=10), nullable=True)
-    market_cap_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    price_usd = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    price_btc = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    volume_usd_day = Column(DECIMAL(precision=60, scale=20), nullable=True)
+    market_cap_usd = Column(DECIMAL(precision=60, scale=20), nullable=True)
     percent_change_hour = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_day = Column(DECIMAL(precision=20, scale=10), nullable=True)
     percent_change_week = Column(DECIMAL(precision=20, scale=10), nullable=True)
-    available_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
-    total_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
-    max_supply = Column(DECIMAL(precision=30, scale=10), nullable=True)
+    available_supply = Column(DECIMAL(precision=20, scale=20), nullable=True)
+    total_supply = Column(DECIMAL(precision=60, scale=20), nullable=True)
+    max_supply = Column(DECIMAL(precision=60, scale=20), nullable=True)
     date = Column(TIMESTAMP, nullable=False)
 
     statistic_currency_history = relationship("Currencies", back_populates="statistic_history", uselist=False,
@@ -165,10 +169,18 @@ class CurrencyStatisticHistory(db.Model):
         }
 
 
-country_method = db.Table('country_method', db.Model.metadata,
-                          db.Column('country_id', db.Integer, db.ForeignKey('countries.id'), primary_key=True),
-                          db.Column('method_id', db.Integer, db.ForeignKey('payment_methods.id'), primary_key=True)
-                          )
+class CountryMethod(db.Model):
+    __tablename__ = 'country_method'
+    country_id = Column(INTEGER, ForeignKey('countries.id', ondelete='CASCADE', onupdate='CASCADE'), primary_key=True)
+    method_id = Column(INTEGER, ForeignKey('payment_methods.id', ondelete='CASCADE', onupdate='CASCADE'),
+                       primary_key=True)
+    exchange_id = Column(INTEGER, ForeignKey('stock_exchanges.id', ondelete='CASCADE', onupdate='CASCADE'),
+                         primary_key=True)
+
+    def __init__(self, countries_id, payment_methods_id, stock_exchanges_id):
+        self.country_id = countries_id
+        self.method_id = payment_methods_id
+        self.exchange_id = stock_exchanges_id
 
 
 class Countries(db.Model):
@@ -180,11 +192,11 @@ class Countries(db.Model):
     slug = Column(String(255), nullable=False, unique=True)
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
-    methods = db.relationship('PaymentMethods', secondary=country_method, lazy='subquery',
-                              backref=db.backref('countries', lazy=True))
+    method_country = relationship("PaymentMethods", secondary='country_method', back_populates="payment_country")
+    stock_country = relationship("StockExchanges", secondary='country_method', back_populates="exchange_country")
 
     def __repr__(self):
-        return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
+        return '<Stats: name={0.name_alpha2!r}, description={0.description!r}>'.format(self)
 
     def count(self):
         return self.query.count()
@@ -201,6 +213,8 @@ class PaymentMethods(db.Model):
     slug = Column(String(255), nullable=False, unique=True)
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
+    payment_country = relationship("Countries", secondary='country_method', back_populates="method_country")
+    payment_stock = relationship("StockExchanges", secondary='country_method', back_populates="exchange_payment")
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.description!r}>'.format(self)
@@ -225,6 +239,8 @@ class StockExchanges(db.Model):
     type = Column(String(45), nullable=False, default='market')
     exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
     exchange_history = relationship('ExchangeHistory', backref='stock_history', lazy=True)
+    exchange_country = relationship("Countries", secondary='country_method', back_populates="stock_country")
+    exchange_payment = relationship("PaymentMethods", secondary='country_method', back_populates="payment_stock")
 
     def __repr__(self):
         return '<Stats: name={0.name!r}, description={0.url!r}>'.format(self)
@@ -363,7 +379,8 @@ class CurrenciesAdmin(AdminModelView):
         type=dict(
             choices=[
                 ('1', 'Coin'),
-                ('2', 'Token')
+                ('2', 'Token'),
+                ('3', 'Fiat')
             ]
         ),
     )
