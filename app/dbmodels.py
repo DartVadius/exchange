@@ -131,6 +131,14 @@ class CurrencyStatistic(db.Model):
     def count(self):
         return self.query.count()
 
+    def serialaze(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "symbol": self.symbol,
+            "date": self.date.strftime('%Y-%m-%d %H:%M:%S')
+        }
+
 
 class CurrencyStatisticHistory(db.Model):
     __tablename__ = 'currency_statistic_history'
@@ -165,7 +173,8 @@ class CurrencyStatisticHistory(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "symbol": self.symbol
+            "symbol": self.symbol,
+            "date": self.date.strftime('%Y-%m-%d %H:%M:%S')
         }
 
 
