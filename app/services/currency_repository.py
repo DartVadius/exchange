@@ -19,3 +19,7 @@ class CurrencyRepository:
 
     def get_currencies_statistic_paginate(self, page, item_per_page):
         return CurrencyStatistic.query.order_by(CurrencyStatistic.rank).paginate(page, item_per_page, False)
+
+    @staticmethod
+    def get_by_id(currency_id):
+        return Currencies.query.filter(Currencies.id == currency_id).one()

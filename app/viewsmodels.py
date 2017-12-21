@@ -10,6 +10,7 @@ from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
+from app.services.localbitcoins.localbitcoins_service import LocalbitcoinsService
 from app.dbmodels import CurrencyStatistic, Countries, PaymentMethods
 from app.apiV10 import Api
 from app.stocks.changelly import Changelly
@@ -71,8 +72,13 @@ class ViewsModels:
         return jsonify(h)
 
     def get_sellers(self):
+        model = LocalbitcoinsService()
         data = request.json
-        print(data['currency_id'])
+        country_find = CountryRepository.get_by_id(data['country_id'])
+        method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
+        currency_find = CurrencyRepository.get_by_id(data['currency_id'])
+        country_sellers = model.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
+        print(country_sellers)
         return jsonify('s')
 
     @staticmethod

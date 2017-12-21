@@ -95,7 +95,13 @@ class StatisticService:
             ).all()
         else:
             stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol).all()
-        prices = [float(stat.price_usd) for stat in stats]
+        prices = []
+        # prices = [float(stat.price_usd) for stat in stats if stat.price_usd is not None]
+        for stat in stats:
+            if stat.price_usd is not None:
+                prices.append(stat.price_usd)
+            else:
+                prices.append(0)
         # times = ['%s' % stat.date for stat in stats]
         bar_chart = pygal.Line(show_legend=False, show_y_labels=False, width=166, height=100, explicit_size=True,
                                show_dots=False, style=LightStyle)
@@ -109,7 +115,12 @@ class StatisticService:
             ).all()
         else:
             stats = CurrencyStatisticHistory.query.filter_by(symbol=symbol).all()
-        prices = [float(stat.price_usd) for stat in stats]
+        prices = []
+        for stat in stats:
+            if stat.price_usd is not None:
+                prices.append(stat.price_usd)
+            else:
+                prices.append(0)
         times = ['%s' % stat.date for stat in stats]
         bar_chart = pygal.Line(width=800, height=500, explicit_size=True, style=LightStyle, x_label_rotation=70,
                                dots_size=2)
