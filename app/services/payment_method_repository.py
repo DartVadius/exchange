@@ -8,4 +8,6 @@ class PaymentMethodRepository:
 
     @staticmethod
     def get_by_id(pm_id):
+        if pm_id == '':
+            return None
         return PaymentMethods.query.filter(PaymentMethods.id == pm_id).one()

@@ -77,8 +77,19 @@ class ViewsModels:
         country_find = CountryRepository.get_by_id(data['country_id'])
         method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
         currency_find = CurrencyRepository.get_by_id(data['currency_id'])
-        country_sellers = model.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
-        print(country_sellers)
+        country_sellers = None
+        method_sellers = None
+        currency_sellers = None
+        if country_find is not None:
+            country_sellers = model.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
+            # print(country_sellers)
+        if method_find is not None:
+            method_sellers = model.buy_bitcoins_method(method_find.method)
+        if currency_find is not None:
+            currency_sellers = model.buy_bitcoins_currency(currency_find.name.lower())
+        common_sellers = model.find_common_sellers(country_sellers,
+                                                   method_sellers,
+                                                   currency_sellers)
         return jsonify('s')
 
     @staticmethod
