@@ -32,16 +32,26 @@
                 <button class="go">GO</button>
             </form>
         </div>
-        <div class="response">
+        <div>
+            <table style="display: none" class="table table-bordered sellers">
+                <thead>
+                <th>Name</th>
+                <th>Feedback Score</th>
+                <th>Trade Count</th>
+                <th>Last Online</th>
+                </thead>
+                <tbody class="response">
 
+                </tbody>
+            </table>
         </div>
     </div>
 </section>
 
 {% block footer %}{% include "footer.html" %}{% endblock %}
 <script>
-    $(document).ready(function(){
-        $('.go').click(function(e){
+    $(document).ready(function () {
+        $('.go').click(function (e) {
             e.preventDefault();
             var country_id = $('.country').val();
             var payment_method_id = $('.payment-method').val();
@@ -60,7 +70,15 @@
                 contentType: 'application/json',
                 url: '/get-sellers',
                 success: function (response) {
-                    console.log(response)
+                    $('table.sellers').show();
+                    var arr = Object.keys(response).map(function (k) {
+                        return response[k]
+                    });
+                    console.log(arr);
+                    $('.response').empty();
+                    arr.forEach(function (item, i, arr) {
+                        $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
+                    });
                 }
             });
         });

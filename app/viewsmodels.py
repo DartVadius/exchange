@@ -82,7 +82,7 @@ class ViewsModels:
         currency_sellers = None
         if country_find is not None:
             country_sellers = model.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
-            # print(country_sellers)
+            print(country_sellers)
         if method_find is not None:
             method_sellers = model.buy_bitcoins_method(method_find.method)
         if currency_find is not None:
@@ -90,7 +90,7 @@ class ViewsModels:
         common_sellers = model.find_common_sellers(country_sellers,
                                                    method_sellers,
                                                    currency_sellers)
-        return jsonify('s')
+        return jsonify(common_sellers)
 
     @staticmethod
     def stocks():

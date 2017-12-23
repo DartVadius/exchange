@@ -374,7 +374,7 @@ class UserAdmin(AdminModelView):
 
 
 class CurrenciesAdmin(AdminModelView):
-    page_size = 30
+    page_size = 50
     column_hide_backrefs = True
     column_display_all_relations = False
     column_list = ('name', 'description', 'slug', 'type')
@@ -393,6 +393,26 @@ class CurrenciesAdmin(AdminModelView):
             ]
         ),
     )
+
+
+class CountriesAdmin(AdminModelView):
+    page_size = 50
+    can_create = False
+    can_edit = True
+    column_list = ('description', 'name_alpha2', 'slug', 'meta_tags', 'meta_description')
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['description', 'meta_tags', 'meta_description']
+
+
+class PaymentMethodsAdmin(AdminModelView):
+    page_size = 50
+    can_create = False
+    can_edit = True
+    column_list = ('name', 'method', 'code', 'description', 'slug', 'meta_tags', 'meta_description')
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['description', 'meta_tags', 'meta_description']
 
 
 class StockExchangesAdmin(AdminModelView):
@@ -426,4 +446,6 @@ db.create_all()
 admin = Admin(app, index_view=AdminHomeView(), name='exchange', template_mode='bootstrap3')
 admin.add_view(CurrenciesAdmin(Currencies, db.session))
 admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
+admin.add_view(CountriesAdmin(Countries, db.session))
+admin.add_view(PaymentMethodsAdmin(PaymentMethods, db.session))
 admin.add_view(UserAdmin(User, db.session))
