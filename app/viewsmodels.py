@@ -32,11 +32,12 @@ def merge_template(template, **kwargs):
     else:
         data = json.loads(contentRecord.data)
 
-    for key,value in data.items():
+    for key, value in data.items():
         if key in kwargs:
             data[key] = kwargs[key]
 
     return render_template(template, **data)
+
 
 class ViewsModels:
     def __init__(self):
@@ -91,22 +92,24 @@ class ViewsModels:
             h.append({method_x.id: method_x.name})
         return jsonify(h)
 
-    @staticmethod
-    def get_sellers():
+    def get_sellers(self):
         model = LocalbitcoinsService()
         data = request.json
+        thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
+        thread_rate.daemon = True
+        thread_rate.start()
         country_find = CountryRepository.get_by_id(data['country_id'])
         method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
         currency_find = CurrencyRepository.get_by_id(data['currency_id'])
         common_sellers = model.get_sellers(country_find, method_find, currency_find)
         return jsonify(common_sellers)
 
-    def update_sellers(self):
-        data = request.json
-        thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
-        thread_rate.daemon = True
-        thread_rate.start()
-        return jsonify(True)
+    # def update_sellers(self):
+    #     data = request.json
+    #     thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
+    #     thread_rate.daemon = True
+    #     thread_rate.start()
+    #     return jsonify(True)
 
     @staticmethod
     def update_sellers_thread(data):
