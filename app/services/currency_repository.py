@@ -24,4 +24,4 @@ class CurrencyRepository:
     def get_by_id(currency_id):
         if currency_id == '':
             return None
-        return Currencies.query.filter(Currencies.id == currency_id).first()
+        return Currencies.query.filter_by(id=currency_id).first()

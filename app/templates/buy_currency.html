@@ -77,15 +77,15 @@
                             $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
                         });
                     }
-                    $.ajax({
-                        type: 'post',
-                        data: JSON.stringify(val),
-                        contentType: 'application/json',
-                        url: '/update-sellers',
-                        success: function (response) {
-
-                        }
-                    });
+                    // $.ajax({
+                    //     type: 'post',
+                    //     data: JSON.stringify(val),
+                    //     contentType: 'application/json',
+                    //     url: '/update-sellers',
+                    //     success: function (response) {
+                    //
+                    //     }
+                    // });
                 }
             });
         });

@@ -10,4 +10,4 @@ class CountryRepository:
     def get_by_id(country_id):
         if country_id == '':
             return None
-        return Countries.query.filter(Countries.id == country_id).one()
+        return Countries.query.filter_by(id=country_id).first()
