@@ -3,6 +3,8 @@
 {% block content %}
 {% block header %}{% include "header.html" %}{% endblock %}
 {% block navigation %}{% include "navigation.html" %}{% endblock %}
+
+{{ About }}
 <div id="chart" class="container">
     <section class="table">
         <embed type="image/svg+xml" src= {{ graph|safe }} />

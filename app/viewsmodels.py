@@ -19,6 +19,24 @@ import time
 import json
 import threading
 
+from app.dbmodels import Content
+
+
+def merge_template(template, **kwargs):
+    contentRecord = Content.query.filter_by(url=request.path).first()
+    if (not contentRecord):
+        return render_template(template, **kwargs)
+
+    if type(contentRecord.data) is dict:
+        data = contentRecord.data
+    else:
+        data = json.loads(contentRecord.data)
+
+    for key,value in data.items():
+        if key in kwargs:
+            data[key] = kwargs[key]
+
+    return render_template(template, **data)
 
 class ViewsModels:
     def __init__(self):
@@ -43,7 +61,7 @@ class ViewsModels:
         if currency == '':
             currencies = currency_repository.get_currencies_statistic_paginate(page, 100)
             all_pages = False
-        return render_template("currencies.html", title='Currencies', currencies=currencies, all=all_pages)
+        return merge_template("currencies.html", title='Currencies', currencies=currencies, all=all_pages)
 
     def stock(self, stock_slug):
         rate_repository = RateRepository()

@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <script src="http://gitlab.a-level.com.ua/gitgod/nanobind/raw/master/static/nb.js"></script>
+        <link rel='stylesheet' href="/static/css/stylesheet.css"></script>
+    </head>
+    <body>
+        <button id='newContent'>+</button>
+        <table id='contentTable'>
+            <thead >
+                <tr id='contentHead'>
+                    <th>
+                        id
+                    </th>
+                    <th>
+                        template
+                    </th>
+                    <th>
+                        url
+                    </th>
+                    <th>
+                        data
+                    </th>
+                    <th>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id='content'>
+                <tr>
+                    <td class='id'>
+                    </td>
+                    <td class='template'>
+                    </td>
+                    <td class='url'>
+                    </td>
+                    <td>
+                        <span class='data'>
+                        </span>
+                        <table class='editDataTable' style='display: none;'>
+                            <tbody class='editData'>
+                                <tr>
+                                    <td class='key'>
+                                    </td>
+                                    <td>
+                                        <input type='text' class='value'>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <button class='del'>X</button>
+                        <button class='edit'>E</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id='templates'>
+        </div>
+        <div id='urls'>
+        </div>
+        <div id='variables'>
+        </div>
+        <script src='/static/js/main.js'></script>
+    </body>
+</html>
