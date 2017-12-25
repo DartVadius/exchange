@@ -41,6 +41,12 @@ def get_sellers():
     return view.get_sellers()
 
 
+@app.route('/update-sellers', methods=['POST'])
+def update_sellers():
+    view = ViewsModels()
+    return view.update_sellers()
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     view = ViewsModels()

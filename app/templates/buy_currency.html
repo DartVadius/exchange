@@ -56,9 +56,6 @@
             var country_id = $('.country').val();
             var payment_method_id = $('.payment-method').val();
             var currency_id = $('.currency').val();
-            console.log(country_id);
-            console.log(payment_method_id);
-            console.log(currency_id);
             var val = {
                 country_id: country_id,
                 payment_method_id: payment_method_id,
@@ -71,13 +68,23 @@
                 url: '/get-sellers',
                 success: function (response) {
                     $('table.sellers').show();
-                    var arr = Object.keys(response).map(function (k) {
-                        return response[k]
-                    });
-                    console.log(arr);
                     $('.response').empty();
-                    arr.forEach(function (item, i, arr) {
-                        $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
+                    if (response !== null) {
+                        var arr = Object.keys(response).map(function (k) {
+                            return response[k]
+                        });
+                        arr.forEach(function (item, i, arr) {
+                            $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
+                        });
+                    }
+                    $.ajax({
+                        type: 'post',
+                        data: JSON.stringify(val),
+                        contentType: 'application/json',
+                        url: '/update-sellers',
+                        success: function (response) {
+
+                        }
                     });
                 }
             });

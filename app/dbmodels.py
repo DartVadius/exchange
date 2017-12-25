@@ -3,10 +3,11 @@ from flask_admin import Admin, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
 from flask_login import current_user
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text, BLOB
 from sqlalchemy.orm import relationship
 
 from app import app, login_manager, bcrypt, db
+from sqlalchemy.dialects.mysql.base import LONGTEXT
 
 
 @login_manager.user_loader
@@ -343,6 +344,16 @@ class ExchangeRates(db.Model):
         self.base_volume = stock['base_volume']
         self.bid = stock['bid']
         self.ask = stock['ask']
+
+
+class SellersCache(db.Model):
+    __tablename__ = 'sellers_cache'
+    code = Column(String(255), primary_key=True)
+    data = Column(LONGTEXT, nullable=False, unique=False)
+
+    def find(self, code):
+        return self.query.filter(self.code == code).first()
+
 
 
 class AdminModelView(ModelView):

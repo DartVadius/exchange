@@ -10,12 +10,14 @@ from app.services.currency_repository import CurrencyRepository
 from app.services.country_repository import CountryRepository
 from app.services.payment_method_repository import PaymentMethodRepository
 from app.services.statistic_service import StatisticService
+from app.services.cache_service import CacheService
 from app.services.localbitcoins.localbitcoins_service import LocalbitcoinsService
 from app.dbmodels import CurrencyStatistic, Countries, PaymentMethods
 from app.apiV10 import Api
-from app.stocks.changelly import Changelly
 import datetime
 import time
+import json
+import threading
 
 
 class ViewsModels:
@@ -71,26 +73,39 @@ class ViewsModels:
             h.append({method_x.id: method_x.name})
         return jsonify(h)
 
-    def get_sellers(self):
+    @staticmethod
+    def get_sellers():
         model = LocalbitcoinsService()
         data = request.json
         country_find = CountryRepository.get_by_id(data['country_id'])
         method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
         currency_find = CurrencyRepository.get_by_id(data['currency_id'])
-        country_sellers = None
-        method_sellers = None
-        currency_sellers = None
-        if country_find is not None:
-            country_sellers = model.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
-            print(country_sellers)
-        if method_find is not None:
-            method_sellers = model.buy_bitcoins_method(method_find.method)
-        if currency_find is not None:
-            currency_sellers = model.buy_bitcoins_currency(currency_find.name.lower())
-        common_sellers = model.find_common_sellers(country_sellers,
-                                                   method_sellers,
-                                                   currency_sellers)
+        common_sellers = model.get_sellers(country_find, method_find, currency_find)
         return jsonify(common_sellers)
+
+    def update_sellers(self):
+        data = request.json
+        thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
+        thread_rate.daemon = True
+        thread_rate.start()
+        return jsonify(True)
+
+    @staticmethod
+    def update_sellers_thread(data):
+        bitcoin_service = LocalbitcoinsService()
+        cache_service = CacheService()
+        if 'payment_method_id' in data:
+            method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
+            method_sellers = bitcoin_service.buy_bitcoins_method(method_find.method)
+            cache_service.set_sellers(method_find.method, json.dumps(method_sellers))
+        if 'country_id' in data:
+            country_find = CountryRepository.get_by_id(data['country_id'])
+            country_sellers = bitcoin_service.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
+            cache_service.set_sellers(country_find.name_alpha2, json.dumps(country_sellers))
+        if 'currency_id' in data:
+            currency_find = CurrencyRepository.get_by_id(data['currency_id'])
+            currency_sellers = bitcoin_service.buy_bitcoins_currency(currency_find.name.lower())
+            cache_service.set_sellers(currency_find.name.lower(), json.dumps(currency_sellers))
 
     @staticmethod
     def stocks():

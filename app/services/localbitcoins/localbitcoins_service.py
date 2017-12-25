@@ -1,6 +1,7 @@
 import json
 
 import urllib3.request
+from app.services.cache_service import CacheService
 
 
 class LocalbitcoinsService:
@@ -40,6 +41,39 @@ class LocalbitcoinsService:
             val.append(result)
             return self.recursive_data(result['pagination']['next'], val)
         return [result]
+
+    def get_sellers(self, country_find, method_find, currency_find):
+        cache_service = CacheService()
+        country_sellers = None
+        method_sellers = None
+        currency_sellers = None
+        if country_find is not None:
+            cache = cache_service.get_sellers(country_find.name_alpha2)
+            if cache is not None:
+                country_sellers = json.loads(cache.data)
+            else:
+                country_sellers = self.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
+                cache_service.set_sellers(country_find.name_alpha2, json.dumps(country_sellers))
+
+        if method_find is not None:
+            cache = cache_service.get_sellers(method_find.method)
+            if cache is not None:
+                method_sellers = json.loads(cache.data)
+            else:
+                method_sellers = self.buy_bitcoins_method(method_find.method)
+                cache_service.set_sellers(method_find.method, json.dumps(method_sellers))
+
+        if currency_find is not None:
+            cache = cache_service.get_sellers(currency_find.name.lower())
+            if cache is not None:
+                currency_sellers = json.loads(cache.data)
+            else:
+                currency_sellers = self.buy_bitcoins_currency(currency_find.name.lower())
+                cache_service.set_sellers(currency_find.name.lower(), json.dumps(currency_sellers))
+
+        return self.find_common_sellers(country_sellers,
+                                        method_sellers,
+                                        currency_sellers)
 
     def find_common_sellers(self, country_sellers, method_sellers, currency_sellers):
         if country_sellers is None and method_sellers is None and currency_sellers is None:
