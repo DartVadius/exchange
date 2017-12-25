@@ -1,5 +1,5 @@
 from app.services.exchange_service import ExchangeService
-from werkzeug.contrib.cache import SimpleCache, MemcachedCache
+from werkzeug.contrib.cache import SimpleCache
 from app.dbmodels import SellersCache
 from app import db
 
