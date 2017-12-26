@@ -153,7 +153,18 @@ class CurrencyStatistic(db.Model):
             "id": self.id,
             "name": self.name,
             "symbol": self.symbol,
-            "date": self.date.strftime('%Y-%m-%d %H:%M:%S')
+            "date": self.date.strftime('%Y-%m-%d %H:%M:%S'),
+            "rank": self.rank,
+            "price_usd": str(self.price_usd),
+            "price_btc": str(self.price_btc),
+            "volume_usd_day": str(self.volume_usd_day),
+            "market_cap_usd": str(self.market_cap_usd),
+            "percent_change_hour": str(self.percent_change_hour),
+            "percent_change_day": str(self.percent_change_day),
+            "percent_change_week": str(self.percent_change_week),
+            "available_supply": str(self.available_supply),
+            "total_supply": str(self.total_supply),
+            "max_supply": str(self.max_supply)
         }
 
 
@@ -191,7 +202,18 @@ class CurrencyStatisticHistory(db.Model):
             "id": self.id,
             "name": self.name,
             "symbol": self.symbol,
-            "date": self.date.strftime('%Y-%m-%d %H:%M:%S')
+            "date": self.date.strftime('%Y-%m-%d %H:%M:%S'),
+            "rank": self.rank,
+            "price_usd": str(self.price_usd),
+            "price_btc": str(self.price_btc),
+            "volume_usd_day": str(self.volume_usd_day),
+            "market_cap_usd": str(self.market_cap_usd),
+            "percent_change_hour": str(self.percent_change_hour),
+            "percent_change_day": str(self.percent_change_day),
+            "percent_change_week": str(self.percent_change_week),
+            "available_supply": str(self.available_supply),
+            "total_supply": str(self.total_supply),
+            "max_supply": str(self.max_supply)
         }
 
 

@@ -1,14 +1,107 @@
-YWRtaW5hZG1pbjpxd2VydHkxMjM0
 
 auth
-http://[hostname]/api/v1.0/auth POST get token
-curl -i -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" -X POST http://localhost:5000/api/v1.0/auth
+
+http(s)://[hostname]/api/v1.0/auth POST get token
+
+python
+authorization_string  = base64.b64encode(b'Login:Password') // логин:пароль кодируем base64
+
+curl
+curl -i -H "Authorization: Basic <authorization_string>" -X POST http(s)://<host_name>/api/v1.0/auth
+
+example
+curl -i -H "Authorization: Basic QWxhZGRpbjpPcGVuU2VzYW1l" -X POST http://localhost:8007/api/v1.0/auth
+
+response
+{
+  "expired": "2017-12-27 16:16:00",
+  "success": true,
+  "token": "c609e947-c828-4936-b8b3-92a08601f766"
+}
+
+response in case error
+{
+  "error": "<error description>"
+}
+
+
 
 
 statistic
-http://[hostname]/api/v1.0/statistic 	GET получить актуальные даннные
 
-curl -i -H "Authorization: Bearer 7383d996-4391-43bf-bd31-f414bae76513" -H "Content-Type: application/json" -X GET -d '{"date":{"from":"2017-12-11 00:00:00", "to":"2017-12-13 13:05:11"}, "page":"1", "page_count":"20"}' http://localhost:5000/api/v1.0/statistic
+http(s)://[hostname]/api/v1.0/statistic 	GET получить актуальные даннные
+
+params
+
+{"date":{"from":"<date from>", "to":"<date to>"}, "page":"<page number to show>", "page_count":"<items per page>"}
+
+date - optional
+from - optional
+to - optional
+если date не указана - получаем последние актуальные данные по криптовалютам, если дата указана - получаем историю за период
+можно указать только from или только to, соответсвенно получим историю с указаной даты по сегодняшний день, или историю с начала по указанную дату
+
+page - optional номер страницы выборки, если не указана - будет выводиться без пагинации !!! лучше так не делать !!!
+
+page_count - optional количество итемов на странице, если не указана - 20 записей по умолчанию
+
+
+curl
+curl -i -H "Authorization: Bearer <token>" -H "Content-Type: application/json" -X GET -d '{"date":{"from":"<date from>", "to":"<date to>"}, "page":"<page number to show>", "page_count":"<items per page>"}' http://localhost:8007/api/v1.0/statistic
+
+
+example
+curl -i -H "Authorization: Bearer c609e947-c828-4936-b8b3-92a08601f766" -H "Content-Type: application/json" -X GET -d '{"date":{"from":"2017-12-11 00:00:00", "to":"2017-12-28 13:05:11"}, "page":"1", "page_count":"2"}' http://localhost:8007/api/v1.0/statistic
+example minimum
+curl -i -H "Authorization: Bearer c609e947-c828-4936-b8b3-92a08601f766" -H "Content-Type: application/json" -X GET -d '{}' http://localhost:8007/api/v1.0/statistic
+
+response
+{
+  "current page": "1",
+  "items per page": "2",
+  "pages total": 253,
+  "result": [
+    {
+      "available_supply": "16754850.00000000000000000000",
+      "date": "2017-12-21 12:29:47",
+      "id": 1,
+      "market_cap_usd": "281491532910.00000000000000000000",
+      "max_supply": "21000000.00000000000000000000",
+      "name": "Bitcoin",
+      "percent_change_day": "-2.9500000000",
+      "percent_change_hour": "-1.4900000000",
+      "percent_change_week": "1.2200000000",
+      "price_btc": "1.0000000000",
+      "price_usd": "16800.6000000000",
+      "rank": 1,
+      "symbol": "BTC",
+      "total_supply": "16754850.00000000000000000000",
+      "volume_usd_day": "18987800000.00000000000000000000"
+    },
+    {
+      "available_supply": "96475491.00000000000000000000",
+      "date": "2017-12-21 12:29:47",
+      "id": 2,
+      "market_cap_usd": "83439047597.00000000000000000000",
+      "max_supply": "None",
+      "name": "Ethereum",
+      "percent_change_day": "5.7300000000",
+      "percent_change_hour": "-0.4100000000",
+      "percent_change_week": "19.8600000000",
+      "price_btc": "0.0516238000",
+      "price_usd": "864.8730000000",
+      "rank": 2,
+      "symbol": "ETH",
+      "total_supply": "96475491.00000000000000000000",
+      "volume_usd_day": "3611930000.00000000000000000000"
+    }
+  ]
+}
+
+response in case error
+{
+  "error": "<error description>"
+}
 
 
 stock_exchanges
