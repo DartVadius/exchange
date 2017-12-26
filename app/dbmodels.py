@@ -3,15 +3,32 @@ from flask_admin import Admin, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
 from flask_login import current_user
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text, BLOB
 from sqlalchemy.orm import relationship
 
 from app import app, login_manager, bcrypt, db
+from sqlalchemy.dialects.mysql.base import LONGTEXT
 
 
 @login_manager.user_loader
 def _user_loader(user_id):
     return User.query.get(int(user_id))
+
+
+class Content(db.Model):
+    __tablename__ = 'contents'
+
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(256))
+    template = db.Column(db.String(256))
+    schema = db.Column(db.Text)
+    data = db.Column(db.Text)
+
+    def __unicode__(self):
+        return u'content for ' + self.url
+
+    def __str__(self):
+        return 'content for ' + self.url
 
 
 class User(db.Model):
@@ -345,6 +362,15 @@ class ExchangeRates(db.Model):
         self.ask = stock['ask']
 
 
+class SellersCache(db.Model):
+    __tablename__ = 'sellers_cache'
+    code = Column(String(255), primary_key=True)
+    data = Column(LONGTEXT, nullable=False, unique=False)
+
+    def find(self, code):
+        return self.query.filter(self.code == code).first()
+
+
 class AdminModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated
@@ -374,7 +400,7 @@ class UserAdmin(AdminModelView):
 
 
 class CurrenciesAdmin(AdminModelView):
-    page_size = 30
+    page_size = 50
     column_hide_backrefs = True
     column_display_all_relations = False
     column_list = ('name', 'description', 'slug', 'type')
@@ -393,6 +419,26 @@ class CurrenciesAdmin(AdminModelView):
             ]
         ),
     )
+
+
+class CountriesAdmin(AdminModelView):
+    page_size = 50
+    can_create = False
+    can_edit = True
+    column_list = ('description', 'name_alpha2', 'slug', 'meta_tags', 'meta_description')
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['description', 'meta_tags', 'meta_description']
+
+
+class PaymentMethodsAdmin(AdminModelView):
+    page_size = 50
+    can_create = False
+    can_edit = True
+    column_list = ('name', 'method', 'code', 'description', 'slug', 'meta_tags', 'meta_description')
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['description', 'meta_tags', 'meta_description']
 
 
 class StockExchangesAdmin(AdminModelView):
@@ -426,4 +472,6 @@ db.create_all()
 admin = Admin(app, index_view=AdminHomeView(), name='exchange', template_mode='bootstrap3')
 admin.add_view(CurrenciesAdmin(Currencies, db.session))
 admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
+admin.add_view(CountriesAdmin(Countries, db.session))
+admin.add_view(PaymentMethodsAdmin(PaymentMethods, db.session))
 admin.add_view(UserAdmin(User, db.session))

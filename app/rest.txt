@@ -31,3 +31,50 @@ http://[hostname]/api/v1.0/exchange_rates 	GET получить текущие �
 http://[hostname]/api/v1.0/exchange_rates/[stock_id]/[date_satart-date_end] GET получить историю за период
 
 curl -i -H "Content-Type: application/json" -X POST -d '{"password":"pass","login":"log"}' http://localhost:5000/api/v1.0/auth
+
+{'data':
+{
+'profile':
+{
+'username': 'alphapeace',
+'trade_count': '26',
+'feedback_score': 100,
+'name': 'alphapeace (26; 100%)',
+'last_online': '2017-12-22T01:29:15+00:00'
+},
+ 'lon': 0.0,
+ 'lat': 0.0,
+ 'require_trade_volume': 0.0,
+ 'visible': True,
+ 'city': '',
+ 'hidden_by_opening_hours': False,
+ 'limit_to_fiat_amounts': '',
+ 'created_at': '2017-12-19T19:43:25+00:00',
+ 'max_amount_available': '1000',
+ 'temp_price': '19218.35',
+ 'trusted_required': False,
+ 'require_trusted_by_advertiser': False,
+ 'payment_window_minutes': 270,
+ 'atm_model': None,
+ 'require_identification': False,
+ 'location_string': 'Canada',
+ 'volume_coefficient_btc': '1.50',
+ 'trade_type': 'ONLINE_SELL',
+ 'countrycode': 'CA',
+ 'is_local_office': False,
+ 'msg': " online bill payment , payee name is 'Canada Post Visa Card' .Check if your bank has this payee in their list. BTC released from escrow after payment is received (can take 1 to 3 business days)",
+ 'ad_id': 642171,
+ 'min_amount': '500',
+ 'age_days_coefficient_limit': '0.00',
+ 'currency': 'CAD',
+ 'email': None,
+ 'first_time_limit_btc': '0.06',
+ 'bank_name': 'bill payment to prepaid debit card',
+ 'online_provider': 'OTHER_PRE_PAID_DEBIT',
+ 'max_amount': '1000',
+ 'sms_verification_required': True,
+ 'temp_price_usd': '15097.49',
+ 'require_feedback_score': 100
+ }
+ },
+ {'actions': {'public_view': 'https://localbitcoins.com/ad/423121'}}

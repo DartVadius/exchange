@@ -10,4 +10,4 @@ class PaymentMethodRepository:
     def get_by_id(pm_id):
         if pm_id == '':
             return None
-        return PaymentMethods.query.filter(PaymentMethods.id == pm_id).one()
+        return PaymentMethods.query.filter_by(id=pm_id).first()
