@@ -3,11 +3,11 @@
 {% block content %}
 {% block header %}{% include "header.html" %}{% endblock %}
 <style>
- #map {
-   width: 100%;
-   height: 400px;
-   background-color: grey;
- }
+    #map {
+        width: 100%;
+        height: 400px;
+        background-color: grey;
+    }
 </style>
 <section>
     <div class="container">
@@ -56,42 +56,72 @@
             </table>
         </div>
         <script>
-          var map, infoWindow;
-          function initMap() {
-            map = new google.maps.Map(document.getElementById('map'), {
-              center: {lat: 50, lng: 30},
-              zoom: 6
+            var map, infoWindow;
+
+            function initMap() {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    center: {lat: 50, lng: 30},
+                    zoom: 6
+                });
+                infoWindow = new google.maps.InfoWindow;
+
+                google.maps.event.addListener(map, "click", function (event) {
+                var lat = event.latLng.lat();
+                var lng = event.latLng.lng();
+                var val = {
+                    lat: lat,
+                    lng: lng
+                }
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(val),
+                    contentType: 'application/json',
+                    url: '/get-sellers-cash',
+                    success: function (response) {
+                        $('table.sellers').show();
+                        $('.response').empty();
+                        if (response !== null) {
+                            var arr = Object.keys(response).map(function (k) {
+                                return response[k]
+                            });
+                            arr.forEach(function (item, i, arr) {
+                                $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
+                            });
+                        }
+                    }
+                });
             });
-            infoWindow = new google.maps.InfoWindow;
 
-            // Try HTML5 geolocation.
-            if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                  lat: position.coords.latitude,
-                  lng: position.coords.longitude
-                };
+                // Try HTML5 geolocation.
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        var pos = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
 
-                infoWindow.setPosition(pos);
-                infoWindow.setContent('Location found.');
-                infoWindow.open(map);
-                map.setCenter(pos);
-              }, function() {
-                handleLocationError(true, infoWindow, map.getCenter());
-              });
-            } else {
-              // Browser doesn't support Geolocation
-              handleLocationError(false, infoWindow, map.getCenter());
+                        infoWindow.setPosition(pos);
+                        infoWindow.setContent('Location found.');
+                        infoWindow.open(map);
+                        map.setCenter(pos);
+                    }, function () {
+                        handleLocationError(true, infoWindow, map.getCenter());
+                    });
+                } else {
+                    // Browser doesn't support Geolocation
+                    handleLocationError(false, infoWindow, map.getCenter());
+                }
             }
-          }
 
-      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-        infoWindow.setPosition(pos);
-        infoWindow.setContent(browserHasGeolocation ?
-                              'Error: The Geolocation service failed.' :
-                              'Error: Your browser doesn\'t support geolocation.');
-        infoWindow.open(map);
-      }
+
+
+            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+                infoWindow.setPosition(pos);
+                infoWindow.setContent(browserHasGeolocation ?
+                    'Error: The Geolocation service failed.' :
+                    'Error: Your browser doesn\'t support geolocation.');
+                infoWindow.open(map);
+            }
 
         </script>
         <script async defer
@@ -130,44 +160,10 @@
                             $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
                         });
                     }
-                    // $.ajax({
-                    //     type: 'post',
-                    //     data: JSON.stringify(val),
-                    //     contentType: 'application/json',
-                    //     url: '/update-sellers',
-                    //     success: function (response) {
-                    //
-                    //     }
-                    // });
                 }
             });
         });
-        google.maps.event.addListener(map, "click", function(event) {
-            var lat = event.latLng.lat();
-            var lng = event.latLng.lng();
-            var val = {
-                lat: lat,
-                lng: lng
-            }
-            $.ajax({
-                type: 'post',
-                data: JSON.stringify(val),
-                contentType: 'application/json',
-                url: '/get-sellers-cash',
-                success: function (response) {
-                    $('table.sellers').show();
-                    $('.response').empty();
-                    if (response !== null) {
-                        var arr = Object.keys(response).map(function (k) {
-                            return response[k]
-                        });
-                        arr.forEach(function (item, i, arr) {
-                            $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
-                        });
-                    }
-                }
-            });
-          });
+
     });
 
 </script>
