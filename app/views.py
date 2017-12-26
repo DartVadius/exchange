@@ -1,14 +1,14 @@
-from app import app
-from app.viewsmodels import ViewsModels
-from flask import render_template
-from flask import jsonify
-from flask import g, request, redirect, url_for
 import json
 
+from flask import jsonify
+from flask import render_template
+from flask import request
 from jinja2schema import infer, to_json_schema
 
+from app import app
 from app import db
 from app.dbmodels import Content
+from app.viewsmodels import ViewsModels
 
 
 @app.route('/stock/<string:stock_slug>', methods=['GET'])
@@ -44,16 +44,34 @@ def buy_btc():
     return view.buy_btc()
 
 
+@app.route('/sell-btc', methods=['GET'])
+def sell_btc():
+    view = ViewsModels()
+    return view.sell_btc()
+
+
 @app.route('/get-sellers', methods=['POST'])
 def get_sellers():
     view = ViewsModels()
     return view.get_sellers()
 
 
-@app.route('/update-sellers', methods=['POST'])
-def update_sellers():
+@app.route('/get-sellers-cash', methods=['POST'])
+def get_sellers_cash():
     view = ViewsModels()
-    return view.update_sellers()
+    return view.get_sellers_cash()
+
+
+@app.route('/get-buyers', methods=['POST'])
+def get_buyers():
+    view = ViewsModels()
+    return view.get_buyers()
+
+
+@app.route('/get-buyers-cash', methods=['POST'])
+def get_buyers_cash():
+    view = ViewsModels()
+    return view.get_buyers_cash()
 
 
 @app.route("/login", methods=["GET", "POST"])

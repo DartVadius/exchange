@@ -3,11 +3,11 @@ from flask_admin import Admin, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
 from flask_login import current_user
-from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text, BLOB
+from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
+from sqlalchemy.dialects.mysql.base import LONGTEXT
 from sqlalchemy.orm import relationship
 
 from app import app, login_manager, bcrypt, db
-from sqlalchemy.dialects.mysql.base import LONGTEXT
 
 
 @login_manager.user_loader
@@ -153,7 +153,18 @@ class CurrencyStatistic(db.Model):
             "id": self.id,
             "name": self.name,
             "symbol": self.symbol,
-            "date": self.date.strftime('%Y-%m-%d %H:%M:%S')
+            "date": self.date.strftime('%Y-%m-%d %H:%M:%S'),
+            "rank": self.rank,
+            "price_usd": str(self.price_usd),
+            "price_btc": str(self.price_btc),
+            "volume_usd_day": str(self.volume_usd_day),
+            "market_cap_usd": str(self.market_cap_usd),
+            "percent_change_hour": str(self.percent_change_hour),
+            "percent_change_day": str(self.percent_change_day),
+            "percent_change_week": str(self.percent_change_week),
+            "available_supply": str(self.available_supply),
+            "total_supply": str(self.total_supply),
+            "max_supply": str(self.max_supply)
         }
 
 
@@ -191,7 +202,18 @@ class CurrencyStatisticHistory(db.Model):
             "id": self.id,
             "name": self.name,
             "symbol": self.symbol,
-            "date": self.date.strftime('%Y-%m-%d %H:%M:%S')
+            "date": self.date.strftime('%Y-%m-%d %H:%M:%S'),
+            "rank": self.rank,
+            "price_usd": str(self.price_usd),
+            "price_btc": str(self.price_btc),
+            "volume_usd_day": str(self.volume_usd_day),
+            "market_cap_usd": str(self.market_cap_usd),
+            "percent_change_hour": str(self.percent_change_hour),
+            "percent_change_day": str(self.percent_change_day),
+            "percent_change_week": str(self.percent_change_week),
+            "available_supply": str(self.available_supply),
+            "total_supply": str(self.total_supply),
+            "max_supply": str(self.max_supply)
         }
 
 
@@ -364,6 +386,15 @@ class ExchangeRates(db.Model):
 
 class SellersCache(db.Model):
     __tablename__ = 'sellers_cache'
+    code = Column(String(255), primary_key=True)
+    data = Column(LONGTEXT, nullable=False, unique=False)
+
+    def find(self, code):
+        return self.query.filter(self.code == code).first()
+
+
+class BuyersCache(db.Model):
+    __tablename__ = 'buyers_cache'
     code = Column(String(255), primary_key=True)
     data = Column(LONGTEXT, nullable=False, unique=False)
 

@@ -165,6 +165,7 @@ class Api:
     def get_login_pass(self, value):
         try:
             value = base64.b64decode(value).decode('utf-8')
+            # print(base64.b64encode(b'login:password'))
             login, password = value.split(':', 1)
             return {'login': login, 'password': password}
         except ValueError:
