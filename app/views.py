@@ -44,6 +44,12 @@ def buy_btc():
     return view.buy_btc()
 
 
+@app.route('/sell-btc', methods=['GET'])
+def sell_btc():
+    view = ViewsModels()
+    return view.sell_btc()
+
+
 @app.route('/get-sellers', methods=['POST'])
 def get_sellers():
     view = ViewsModels()
@@ -56,10 +62,16 @@ def get_sellers_cash():
     return view.get_sellers_cash()
 
 
-@app.route('/update-sellers', methods=['POST'])
-def update_sellers():
+@app.route('/get-buyers', methods=['POST'])
+def get_buyers():
     view = ViewsModels()
-    return view.update_sellers()
+    return view.get_buyers()
+
+
+@app.route('/get-buyers-cash', methods=['POST'])
+def get_buyers_cash():
+    view = ViewsModels()
+    return view.get_buyers_cash()
 
 
 @app.route("/login", methods=["GET", "POST"])

@@ -1,25 +1,25 @@
-from flask import render_template, redirect, request, url_for, session, make_response, abort, jsonify
-from flask_login import login_user, logout_user, current_user
-
-from app.forms import LoginForm
-from app.services.exchange_service import ExchangeService
-from app.services.rate_repository import RateRepository
-from app.services.session_service import SessionService
-from app.services.stock_repository import StockRepository
-from app.services.currency_repository import CurrencyRepository
-from app.services.country_repository import CountryRepository
-from app.services.payment_method_repository import PaymentMethodRepository
-from app.services.statistic_service import StatisticService
-from app.services.cache_service import CacheService
-from app.services.localbitcoins.localbitcoins_service import LocalbitcoinsService
-from app.dbmodels import CurrencyStatistic, Countries, PaymentMethods
-from app.apiV10 import Api
 import datetime
-import time
 import json
 import threading
+import time
 
+from flask import render_template, redirect, request, url_for, session, jsonify
+from flask_login import login_user, logout_user, current_user
+
+from app.apiV10 import Api
 from app.dbmodels import Content
+from app.dbmodels import CurrencyStatistic
+from app.forms import LoginForm
+from app.services.cache_service import CacheService
+from app.services.country_repository import CountryRepository
+from app.services.currency_repository import CurrencyRepository
+from app.services.exchange_service import ExchangeService
+from app.services.localbitcoins.localbitcoins_service import LocalbitcoinsService
+from app.services.payment_method_repository import PaymentMethodRepository
+from app.services.rate_repository import RateRepository
+from app.services.session_service import SessionService
+from app.services.statistic_service import StatisticService
+from app.services.stock_repository import StockRepository
 
 
 def merge_template(template, **kwargs):
@@ -81,16 +81,27 @@ class ViewsModels:
         countries = country.get_all()
         payment_methods = methods.get_all()
         currencies = currency.get_fiat_currencies()
-        return render_template("buy_currency.html", title='Buy Bitcoin', data=countries, methods=payment_methods,
+        return render_template("buy_currency.html", title='Buy Bitcoins', data=countries, methods=payment_methods,
                                currencies=currencies)
 
-    def get_payment_method(self):
-        country_id = request.json
-        country_find = Countries.query.filter(Countries.id == country_id).one()
-        h = []
-        for method_x in country_find.method_country:
-            h.append({method_x.id: method_x.name})
-        return jsonify(h)
+    def sell_btc(self):
+        country = CountryRepository()
+        methods = PaymentMethodRepository()
+        currency = CurrencyRepository()
+        countries = country.get_all()
+        payment_methods = methods.get_all()
+        currencies = currency.get_fiat_currencies()
+        return render_template("sell_currency.html", title='Sell Bitcoins', data=countries, methods=payment_methods,
+                               currencies=currencies)
+
+    #
+    # def get_payment_method(self):
+    #     country_id = request.json
+    #     country_find = Countries.query.filter(Countries.id == country_id).one()
+    #     h = []
+    #     for method_x in country_find.method_country:
+    #         h.append({method_x.id: method_x.name})
+    #     return jsonify(h)
 
     def get_sellers(self):
         model = LocalbitcoinsService()
@@ -104,10 +115,28 @@ class ViewsModels:
         common_sellers = model.get_sellers(country_find, method_find, currency_find)
         return jsonify(common_sellers)
 
+    def get_buyers(self):
+        model = LocalbitcoinsService()
+        data = request.json
+        thread_rate = threading.Thread(target=self.update_buyers_thread, args=(data,))
+        thread_rate.daemon = True
+        thread_rate.start()
+        country_find = CountryRepository.get_by_id(data['country_id'])
+        method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
+        currency_find = CurrencyRepository.get_by_id(data['currency_id'])
+        common_sellers = model.get_buyers(country_find, method_find, currency_find)
+        return jsonify(common_sellers)
+
     def get_sellers_cash(self):
         model = LocalbitcoinsService()
         data = request.json
         places = model.get_sellers_cash(data['lat'], data['lng'])
+        return jsonify(places)
+
+    def get_buyers_cash(self):
+        model = LocalbitcoinsService()
+        data = request.json
+        places = model.get_buyers_cash(data['lat'], data['lng'])
         return jsonify(places)
 
     # def update_sellers(self):
@@ -133,6 +162,23 @@ class ViewsModels:
             currency_find = CurrencyRepository.get_by_id(data['currency_id'])
             currency_sellers = bitcoin_service.buy_bitcoins_currency(currency_find.name.lower())
             cache_service.set_sellers(currency_find.name.lower(), json.dumps(currency_sellers))
+
+    @staticmethod
+    def update_buyers_thread(data):
+        bitcoin_service = LocalbitcoinsService()
+        cache_service = CacheService()
+        if bool(data['payment_method_id']):
+            method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
+            method_sellers = bitcoin_service.sell_bitcoins_method(method_find.method)
+            cache_service.set_buyers(method_find.method, json.dumps(method_sellers))
+        if bool(data['country_id']):
+            country_find = CountryRepository.get_by_id(data['country_id'])
+            country_sellers = bitcoin_service.sell_bitcoins_country(country_find.name_alpha2, country_find.description)
+            cache_service.set_buyers(country_find.name_alpha2, json.dumps(country_sellers))
+        if bool(data['currency_id']):
+            currency_find = CurrencyRepository.get_by_id(data['currency_id'])
+            currency_sellers = bitcoin_service.sell_bitcoins_currency(currency_find.name.lower())
+            cache_service.set_buyers(currency_find.name.lower(), json.dumps(currency_sellers))
 
     @staticmethod
     def stocks():

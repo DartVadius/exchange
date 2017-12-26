@@ -1,7 +1,8 @@
-from app.services.exchange_service import ExchangeService
 from werkzeug.contrib.cache import SimpleCache
-from app.dbmodels import SellersCache
+
 from app import db
+from app.dbmodels import SellersCache, BuyersCache
+from app.services.exchange_service import ExchangeService
 
 
 class CacheService:
@@ -23,7 +24,8 @@ class CacheService:
             self.cache.set('market_count', market_count, timeout=60 * 60 * 24 * 30)
         return market_count
 
-    def set_sellers(self, code, data):
+    @staticmethod
+    def set_sellers(code, data):
         sellers_cache = SellersCache.query.filter_by(code=code).first()
         if sellers_cache is None:
             sellers_cache = SellersCache()
@@ -36,5 +38,24 @@ class CacheService:
         db.session.commit()
         return sellers_cache
 
-    def get_sellers(self, code):
+    @staticmethod
+    def get_sellers(code):
         return SellersCache.query.filter_by(code=code).first()
+
+    @staticmethod
+    def set_buyers(code, data):
+        buyers_cache = BuyersCache.query.filter_by(code=code).first()
+        if buyers_cache is None:
+            buyers_cache = BuyersCache()
+            buyers_cache.code = code
+            buyers_cache.data = data
+            db.session.add(buyers_cache)
+        else:
+            buyers_cache.data = data
+            db.session.add(buyers_cache)
+        db.session.commit()
+        return buyers_cache
+
+    @staticmethod
+    def get_buyers(code):
+        return BuyersCache.query.filter_by(code=code).first()

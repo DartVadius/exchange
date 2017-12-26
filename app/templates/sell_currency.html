@@ -14,7 +14,7 @@
         <h1>{{title}}</h1>
         <div>
             <form>
-                <h3>Buy Bitcoins online</h3>
+                <h3>Sell Bitcoins online</h3>
                 <select class="country">
                     <option value="">Select Country</option>
                     {% for country in data %}
@@ -39,7 +39,7 @@
                 <button class="go">GO</button>
             </form>
         </div>
-        <h3>Buy Bitcoins with cash</h3>
+        <h3>Sell Bitcoins with cash</h3>
         <p>Select your location on the map and click the left mouse button</p>
         <div id="map"></div>
         <div>
@@ -118,7 +118,7 @@
                 type: 'post',
                 data: JSON.stringify(val),
                 contentType: 'application/json',
-                url: '/get-sellers',
+                url: '/get-buyers',
                 success: function (response) {
                     $('table.sellers').show();
                     $('.response').empty();
@@ -153,7 +153,7 @@
                 type: 'post',
                 data: JSON.stringify(val),
                 contentType: 'application/json',
-                url: '/get-sellers-cash',
+                url: '/get-buyers-cash',
                 success: function (response) {
                     $('table.sellers').show();
                     $('.response').empty();
