@@ -171,5 +171,3 @@ curl -i -H "Content-Type: application/json" -X POST -d '{"password":"pass","logi
  }
  },
  {'actions': {'public_view': 'https://localbitcoins.com/ad/423121'}}
-
-coins:vjytnbpfwbz
