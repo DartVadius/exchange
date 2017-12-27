@@ -4,6 +4,8 @@ from app import db
 from app.dbmodels import SellersCache, BuyersCache
 from app.services.exchange_service import ExchangeService
 from sqlalchemy.orm import scoped_session, sessionmaker
+from app import database
+from sqlalchemy import create_engine
 
 
 class CacheService:
@@ -27,16 +29,25 @@ class CacheService:
 
     @staticmethod
     def set_sellers(code, data):
+        engine = create_engine(database.connect)
+        Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+        session = Session()
         sellers_cache = SellersCache.query.filter_by(code=code).first()
         if sellers_cache is None:
             sellers_cache = SellersCache()
             sellers_cache.code = code
             sellers_cache.data = data
-            db.session.add(sellers_cache)
+            local_object = session.merge(sellers_cache)
+            session.add(local_object)
+            # db.session.add(sellers_cache)
         else:
             sellers_cache.data = data
-            db.session.add(sellers_cache)
-        db.session.commit()
+            local_object = session.merge(sellers_cache)
+            session.add(local_object)
+            # db.session.add(sellers_cache)
+        session.commit()
+        session.close()
+        # db.session.commit()
         return sellers_cache
 
     @staticmethod
@@ -45,16 +56,25 @@ class CacheService:
 
     @staticmethod
     def set_buyers(code, data):
+        engine = create_engine(database.connect)
+        Session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+        session = Session()
         buyers_cache = BuyersCache.query.filter_by(code=code).first()
         if buyers_cache is None:
             buyers_cache = BuyersCache()
             buyers_cache.code = code
             buyers_cache.data = data
-            db.session.add(buyers_cache)
+            local_object = session.merge(buyers_cache)
+            session.add(local_object)
+            # db.session.add(buyers_cache)
         else:
             buyers_cache.data = data
-            db.session.add(buyers_cache)
-        db.session.commit()
+            local_object = session.merge(buyers_cache)
+            session.add(local_object)
+            # db.session.add(buyers_cache)
+        # db.session.commit()
+        session.commit()
+        session.close()
         return buyers_cache
 
     @staticmethod
