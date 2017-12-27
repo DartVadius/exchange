@@ -19,56 +19,57 @@ class LocalbitcoinsService:
     def buy_bitcoins_country(self, country_code, country_name):
         url = 'https://localbitcoins.com/buy-bitcoins-online/' + country_code + '/' + country_name + '/.json'
         result = self.get_request(url)
+        print(result['data']['ad_list'])
         if 'pagination' in result:
             val = list()
-            val.append(result)
+            val.append(result['data']['ad_list'])
             return self.recursive_data(result['pagination']['next'], val)
-        return [result]
+        return [result['data']['ad_list']]
 
     def sell_bitcoins_country(self, country_code, country_name):
         url = 'https://localbitcoins.com/sell-bitcoins-online/' + country_code + '/' + country_name + '/.json'
         result = self.get_request(url)
         if 'pagination' in result:
             val = list()
-            val.append(result)
+            val.append(result['data']['ad_list'])
             return self.recursive_data(result['pagination']['next'], val)
-        return [result]
+        return [result['data']['ad_list']]
 
     def buy_bitcoins_method(self, payment_method):
         url = 'https://localbitcoins.com/buy-bitcoins-online/' + payment_method + '/.json'
         result = self.get_request(url)
         if 'pagination' in result:
             val = list()
-            val.append(result)
+            val.append(result['data']['ad_list'])
             return self.recursive_data(result['pagination']['next'], val)
-        return [result]
+        return [result['data']['ad_list']]
 
     def sell_bitcoins_method(self, payment_method):
         url = 'https://localbitcoins.com/sell-bitcoins-online/' + payment_method + '/.json'
         result = self.get_request(url)
         if 'pagination' in result:
             val = list()
-            val.append(result)
+            val.append(result['data']['ad_list'])
             return self.recursive_data(result['pagination']['next'], val)
-        return [result]
+        return [result['data']['ad_list']]
 
     def buy_bitcoins_currency(self, currency):
         url = 'https://localbitcoins.com/buy-bitcoins-online/' + currency + '/.json'
         result = self.get_request(url)
         if 'pagination' in result:
             val = list()
-            val.append(result)
+            val.append(result['data']['ad_list'])
             return self.recursive_data(result['pagination']['next'], val)
-        return [result]
+        return [result['data']['ad_list']]
 
     def sell_bitcoins_currency(self, currency):
         url = 'https://localbitcoins.com/sell-bitcoins-online/' + currency + '/.json'
         result = self.get_request(url)
         if 'pagination' in result:
             val = list()
-            val.append(result)
+            val.append(result['data']['ad_list'])
             return self.recursive_data(result['pagination']['next'], val)
-        return [result]
+        return [result['data']['ad_list']]
 
     def get_sellers(self, country_find, method_find, currency_find):
         cache_service = CacheService()
@@ -204,14 +205,14 @@ class LocalbitcoinsService:
     def get_sellers_dict(sellers):
         resp_dict = dict()
         for value in sellers:
-            sellers_loc = value['data']['ad_list']
+            sellers_loc = value
             sellers_dict = {value['data']['ad_id']: value['data']['profile'] for value in sellers_loc}
             resp_dict.update(sellers_dict)
         return resp_dict
 
     def recursive_data(self, url, val):
         result = self.get_request(url)
-        val.append(result)
+        val.append(result['data']['ad_list'])
         if 'pagination' in result and 'next' in result['pagination']:
             self.recursive_data(result['pagination']['next'], val)
         return val
