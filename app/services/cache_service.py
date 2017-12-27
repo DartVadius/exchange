@@ -3,6 +3,7 @@ from werkzeug.contrib.cache import SimpleCache
 from app import db
 from app.dbmodels import SellersCache, BuyersCache
 from app.services.exchange_service import ExchangeService
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 class CacheService:
@@ -53,7 +54,6 @@ class CacheService:
         else:
             buyers_cache.data = data
             db.session.add(buyers_cache)
-        db.session.commit()
         return buyers_cache
 
     @staticmethod
