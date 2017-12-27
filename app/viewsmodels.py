@@ -166,19 +166,18 @@ class ViewsModels:
     @staticmethod
     def update_buyers_thread(data):
         bitcoin_service = LocalbitcoinsService()
-        cache_service = CacheService()
         if bool(data['payment_method_id']):
             method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
             method_sellers = bitcoin_service.sell_bitcoins_method(method_find.method)
-            cache_service.set_buyers(method_find.method, json.dumps(method_sellers))
+            CacheService.set_buyers(method_find.method, json.dumps(method_sellers))
         if bool(data['country_id']):
             country_find = CountryRepository.get_by_id(data['country_id'])
             country_sellers = bitcoin_service.sell_bitcoins_country(country_find.name_alpha2, country_find.description)
-            cache_service.set_buyers(country_find.name_alpha2, json.dumps(country_sellers))
+            CacheService.set_buyers(country_find.name_alpha2, json.dumps(country_sellers))
         if bool(data['currency_id']):
             currency_find = CurrencyRepository.get_by_id(data['currency_id'])
             currency_sellers = bitcoin_service.sell_bitcoins_currency(currency_find.name.lower())
-            cache_service.set_buyers(currency_find.name.lower(), json.dumps(currency_sellers))
+            CacheService.set_buyers(currency_find.name.lower(), json.dumps(currency_sellers))
 
     @staticmethod
     def stocks():
