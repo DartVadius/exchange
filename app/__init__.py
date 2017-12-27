@@ -13,6 +13,7 @@ app.config['SQLALCHEMY_POOL_TIMEOUT'] = 120
 app.config['SECRET_KEY'] = 'v89gs9dgyd9d256s9fy96jifp80yhpSEEEous'
 app.config['SQLALCHEMY_DATABASE_URI'] = database.connect
 db = SQLAlchemy(app)
+db.session.expire_on_commit = False
 
 migrate = Migrate(app, db)
 
