@@ -54,6 +54,7 @@ class CacheService:
         else:
             buyers_cache.data = data
             db.session.add(buyers_cache)
+        db.session.commit()
         return buyers_cache
 
     @staticmethod
