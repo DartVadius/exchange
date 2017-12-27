@@ -211,6 +211,7 @@ class LocalbitcoinsService:
     def recursive_data(self, url, val):
         result = self.get_request(url)
         val.append(result['data']['ad_list'])
+        CacheService.get_buyers('tmp')
         if 'pagination' in result and 'next' in result['pagination']:
             self.recursive_data(result['pagination']['next'], val)
         return val
