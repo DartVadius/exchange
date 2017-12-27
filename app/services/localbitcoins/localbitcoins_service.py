@@ -72,66 +72,64 @@ class LocalbitcoinsService:
         return [result['data']['ad_list']]
 
     def get_sellers(self, country_find, method_find, currency_find):
-        cache_service = CacheService()
         country_sellers = None
         method_sellers = None
         currency_sellers = None
         if country_find is not None:
-            cache = cache_service.get_sellers(country_find.name_alpha2)
+            cache = CacheService.get_sellers(country_find.name_alpha2)
             if cache is not None:
                 country_sellers = json.loads(cache.data)
             else:
                 country_sellers = self.buy_bitcoins_country(country_find.name_alpha2, country_find.description)
-                cache_service.set_sellers(country_find.name_alpha2, json.dumps(country_sellers))
+                CacheService.set_sellers(country_find.name_alpha2, json.dumps(country_sellers))
 
         if method_find is not None:
-            cache = cache_service.get_sellers(method_find.method)
+            cache = CacheService.get_sellers(method_find.method)
             if cache is not None:
                 method_sellers = json.loads(cache.data)
             else:
                 method_sellers = self.buy_bitcoins_method(method_find.method)
-                cache_service.set_sellers(method_find.method, json.dumps(method_sellers))
+                CacheService.set_sellers(method_find.method, json.dumps(method_sellers))
 
         if currency_find is not None:
-            cache = cache_service.get_sellers(currency_find.name.lower())
+            cache = CacheService.get_sellers(currency_find.name.lower())
             if cache is not None:
                 currency_sellers = json.loads(cache.data)
             else:
                 currency_sellers = self.buy_bitcoins_currency(currency_find.name.lower())
-                cache_service.set_sellers(currency_find.name.lower(), json.dumps(currency_sellers))
+                CacheService.set_sellers(currency_find.name.lower(), json.dumps(currency_sellers))
 
         return self.find_common_result(country_sellers,
                                        method_sellers,
                                        currency_sellers)
 
     def get_buyers(self, country_find, method_find, currency_find):
-        cache_service = CacheService()
         country_buyers = None
         method_buyers = None
         currency_buyers = None
         if country_find is not None:
-            cache = cache_service.get_buyers(country_find.name_alpha2)
+            cache = CacheService.get_buyers(country_find.name_alpha2)
             if cache is not None:
                 country_buyers = json.loads(cache.data)
             else:
                 country_buyers = self.sell_bitcoins_country(country_find.name_alpha2, country_find.description)
-                cache_service.set_buyers(country_find.name_alpha2, json.dumps(country_buyers))
+                CacheService.set_buyers(country_find.name_alpha2, json.dumps(country_buyers))
 
         if method_find is not None:
-            cache = cache_service.get_buyers(method_find.method)
+            cache = CacheService.get_buyers(method_find.method)
             if cache is not None:
                 method_buyers = json.loads(cache.data)
             else:
                 method_buyers = self.sell_bitcoins_method(method_find.method)
-                cache_service.set_buyers(method_find.method, json.dumps(method_buyers))
+                CacheService.set_buyers(method_find.method, json.dumps(method_buyers))
 
         if currency_find is not None:
-            cache = cache_service.get_buyers(currency_find.name.lower())
+            cache = CacheService.get_buyers(currency_find.name.lower())
             if cache is not None:
                 currency_buyers = json.loads(cache.data)
             else:
                 currency_buyers = self.sell_bitcoins_currency(currency_find.name.lower())
-                cache_service.set_buyers(currency_find.name.lower(), json.dumps(currency_buyers))
+                CacheService.set_buyers(currency_find.name.lower(), json.dumps(currency_buyers))
 
         return self.find_common_result(country_buyers,
                                        method_buyers,
