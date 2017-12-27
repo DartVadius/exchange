@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'None'
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 30
 app.config['SECRET_KEY'] = 'v89gs9dgyd9d256s9fy96jifp80yhpSEEEous'
 app.config['SQLALCHEMY_DATABASE_URI'] = database.connect
 db = SQLAlchemy(app)
