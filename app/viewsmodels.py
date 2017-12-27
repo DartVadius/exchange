@@ -106,25 +106,25 @@ class ViewsModels:
     def get_sellers(self):
         model = LocalbitcoinsService()
         data = request.json
-        thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
-        thread_rate.daemon = True
-        thread_rate.start()
         country_find = CountryRepository.get_by_id(data['country_id'])
         method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
         currency_find = CurrencyRepository.get_by_id(data['currency_id'])
         common_sellers = model.get_sellers(country_find, method_find, currency_find)
+        thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
+        thread_rate.daemon = True
+        thread_rate.start()
         return jsonify(common_sellers)
 
     def get_buyers(self):
         model = LocalbitcoinsService()
         data = request.json
-        thread_rate = threading.Thread(target=self.update_buyers_thread, args=(data,))
-        thread_rate.daemon = True
-        thread_rate.start()
         country_find = CountryRepository.get_by_id(data['country_id'])
         method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
         currency_find = CurrencyRepository.get_by_id(data['currency_id'])
         common_sellers = model.get_buyers(country_find, method_find, currency_find)
+        thread_rate = threading.Thread(target=self.update_buyers_thread, args=(data,))
+        thread_rate.daemon = True
+        thread_rate.start()
         return jsonify(common_sellers)
 
     def get_sellers_cash(self):
