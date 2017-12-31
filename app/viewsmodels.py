@@ -7,8 +7,7 @@ from flask import render_template, redirect, request, url_for, session, jsonify
 from flask_login import login_user, logout_user, current_user
 
 from app.apiV10 import Api
-from app.dbmodels import Content
-from app.dbmodels import CurrencyStatistic
+from app.dbmodels import Content, CurrencyStatistic, User
 from app.forms import LoginForm
 from app.services.cache_service import CacheService
 from app.services.country_repository import CountryRepository
