@@ -157,6 +157,10 @@ class ExchangeService:
                         continue
                     for aviable_method in aviable_methods:
                         method = PaymentMethods.query.filter_by(code=aviable_method['code']).first()
+                        link = CountryMethod.query.filter_by(country_id=country.id, method_id=method.id,
+                                                             exchange_id=model.id).first()
+                        if link is not None:
+                            continue
                         link = CountryMethod(country.id, method.id, model.id)
                         db.session.add(link)
                         db.session.commit()

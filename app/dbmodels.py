@@ -1,5 +1,6 @@
 from flask import request, redirect, url_for
 from flask_admin import Admin, expose, AdminIndexView
+from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.form import Select2Field
 from flask_login import current_user
@@ -402,6 +403,17 @@ class BuyersCache(db.Model):
         return self.query.filter(self.code == code).first()
 
 
+class Cities(db.Model):
+    __tablename__ = 'cities'
+    id = Column(INTEGER, primary_key=True)
+    country_code = Column(String(3))
+    city_name = Column(String(255))
+    lat = Column(DECIMAL(precision=13, scale=10))
+    lng = Column(DECIMAL(precision=13, scale=10))
+    link_sellers = Column(String(255))
+    link_buyers = Column(String(255))
+
+
 class AdminModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated
@@ -462,6 +474,19 @@ class CountriesAdmin(AdminModelView):
     form_columns = ['description', 'meta_tags', 'meta_description']
 
 
+class CitiesAdmin(AdminModelView):
+    page_size = 100
+    can_create = False
+    can_edit = True
+    column_list = ('country_code', 'city_name', 'lat', 'lng')
+    column_hide_backrefs = True
+    column_display_all_relations = False
+    form_columns = ['country_code', 'city_name', 'lat', 'lng']
+    column_filters = [
+        FilterEqual(column=Cities.country_code, name='Country code'),
+    ]
+
+
 class PaymentMethodsAdmin(AdminModelView):
     page_size = 50
     can_create = False
@@ -504,5 +529,6 @@ admin = Admin(app, index_view=AdminHomeView(), name='exchange', template_mode='b
 admin.add_view(CurrenciesAdmin(Currencies, db.session))
 admin.add_view(StockExchangesAdmin(StockExchanges, db.session))
 admin.add_view(CountriesAdmin(Countries, db.session))
+admin.add_view(CitiesAdmin(Cities, db.session))
 admin.add_view(PaymentMethodsAdmin(PaymentMethods, db.session))
 admin.add_view(UserAdmin(User, db.session))

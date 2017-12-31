@@ -1,170 +1,177 @@
 {% extends "layout2.html" %}
 
 {% block content %}
-{% block header %}{% include "header.html" %}{% endblock %}
-<style>
-    #map {
-        width: 100%;
-        height: 400px;
-        background-color: grey;
-    }
-</style>
-<section>
-    <div class="container">
-        <h1>{{title}}</h1>
-        <div>
-            <form>
-                <h3>Sell Bitcoins online</h3>
-                <select class="country">
-                    <option value="">Select Country</option>
-                    {% for country in data %}
-                    <option value="{{country.id}}">{{country.description.title().replace("-", " ")}}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <select class="payment-method">
-                    <option value="">Select payment method</option>
-                    {% for method in methods %}
-                    <option value="{{method.id}}">{{method.name.title()}}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <select class="currency">
-                    <option value="">Select currency</option>
-                    {% for currency in currencies %}
-                    <option value="{{currency.id}}">{{currency.name}}</option>
-                    {% endfor %}
-                </select>
-                <br>
-                <button class="go">GO</button>
-            </form>
+    {% block header %}{% include "header.html" %}{% endblock %}
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+            background-color: grey;
+        }
+    </style>
+    <section>
+        <div class="container">
+            <h1>{{ title }}</h1>
+            <div>
+                <form>
+                    <h3>Sell Bitcoins online</h3>
+                    <select class="country country_online">
+                        <option value="">Select Country</option>
+                        {% for country in data %}
+                            <option value="{{ country.id }}">{{ country.description.title().replace("-", " ") }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <select class="payment-method">
+                        <option value="">Select payment method</option>
+                        {% for method in methods %}
+                            <option value="{{ method.id }}">{{ method.name.title() }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <select class="currency">
+                        <option value="">Select currency</option>
+                        {% for currency in currencies %}
+                            <option value="{{ currency.id }}">{{ currency.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <button class="go">GO</button>
+                </form>
+            </div>
+             <div>
+                <form>
+                    <h3>Sell Bitcoins with cash</h3>
+                    <select class="country country_cash">
+                        <option value="">Select Country</option>
+                        {% for country in data %}
+                            <option value="{{ country.id }}">{{ country.description.title().replace("-", " ") }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    <select class="city">
+                        <option value="">Select city</option>
+                    </select>
+                    <br>
+                    <button class="go_cash">GO</button>
+                </form>
+            </div>
+            <div id="count">
+
+            </div>
+            <div>
+                <table style="display: none" class="table table-bordered sellers">
+                    <thead>
+                    <th>Name</th>
+                    <th>Feedback Score</th>
+                    <th>Trade Count</th>
+                    <th>Last Online</th>
+                    </thead>
+                    <tbody class="response">
+
+                    </tbody>
+                </table>
+            </div>
+
         </div>
-        <h3>Sell Bitcoins with cash</h3>
-        <p>Select your location on the map and click the left mouse button</p>
-        <div id="map"></div>
-        <div>
-            <table style="display: none" class="table table-bordered sellers">
-                <thead>
-                <th>Name</th>
-                <th>Feedback Score</th>
-                <th>Trade Count</th>
-                <th>Last Online</th>
-                </thead>
-                <tbody class="response">
+    </section>
 
-                </tbody>
-            </table>
-        </div>
-        <script>
-            var map, infoWindow;
-
-            function initMap() {
-                map = new google.maps.Map(document.getElementById('map'), {
-                    center: {lat: 50, lng: 30},
-                    zoom: 6
-                });
-                infoWindow = new google.maps.InfoWindow;
-
-                google.maps.event.addListener(map, "click", function (event) {
-                    var lat = event.latLng.lat();
-                    var lng = event.latLng.lng();
-                    var val = {
-                        lat: lat,
-                        lng: lng
-                    }
-                    $.ajax({
-                        type: 'post',
-                        data: JSON.stringify(val),
-                        contentType: 'application/json',
-                        url: '/get-buyers-cash',
-                        success: function (response) {
-                            $('table.sellers').show();
-                            $('.response').empty();
-                            if (response !== null) {
-                                var arr = Object.keys(response).map(function (k) {
-                                    return response[k]
-                                });
-                                arr.forEach(function (item, i, arr) {
-                                    $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
-                                });
-                            }
+    {% block footer %}{% include "footer.html" %}{% endblock %}
+    <script>
+        $(document).ready(function () {
+            $('.go').click(function (e) {
+                e.preventDefault();
+                var country_id = $('.country_online').val();
+                var payment_method_id = $('.payment-method').val();
+                var currency_id = $('.currency').val();
+                var val = {
+                    country_id: country_id,
+                    payment_method_id: payment_method_id,
+                    currency_id: currency_id
+                }
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(val),
+                    contentType: 'application/json',
+                    url: '/get-buyers',
+                    success: function (response) {
+                        $('table.sellers').show();
+                        $('.response').empty();
+                        if (response !== null) {
+                            var arr = Object.keys(response).map(function (k) {
+                                return response[k]
+                            });
+                            arr.forEach(function (item, i, arr) {
+                                $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
+                            });
                         }
-                    });
-                });
-
-                // Try HTML5 geolocation.
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(function (position) {
-                        var pos = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-
-                        infoWindow.setPosition(pos);
-                        infoWindow.setContent('Location found.');
-                        infoWindow.open(map);
-                        map.setCenter(pos);
-                    }, function () {
-                        // handleLocationError(true, infoWindow, map.getCenter());
-                    });
-                } else {
-                    // Browser doesn't support Geolocation
-                    // handleLocationError(false, infoWindow, map.getCenter());
-                }
-            }
-
-
-            function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-                infoWindow.setPosition(pos);
-                infoWindow.setContent(browserHasGeolocation ?
-                    'Error: The Geolocation service failed.' :
-                    'Error: Your browser doesn\'t support geolocation.');
-                infoWindow.open(map);
-            }
-
-        </script>
-        <script async defer
-                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOaDPpSjQbFoQmusupLE8GvEH38AX_SIo&callback=initMap">
-        </script>
-
-    </div>
-</section>
-
-{% block footer %}{% include "footer.html" %}{% endblock %}
-<script>
-    $(document).ready(function () {
-        $('.go').click(function (e) {
-            e.preventDefault();
-            var country_id = $('.country').val();
-            var payment_method_id = $('.payment-method').val();
-            var currency_id = $('.currency').val();
-            var val = {
-                country_id: country_id,
-                payment_method_id: payment_method_id,
-                currency_id: currency_id
-            }
-            $.ajax({
-                type: 'post',
-                data: JSON.stringify(val),
-                contentType: 'application/json',
-                url: '/get-buyers',
-                success: function (response) {
-                    $('table.sellers').show();
-                    $('.response').empty();
-                    if (response !== null) {
-                        var arr = Object.keys(response).map(function (k) {
-                            return response[k]
-                        });
-                        arr.forEach(function (item, i, arr) {
-                            $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
-                        });
                     }
-                }
+                });
             });
+            $('.country_cash').change(function () {
+                $('.city').empty();
+                val = '<option value="">Select city</option>';
+                $('.city').append(val);
+                var country_id = $('.country_cash').val();
+                var val = {
+                    country_id: country_id
+                }
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(val),
+                    contentType: 'application/json',
+                    url: '/get-cities',
+                    success: function (response) {
+                        console.log(response);
+                        if (response !== null) {
+                            $.each(response, function (i, item) {
+                                val = '<option value="' + item.city_id + '">' + item.city_name + '</option>';
+                                $('.city').append(val);
+                            });
+                        }
+                    }
+                });
+            });
+            $('.go_cash').click(function (e) {
+                e.preventDefault();
+                var city_id = $('.city').val();
+                var val = {
+                    city_id: city_id
+                }
+                $.ajax({
+                    type: 'post',
+                    data: JSON.stringify(val),
+                    contentType: 'application/json',
+                    url: '/get-buyers-cash',
+                    success: function (response) {
+                        $('#count').empty();
+                        $('#count').html('<h2>Offers found: ' + countProperties(response) + '</h2>');
+                        $('table.sellers').show();
+                        $('.response').empty();
+                        if (response !== null) {
+                            var arr = Object.keys(response).map(function (k) {
+                                return response[k]
+                            });
+                            arr.forEach(function (item, i, arr) {
+                                $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
+                            });
+                        }
+                    }
+                });
+            });
+
+            function countProperties(obj) {
+                var prop;
+                var propCount = 0;
+
+                for (prop in obj) {
+                    propCount++;
+                }
+                return propCount;
+            }
+
         });
 
-    });
-
-</script>
+    </script>
 {% endblock %}
 

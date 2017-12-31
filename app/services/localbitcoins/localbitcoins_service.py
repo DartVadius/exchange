@@ -136,9 +136,18 @@ class LocalbitcoinsService:
     def get_sellers_cash(self, lat, lng):
         url = 'https://localbitcoins.com/api/places/?lat=' + str(lat) + '&lon=' + str(lng)
         result = self.get_request(url)
-        print(result)
         url = result['data']['places'][0]
         result = self.get_request(url['buy_local_url'])
+        return self.get_sellers_dict([result])
+
+    def get_users_cash_link(self, lat, lng):
+        url = 'https://localbitcoins.com/api/places/?lat=' + str(lat) + '&lon=' + str(lng)
+        result = self.get_request(url)
+        url = result['data']['places'][0]
+        return url
+
+    def get_users_cash_list(self, url):
+        result = self.get_request(url)
         return self.get_sellers_dict([result])
 
     def get_buyers_cash(self, lat, lng):

@@ -20,8 +20,6 @@ db = SQLAlchemy(app)
 db.session.expire_on_commit = False
 db.session.pool_pre_ping = True
 
-migrate = Migrate(app, db)
-
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 

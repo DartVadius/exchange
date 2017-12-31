@@ -2,12 +2,13 @@ import datetime
 import json
 import threading
 import time
+import pprint
 
 from flask import render_template, redirect, request, url_for, session, jsonify
 from flask_login import login_user, logout_user, current_user
 
 from app.apiV10 import Api
-from app.dbmodels import Content, CurrencyStatistic, User
+from app.dbmodels import Content, CurrencyStatistic, User, Countries, Cities
 from app.forms import LoginForm
 from app.services.cache_service import CacheService
 from app.services.country_repository import CountryRepository
@@ -19,6 +20,7 @@ from app.services.rate_repository import RateRepository
 from app.services.session_service import SessionService
 from app.services.statistic_service import StatisticService
 from app.services.stock_repository import StockRepository
+from app.dbmodels import db
 
 
 def merge_template(template, **kwargs):
@@ -93,14 +95,15 @@ class ViewsModels:
         return render_template("sell_currency.html", title='Sell Bitcoins', data=countries, methods=payment_methods,
                                currencies=currencies)
 
-    #
-    # def get_payment_method(self):
-    #     country_id = request.json
-    #     country_find = Countries.query.filter(Countries.id == country_id).one()
-    #     h = []
-    #     for method_x in country_find.method_country:
-    #         h.append({method_x.id: method_x.name})
-    #     return jsonify(h)
+    def get_cities(self):
+        country_id = request.json['country_id']
+        country_find = Countries.query.filter(Countries.id == country_id).first()
+        cities_find = Cities.query.filter(Cities.country_code == country_find.name_alpha2).order_by(
+            Cities.city_name).all()
+        h = []
+        for city in cities_find:
+            h.append({'city_id': city.id, 'city_name': city.city_name})
+        return jsonify(h)
 
     def get_sellers(self):
         model = LocalbitcoinsService()
@@ -128,15 +131,29 @@ class ViewsModels:
 
     def get_sellers_cash(self):
         model = LocalbitcoinsService()
-        data = request.json
-        places = model.get_sellers_cash(data['lat'], data['lng'])
-        return jsonify(places)
+        city_id = request.json['city_id']
+        cities_find = Cities.query.filter_by(id=city_id).first()
+        if cities_find.link_sellers is None:
+            url = model.get_users_cash_link(cities_find.lat, cities_find.lng)
+            cities_find.link_sellers = url['buy_local_url']
+            db.session.add(cities_find)
+            db.session.commit()
+        user_list = model.get_users_cash_list(cities_find.link_sellers)
+        # places = model.get_sellers_cash(data['lat'], data['lng'])
+        return jsonify(user_list)
 
     def get_buyers_cash(self):
         model = LocalbitcoinsService()
-        data = request.json
-        places = model.get_buyers_cash(data['lat'], data['lng'])
-        return jsonify(places)
+        city_id = request.json['city_id']
+        cities_find = Cities.query.filter_by(id=city_id).first()
+        if cities_find.link_buyers is None:
+            url = model.get_users_cash_link(cities_find.lat, cities_find.lng)
+            cities_find.link_buyers = url['sell_local_url']
+            db.session.add(cities_find)
+            db.session.commit()
+        user_list = model.get_users_cash_list(cities_find.link_buyers)
+        # places = model.get_sellers_cash(data['lat'], data['lng'])
+        return jsonify(user_list)
 
     # def update_sellers(self):
     #     data = request.json
