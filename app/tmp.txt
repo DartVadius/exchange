@@ -1,4 +1,4 @@
 pip install Flask-Script
 
 # запуск скриптов из консоли
-python cli.py <название_метода>
+python cli.py <название_метода> <param 1> <param 2> etc.

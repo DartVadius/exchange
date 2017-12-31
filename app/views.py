@@ -49,6 +49,7 @@ def sell_btc():
     view = ViewsModels()
     return view.sell_btc()
 
+
 @app.route('/get-cities', methods=['POST'])
 def get_cities():
     view = ViewsModels()

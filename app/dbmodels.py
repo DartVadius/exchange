@@ -476,7 +476,7 @@ class CountriesAdmin(AdminModelView):
 
 class CitiesAdmin(AdminModelView):
     page_size = 100
-    can_create = False
+    can_create = True
     can_edit = True
     column_list = ('country_code', 'city_name', 'lat', 'lng')
     column_hide_backrefs = True
