@@ -127,3 +127,9 @@ class StatisticService:
         bar_chart.add('USD', prices)
         bar_chart.x_labels = times
         return bar_chart.render_data_uri()
+
+    def create_graph_for_single_page(self, currency):
+        date_end = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+        date_start = datetime.date.today() + datetime.timedelta(days=-7)
+        date_start = date_start.strftime('%Y-%m-%d %H:%M:%S')
+        return self.create_graph_strait(currency, date_start, date_end)

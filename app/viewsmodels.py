@@ -8,7 +8,7 @@ from flask import render_template, redirect, request, url_for, session, jsonify
 from flask_login import login_user, logout_user, current_user
 
 from app.apiV10 import Api
-from app.dbmodels import Content, CurrencyStatistic, User, Countries, Cities
+from app.dbmodels import Content, CurrencyStatistic, Countries, Cities
 from app.forms import LoginForm
 from app.services.cache_service import CacheService
 from app.services.country_repository import CountryRepository
@@ -47,14 +47,10 @@ class ViewsModels:
 
     def currencies(self, page, currency):
         currency_repository = CurrencyRepository()
-        statistic_service = StatisticService()
         if currency != 'all' and currency != '':
-            rate_repository = RateRepository()
-            currency_data = rate_repository.get_currency_rates_by_name(currency)
-            date_end = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
-            date_start = datetime.date.today() + datetime.timedelta(days=-7)
-            date_start = date_start.strftime('%Y-%m-%d %H:%M:%S')
-            graph = statistic_service.create_graph_strait(currency, date_start, date_end)
+            statistic_service = StatisticService()
+            currency_data = RateRepository.get_currency_rates_by_name(currency)
+            graph = statistic_service.create_graph_for_single_page(currency)
             return render_template("currency.html", title=currency.upper(), currency_data=currency_data, graph=graph)
         if currency == 'all':
             curr = CurrencyStatistic()
@@ -155,13 +151,6 @@ class ViewsModels:
         # places = model.get_sellers_cash(data['lat'], data['lng'])
         return jsonify(user_list)
 
-    # def update_sellers(self):
-    #     data = request.json
-    #     thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
-    #     thread_rate.daemon = True
-    #     thread_rate.start()
-    #     return jsonify(True)
-
     @staticmethod
     def update_sellers_thread(data):
         bitcoin_service = LocalbitcoinsService()
@@ -241,11 +230,7 @@ class ViewsModels:
     @staticmethod
     def test():
         model = StatisticService()
-        # model.create_graph('BTC')
         model.set_statistic()
-        # model.set_markets()
-        # model.set_markets()
-        # print(model.set_markets())
         return redirect(url_for('admin.index'))
 
     # api

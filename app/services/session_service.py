@@ -1,6 +1,6 @@
 from flask import session
 from app.services.cache_service import CacheService
-from app.dbmodels import Countries, PaymentMethods
+from app.dbmodels import Countries, PaymentMethods, Currencies, StockExchanges
 
 
 class SessionService:
@@ -9,13 +9,13 @@ class SessionService:
 
     def set_currency_count(self):
         if 'currency_count' not in session:
-            session['currency_count'] = self.cache_service.set_currency_count()
+            session['currency_count'] = Currencies.query.count()
             return True
         return False
 
     def set_markets_count(self):
         if 'market_count' not in session:
-            session['market_count'] = self.cache_service.set_markets_count()
+            session['market_count'] = StockExchanges.query.count()
             return True
         return False
 

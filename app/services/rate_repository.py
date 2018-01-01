@@ -20,7 +20,8 @@ class RateRepository:
             (ExchangeRates.compare_currency_id == currency_id) | (ExchangeRates.base_currency_id == currency_id)).one()
         return result[0]
 
-    def get_currency_rates_by_name(self, name):
+    @staticmethod
+    def get_currency_rates_by_name(name):
         exchange_rates = ExchangeRates.query.filter(
             or_(
                 ExchangeRates.base_currency_id == Currencies.query.filter_by(slug=name.lower()).first().id,

@@ -5,7 +5,8 @@ from app import database
 from app.services.exchange_service import ExchangeService
 from app.services.statistic_service import StatisticService
 from flask_sqlalchemy import SQLAlchemy
-import json, csv
+import json
+import csv
 
 app = Flask(__name__)
 
@@ -18,7 +19,7 @@ manager = Manager(app)
 
 @manager.command
 def init_cities_json():
-    # все города с населением более 1000 челоек, дохуя городов
+    # все города с населением более 1000 челоек, дохуя городов короче
     # добавляем в базу список городов из текстового файла
     # использовать 1 раз для инициализации приложения
     with open('app/files/cities.json', encoding="utf8") as json_file:
@@ -53,7 +54,6 @@ def init_cities_csv():
                 city.lat = row[2]
                 city.lng = row[3]
                 db.session.add(city)
-                # print(row[0], row[2], row[3], row[6])
             except Exception as e:
                 print(e.__traceback__)
         db.session.commit()
@@ -61,11 +61,11 @@ def init_cities_csv():
 
 @manager.command
 def update_countries_and_payment_methods():
-    # обновляем список стран и методов оплаты, привязываем методы оплаты к стране
-    test = ExchangeService()
-    test.set_countries()
-    test.set_payment_methods()
-    test.set_payment_methods_by_country_codes()
+    # обновляем список стран и методов оплаты, привязываем методы оплаты к стране и обменнику
+    model = ExchangeService()
+    model.set_countries()
+    model.set_payment_methods()
+    model.set_payment_methods_by_country_codes()
     session.clear()
     return True
 
@@ -89,7 +89,7 @@ def update_statistic():
 
 @manager.command
 def add_user(login, password):
-    # добавление пользователя в дб
+    # добавление пользователя в дб, пользователь добавляется как неактивный
     user = User.create(login, password)
     db.session.add(user)
     db.session.commit()
