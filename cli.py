@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from flask import Flask, session
 from flask_script import Manager
 from app.dbmodels import Cities, User
