@@ -111,7 +111,7 @@ class ViewsModels:
         thread_rate = threading.Thread(target=self.update_sellers_thread, args=(data,))
         thread_rate.daemon = True
         thread_rate.start()
-        return jsonify(common_sellers)
+        return jsonify(len(common_sellers.keys()))
 
     def get_buyers(self):
         model = LocalbitcoinsService()
@@ -123,7 +123,7 @@ class ViewsModels:
         thread_rate = threading.Thread(target=self.update_buyers_thread, args=(data,))
         thread_rate.daemon = True
         thread_rate.start()
-        return jsonify(common_sellers)
+        return jsonify(len(common_sellers.keys()))
 
     def get_sellers_cash(self):
         model = LocalbitcoinsService()
@@ -135,8 +135,9 @@ class ViewsModels:
             db.session.add(cities_find)
             db.session.commit()
         user_list = model.get_users_cash_list(cities_find.link_sellers)
+        # pprint.pprint(len(user_list.keys()))
         # places = model.get_sellers_cash(data['lat'], data['lng'])
-        return jsonify(user_list)
+        return jsonify(len(user_list.keys()))
 
     def get_buyers_cash(self):
         model = LocalbitcoinsService()
@@ -149,7 +150,7 @@ class ViewsModels:
             db.session.commit()
         user_list = model.get_users_cash_list(cities_find.link_buyers)
         # places = model.get_sellers_cash(data['lat'], data['lng'])
-        return jsonify(user_list)
+        return jsonify(len(user_list.keys()))
 
     @staticmethod
     def update_sellers_thread(data):

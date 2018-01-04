@@ -2,13 +2,6 @@
 
 {% block content %}
     {% block header %}{% include "header.html" %}{% endblock %}
-    <style>
-        #map {
-            width: 100%;
-            height: 400px;
-            background-color: grey;
-        }
-    </style>
     <section>
         <div class="container">
             <h1>{{ title }}</h1>
@@ -95,16 +88,8 @@
                     contentType: 'application/json',
                     url: '/get-buyers',
                     success: function (response) {
-                        $('table.sellers').show();
-                        $('.response').empty();
-                        if (response !== null) {
-                            var arr = Object.keys(response).map(function (k) {
-                                return response[k]
-                            });
-                            arr.forEach(function (item, i, arr) {
-                                $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
-                            });
-                        }
+                        $('#count').empty();
+                        $('#count').html('<h2>Offers found: ' + response + '</h2>');
                     }
                 });
             });
@@ -145,31 +130,10 @@
                     url: '/get-buyers-cash',
                     success: function (response) {
                         $('#count').empty();
-                        $('#count').html('<h2>Offers found: ' + countProperties(response) + '</h2>');
-                        $('table.sellers').show();
-                        $('.response').empty();
-                        if (response !== null) {
-                            var arr = Object.keys(response).map(function (k) {
-                                return response[k]
-                            });
-                            arr.forEach(function (item, i, arr) {
-                                $('.response').append('<tr><td>' + item.username + '</td><td>' + item.feedback_score + '</td><td>' + item.trade_count + '</td><td>' + item.last_online + '</td></tr>');
-                            });
-                        }
+                        $('#count').html('<h2>Offers found: ' + response + '</h2>');
                     }
                 });
             });
-
-            function countProperties(obj) {
-                var prop;
-                var propCount = 0;
-
-                for (prop in obj) {
-                    propCount++;
-                }
-                return propCount;
-            }
-
         });
 
     </script>
