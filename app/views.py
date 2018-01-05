@@ -39,9 +39,10 @@ def update_rates():
 
 
 @app.route('/buy-btc', methods=['GET'])
-def buy_btc():
+@app.route('/buy-btc/<string:buy_type>/<string:params>', methods=['GET', 'POST'])
+def buy_btc(buy_type=None, params=None):
     view = ViewsModels()
-    return view.buy_btc()
+    return view.buy_btc(buy_type, params)
 
 
 @app.route('/sell-btc', methods=['GET'])

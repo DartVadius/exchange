@@ -6,26 +6,29 @@
         <div class="container">
             <h1>{{ title }}</h1>
             <div>
-                <form>
+                <form id="buy-online" method="post" action="" name="buy-online">
                     <h3>Buy Bitcoins online</h3>
-                    <select class="country country_online">
+                    <select class="country country_online" name="country_id">
                         <option value="">Select Country</option>
                         {% for country in data %}
-                            <option value="{{ country.id }}">{{ country.description.title().replace("-", " ") }}</option>
+                            <option value="{{ country.id }}" {% if select.country|string() == country.id|string() %}
+                                    selected="selected" {% endif %}>{{ country.description.title().replace("-", " ") }}</option>
                         {% endfor %}
                     </select>
                     <br>
-                    <select class="payment-method">
+                    <select class="payment-method" name="payment_method_id">
                         <option value="">Select payment method</option>
                         {% for method in methods %}
-                            <option value="{{ method.id }}">{{ method.name.title() }}</option>
+                            <option value="{{ method.id }}" {% if select.method|string() == method.id|string() %}
+                                    selected="selected" {% endif %}>{{ method.name.title() }}</option>
                         {% endfor %}
                     </select>
                     <br>
-                    <select class="currency">
+                    <select class="currency" name="currency_id">
                         <option value="">Select currency</option>
                         {% for currency in currencies %}
-                            <option value="{{ currency.id }}">{{ currency.name }}</option>
+                            <option value="{{ currency.id }}" {% if select.currency|string() == currency.id|string() %}
+                                    selected="selected" {% endif %}>{{ currency.name }}</option>
                         {% endfor %}
                     </select>
                     <br>
@@ -33,37 +36,32 @@
                 </form>
             </div>
             <div>
-                <form method="post" action="buy-btc/cash">
+                <form method="post" action="" id="buy-cash" name="buy-cash">
                     <h3>Buy Bitcoins with cash</h3>
-                    <select class="country country_cash">
+                    <select class="country country_cash" name="country_id_cash">
                         <option value="">Select Country</option>
                         {% for country in data %}
-                            <option value="{{ country.id }}">{{ country.description.title().replace("-", " ") }}</option>
+                            <option value="{{ country.id }}" {% if select.country_cash|string() == country.id|string() %}
+                                    selected="selected" {% endif %}>{{ country.description.title().replace("-", " ") }}</option>
                         {% endfor %}
                     </select>
                     <br>
-                    <select class="city">
+                    <select class="city" name="city_id">
                         <option value="">Select city</option>
+                    {{ cities }}
+                        {% for one_city in select.cities %}
+                            <option value="{{ one_city.city_id }}" {% if select.city|string() == one_city.city_id|string() %}
+                                    selected="selected" {% endif %}>{{ one_city.city_name.title().replace("-", " ") }}</option>
+                        {% endfor %}
                     </select>
                     <br>
                     <button class="go_cash">GO</button>
                 </form>
             </div>
             <div id="count">
-
-            </div>
-            <div>
-                <table style="display: none" class="table table-bordered sellers">
-                    <thead>
-                    <th>Name</th>
-                    <th>Feedback Score</th>
-                    <th>Trade Count</th>
-                    <th>Last Online</th>
-                    </thead>
-                    <tbody class="response">
-
-                    </tbody>
-                </table>
+                {% if count is not none %}
+                    <h2>Offers found: {{ count }}</h2>'
+                {% endif %}
             </div>
         </div>
     </section>
@@ -73,24 +71,30 @@
         $(document).ready(function () {
             $('.go').click(function (e) {
                 e.preventDefault();
-                var country_id = $('.country_online').val();
-                var payment_method_id = $('.payment-method').val();
-                var currency_id = $('.currency').val();
-                var val = {
-                    country_id: country_id,
-                    payment_method_id: payment_method_id,
-                    currency_id: currency_id
+                var param = [];
+                var country = $('.country_online option:selected').text();
+                var payment_method = $('.payment-method option:selected').text();
+                var currency = $('.currency option:selected').text();
+                if (country != 'Select Country') {
+                    param.push(country.toLowerCase().split(' ').join('-'))
                 }
-                $.ajax({
-                    type: 'post',
-                    data: JSON.stringify(val),
-                    contentType: 'application/json',
-                    url: '/get-sellers',
-                    success: function (response) {
-                        $('#count').empty();
-                        $('#count').html('<h2>Offers found: ' + response + '</h2>');
-                    }
-                });
+                if (payment_method != 'Select payment method') {
+                    param.push(payment_method.toLowerCase().split(' ').join('-'))
+                }
+                if (currency != 'Select currency') {
+                    param.push(currency.toLowerCase().split(' ').join('-'))
+                }
+                if (param.length > 0) {
+                    var param = param.join('-');
+                    $('#buy-online').attr('action', '/buy-btc/online/' + param).submit();
+                }
+            });
+            $('.go_cash').click(function (e) {
+                e.preventDefault();
+                var city = $('.city option:selected').text();
+                if (city != 'Select city') {
+                    $('#buy-cash').attr('action', '/buy-btc/cash/' + city.toLowerCase().split(' ').join('-')).submit();
+                }
             });
             $('.country_cash').change(function () {
                 $('.city').empty();
@@ -113,23 +117,6 @@
                                 $('.city').append(val);
                             });
                         }
-                    }
-                });
-            });
-            $('.go_cash').click(function (e) {
-                e.preventDefault();
-                var city_id = $('.city').val();
-                var val = {
-                    city_id: city_id
-                }
-                $.ajax({
-                    type: 'post',
-                    data: JSON.stringify(val),
-                    contentType: 'application/json',
-                    url: '/get-sellers-cash',
-                    success: function (response) {
-                        $('#count').empty();
-                        $('#count').html('<h2>Offers found: ' + response + '</h2>');
                     }
                 });
             });
