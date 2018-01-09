@@ -4,7 +4,6 @@ from app.custom_session_interface import CustomSessionInterface
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
 from flask_bcrypt import Bcrypt
-from flask_migrate import Migrate
 
 app = Flask(__name__)
 

@@ -48,7 +48,6 @@
                     <br>
                     <select class="city" name="city_id">
                         <option value="">Select city</option>
-                    {{ cities }}
                         {% for one_city in select.cities %}
                             <option value="{{ one_city.city_id }}" {% if select.city|string() == one_city.city_id|string() %}
                                     selected="selected" {% endif %}>{{ one_city.city_name.title().replace("-", " ") }}</option>
@@ -58,9 +57,63 @@
                     <button class="go_cash">GO</button>
                 </form>
             </div>
+            <div class="country_one" name="country_one_id">
+                <h3>Buy Bitcoins in country</h3>
+                    {% for country in data %}
+                        {% if country.priority == 1 %}
+                            <a href="/buy-btc/country/{{country.name_alpha2.lower()}}">{{ country.description.title().replace("-", " ") }}</a><br>
+                        {% endif %}
+                    {% endfor %}
+                <div class="accordion">
+                    <a href="#">Show more...</a>
+                    <div>
+                        {% for country in data %}
+                            {% if country.priority != 1 %}
+                                <a href="/buy-btc/country/{{country.name_alpha2.lower()}}">{{ country.description.title().replace("-", " ") }}</a><br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="payment_method_one" name="payment_method_one_id">
+                <h3>Buy Bitcoins with payment method</h3>
+                    {% for method in methods %}
+                        {% if method.priority == 1 %}
+                            <a href="/buy-btc/payment-method/{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+                        {% endif %}
+                    {% endfor %}
+                <div class="accordion">
+                    <a href="#">Show more...</a>
+                    <div>
+                        {% for method in methods %}
+                            {% if method.priority != 1 %}
+                                <a href="/buy-btc/payment-method/{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="currency_one" name="currency_one_id">
+                <h3>Buy Bitcoins with currency</h3>
+                    {% for currency in currencies %}
+                        {% if currency.priority == 1 %}
+                            <a href="/buy-btc/currency/{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+                        {% endif %}
+                    {% endfor %}
+                <div class="accordion">
+                    <a href="#">Show more...</a>
+                    <div>
+                        {% for currency in currencies %}
+                            {% if currency.priority != 1 %}
+                                <a href="/buy-btc/currency/{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
             <div id="count">
                 {% if count is not none %}
-                    <h2>Offers found: {{ count }}</h2>'
+                    <h2>Offers found: {{ count }}</h2>
                 {% endif %}
             </div>
         </div>
@@ -69,6 +122,17 @@
     {% block footer %}{% include "footer.html" %}{% endblock %}
     <script>
         $(document).ready(function () {
+
+            $(".accordion a:first").addClass("active");
+            $(".accordion div").hide();
+
+            $(".accordion a").click(function(){
+                $(this).next("div").slideToggle("slow")
+                .siblings("div:visible").slideUp("slow");
+                $(this).toggleClass("active");
+                $(this).siblings("a").removeClass("active");
+            });
+
             $('.go').click(function (e) {
                 e.preventDefault();
                 var param = [];

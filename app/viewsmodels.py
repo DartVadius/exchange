@@ -1,14 +1,12 @@
-import datetime
 import json
 import threading
-import time
-import pprint
 
 from flask import render_template, redirect, request, url_for, session, jsonify
 from flask_login import login_user, logout_user, current_user
 
 from app.apiV10 import Api
-from app.dbmodels import Content, CurrencyStatistic, Countries, Cities
+from app.dbmodels import Content, CurrencyStatistic, Countries, Cities, PaymentMethods, Currencies
+from app.dbmodels import db
 from app.forms import LoginForm
 from app.services.cache_service import CacheService
 from app.services.country_repository import CountryRepository
@@ -20,7 +18,6 @@ from app.services.rate_repository import RateRepository
 from app.services.session_service import SessionService
 from app.services.statistic_service import StatisticService
 from app.services.stock_repository import StockRepository
-from app.dbmodels import db
 
 
 def merge_template(template, **kwargs):
@@ -97,6 +94,18 @@ class ViewsModels:
             city = request.form.get('city_id')
             if city is not None:
                 count = self.get_sellers_cash(city)
+        if buy_type == 'country':
+            country_find = Countries.query.filter(Countries.name_alpha2 == params).first()
+            country_id_one = country_find.id
+            count = self.get_sellers(country_id_one, None, None)
+        if buy_type == 'payment-method':
+            method_find = PaymentMethods.query.filter(PaymentMethods.slug == params).first()
+            method_id_one = method_find.id
+            count = self.get_sellers(None, method_id_one, None)
+        if buy_type == 'currency':
+            currency_find = Currencies.query.filter(Currencies.slug == params).first()
+            currency_id_one = currency_find.id
+            count = self.get_sellers(None, None, currency_id_one)
         select = {'country': country_id, 'method': method_id, 'currency': currency_id, 'country_cash': country_id_cash,
                   'city': city, 'cities': h}
         return render_template("buy_currency.html", title='Buy Bitcoins', data=countries, methods=payment_methods,
@@ -230,6 +239,16 @@ class ViewsModels:
         test.set_countries()
         test.set_payment_methods()
         test.set_payment_methods_by_country_codes()
+        with open('app/files/cities.json', encoding="utf8") as json_file:
+            data = json.load(json_file)
+        for value in data:
+            city = Cities()
+            city.country_code = value['country']
+            city.city_name = value['name']
+            city.lat = value['lat']
+            city.lng = value['lng']
+            db.session.add(city)
+        db.session.commit()
         session.clear()
         return redirect(url_for('admin.index'))
 
