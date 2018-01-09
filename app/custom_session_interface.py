@@ -1,6 +1,5 @@
 from flask import g
 from flask.sessions import SecureCookieSessionInterface
-from flask_login import user_loaded_from_header
 
 
 class CustomSessionInterface(SecureCookieSessionInterface):

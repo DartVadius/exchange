@@ -1,4 +1,5 @@
 import json
+import pprint
 
 import urllib3.request
 
@@ -211,7 +212,10 @@ class LocalbitcoinsService:
     def get_sellers_dict(sellers):
         resp_dict = dict()
         for value in sellers:
-            sellers_loc = value['data']['ad_list']
+            if isinstance(value, list):
+                sellers_loc = [value[0]]
+            else:
+                sellers_loc = value['data']['ad_list']
             sellers_dict = {value['data']['ad_id']: value['data']['profile'] for value in sellers_loc}
             resp_dict.update(sellers_dict)
         return resp_dict
