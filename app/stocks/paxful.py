@@ -1,8 +1,6 @@
 import datetime
 import json
 import time
-from urllib import parse
-from hashlib import sha256
 
 import urllib3.request
 

@@ -1,7 +1,7 @@
 from flask import request, redirect, url_for
 from flask_admin import Admin, expose, AdminIndexView
-from flask_admin.contrib.sqla.filters import BaseSQLAFilter, FilterEqual
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.sqla.filters import FilterEqual
 from flask_admin.form import Select2Field
 from flask_login import current_user
 from sqlalchemy import Column, INTEGER, String, UniqueConstraint, TIMESTAMP, DECIMAL, ForeignKey, Text
@@ -100,6 +100,7 @@ class Currencies(db.Model):
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
     type = Column(INTEGER, nullable=True, default=1)
+    priority = Column(INTEGER, nullable=True, default=0)
     rate_base = relationship("ExchangeRates", foreign_keys='ExchangeRates.base_currency_id',
                              back_populates="rate_base_currency")
     rate_compare = relationship("ExchangeRates", foreign_keys='ExchangeRates.compare_currency_id',
@@ -241,6 +242,7 @@ class Countries(db.Model):
     slug = Column(String(255), nullable=False, unique=True)
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
+    priority = Column(INTEGER, nullable=True, default=0)
     method_country = relationship("PaymentMethods", secondary='country_method', back_populates="payment_country")
     stock_country = relationship("StockExchanges", secondary='country_method', back_populates="exchange_country")
 
@@ -262,6 +264,7 @@ class PaymentMethods(db.Model):
     slug = Column(String(255), nullable=False, unique=True)
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
+    priority = Column(INTEGER, nullable=True, default=0)
     payment_country = relationship("Countries", secondary='country_method', back_populates="method_country")
     payment_stock = relationship("StockExchanges", secondary='country_method', back_populates="exchange_payment")
 
@@ -446,12 +449,13 @@ class CurrenciesAdmin(AdminModelView):
     page_size = 50
     column_hide_backrefs = True
     column_display_all_relations = False
-    column_list = ('name', 'description', 'slug', 'type')
-    form_columns = ['name', 'description', 'slug', 'type', 'meta_tags', 'meta_description', ]
+    column_list = ('name', 'description', 'slug', 'type', 'priority')
+    form_columns = ['name', 'description', 'slug', 'type', 'priority', 'meta_tags', 'meta_description', ]
     can_edit = True
     column_editable_list = ('description', 'slug', 'meta_tags', 'meta_description',)
     form_overrides = dict(
-        type=Select2Field
+        type=Select2Field,
+        priority=Select2Field
     )
     form_args = dict(
         type=dict(
@@ -461,6 +465,12 @@ class CurrenciesAdmin(AdminModelView):
                 ('3', 'Fiat')
             ]
         ),
+        priority=dict(
+            choices=[
+                ('1', 'High priority'),
+                ('0', 'Low priority')
+            ]
+        ),
     )
 
 
@@ -468,10 +478,21 @@ class CountriesAdmin(AdminModelView):
     page_size = 50
     can_create = False
     can_edit = True
-    column_list = ('description', 'name_alpha2', 'slug', 'meta_tags', 'meta_description')
+    column_list = ('description', 'name_alpha2', 'slug', 'priority', 'meta_tags', 'meta_description')
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['description', 'meta_tags', 'meta_description']
+    form_columns = ['description', 'priority', 'meta_tags', 'meta_description']
+    form_overrides = dict(
+        priority=Select2Field
+    )
+    form_args = dict(
+        priority=dict(
+            choices=[
+                ('1', 'High priority'),
+                ('0', 'Low priority')
+            ]
+        ),
+    )
 
 
 class CitiesAdmin(AdminModelView):
@@ -491,10 +512,21 @@ class PaymentMethodsAdmin(AdminModelView):
     page_size = 50
     can_create = False
     can_edit = True
-    column_list = ('name', 'method', 'code', 'description', 'slug', 'meta_tags', 'meta_description')
+    column_list = ('name', 'method', 'code', 'description', 'slug', 'priority', 'meta_tags', 'meta_description')
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['description', 'meta_tags', 'meta_description']
+    form_columns = ['description', 'priority', 'meta_tags', 'meta_description']
+    form_overrides = dict(
+        priority=Select2Field
+    )
+    form_args = dict(
+        priority=dict(
+            choices=[
+                ('1', 'High priority'),
+                ('0', 'Low priority')
+            ]
+        ),
+    )
 
 
 class StockExchangesAdmin(AdminModelView):
