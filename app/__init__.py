@@ -8,9 +8,9 @@ from flask_bcrypt import Bcrypt
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = 'None'
-# app.config['SQLALCHEMY_POOL_TIMEOUT'] = 120
-# app.config['SQLALCHEMY_POOL_SIZE'] = 100
-# app.config['SQLALCHEMY_POOL_RECYCLE'] = 120
+app.config['SQLALCHEMY_POOL_TIMEOUT'] = 120
+app.config['SQLALCHEMY_POOL_SIZE'] = 100
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 120
 app.config['SECRET_KEY'] = 'v89gs9dgyd9d256s9fy96jifp80yhpSEEEous'
 app.config['SQLALCHEMY_DATABASE_URI'] = database.connect
 db = SQLAlchemy(app)

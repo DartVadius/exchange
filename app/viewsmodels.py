@@ -111,15 +111,48 @@ class ViewsModels:
         return render_template("buy_currency.html", title='Buy Bitcoins', data=countries, methods=payment_methods,
                                currencies=currencies, count=count, select=select)
 
-    def sell_btc(self):
+    def sell_btc(self, sell_type, params):
         country = CountryRepository()
         methods = PaymentMethodRepository()
         currency = CurrencyRepository()
         countries = country.get_all()
         payment_methods = methods.get_all()
         currencies = currency.get_fiat_currencies()
+        count = None
+        country_id = country_id_cash = method_id = currency_id = city = None
+        h = []
+        if sell_type == 'online':
+            country_id = request.form.get('country_id')
+            method_id = request.form.get('payment_method_id')
+            currency_id = request.form.get('currency_id')
+            if country_id is not None or method_id is not None or currency_id is not None:
+                count = self.get_buyers(country_id, method_id, currency_id)
+        if sell_type == 'cash':
+            country_id_cash = request.form.get('country_id_cash')
+            country_find = Countries.query.filter(Countries.id == country_id_cash).first()
+            cities_find = Cities.query.filter(Cities.country_code == country_find.name_alpha2).order_by(
+                Cities.city_name).all()
+            for city in cities_find:
+                h.append({'city_id': city.id, 'city_name': city.city_name})
+            city = request.form.get('city_id')
+            if city is not None:
+                count = self.get_sellers_cash(city)
+        if sell_type == 'country':
+            country_find = Countries.query.filter(Countries.name_alpha2 == params).first()
+            country_id_one = country_find.id
+            count = self.get_buyers(country_id_one, None, None)
+        if sell_type == 'payment-method':
+            method_find = PaymentMethods.query.filter(PaymentMethods.slug == params).first()
+            method_id_one = method_find.id
+            count = self.get_buyers(None, method_id_one, None)
+        if sell_type == 'currency':
+            currency_find = Currencies.query.filter(Currencies.slug == params).first()
+            currency_id_one = currency_find.id
+            count = self.get_buyers(None, None, currency_id_one)
+        select = {'country': country_id, 'method': method_id, 'currency': currency_id, 'country_cash': country_id_cash,
+                  'city': city, 'cities': h}
         return render_template("sell_currency.html", title='Sell Bitcoins', data=countries, methods=payment_methods,
-                               currencies=currencies)
+                               currencies=currencies, count=count, select=select)
 
     def get_cities(self):
         country_id = request.json['country_id']
@@ -157,17 +190,18 @@ class ViewsModels:
         # places = model.get_sellers_cash(data['lat'], data['lng'])
         return len(user_list.keys())
 
-    def get_buyers(self):
+    def get_buyers(self, country, method, currency):
         model = LocalbitcoinsService()
-        data = request.json
-        country_find = CountryRepository.get_by_id(data['country_id'])
-        method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
-        currency_find = CurrencyRepository.get_by_id(data['currency_id'])
+        country_find = CountryRepository.get_by_id(country)
+        method_find = PaymentMethodRepository.get_by_id(method)
+        currency_find = CurrencyRepository.get_by_id(currency)
         common_sellers = model.get_buyers(country_find, method_find, currency_find)
-        thread_rate = threading.Thread(target=self.update_buyers_thread, args=(data,))
+        thread_rate = threading.Thread(target=self.update_buyers_thread, args=(country, method, currency,))
         thread_rate.daemon = True
         thread_rate.start()
-        return jsonify(len(common_sellers.keys()))
+        if common_sellers is None:
+            return 0
+        return len(common_sellers.keys())
 
     def get_buyers_cash(self):
         model = LocalbitcoinsService()
@@ -199,18 +233,18 @@ class ViewsModels:
             CacheService.set_sellers(currency_find.name.lower(), json.dumps(currency_sellers))
 
     @staticmethod
-    def update_buyers_thread(data):
+    def update_buyers_thread(country, method, currency):
         bitcoin_service = LocalbitcoinsService()
-        if bool(data['payment_method_id']):
-            method_find = PaymentMethodRepository.get_by_id(data['payment_method_id'])
+        if bool(method):
+            method_find = PaymentMethodRepository.get_by_id(method)
             method_sellers = bitcoin_service.sell_bitcoins_method(method_find.method)
             CacheService.set_buyers(method_find.method, json.dumps(method_sellers))
-        if bool(data['country_id']):
-            country_find = CountryRepository.get_by_id(data['country_id'])
+        if bool(country):
+            country_find = CountryRepository.get_by_id(country)
             country_sellers = bitcoin_service.sell_bitcoins_country(country_find.name_alpha2, country_find.description)
             CacheService.set_buyers(country_find.name_alpha2, json.dumps(country_sellers))
-        if bool(data['currency_id']):
-            currency_find = CurrencyRepository.get_by_id(data['currency_id'])
+        if bool(currency):
+            currency_find = CurrencyRepository.get_by_id(currency)
             currency_sellers = bitcoin_service.sell_bitcoins_currency(currency_find.name.lower())
             CacheService.set_buyers(currency_find.name.lower(), json.dumps(currency_sellers))
 

@@ -46,9 +46,10 @@ def buy_btc(buy_type=None, params=None):
 
 
 @app.route('/sell-btc', methods=['GET'])
-def sell_btc():
+@app.route('/sell-btc/<string:sell_type>/<string:params>', methods=['GET', 'POST'])
+def sell_btc(sell_type=None, params=None):
     view = ViewsModels()
-    return view.sell_btc()
+    return view.sell_btc(sell_type, params)
 
 
 @app.route('/get-cities', methods=['POST'])
