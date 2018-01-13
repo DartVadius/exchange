@@ -149,7 +149,7 @@ class ViewsModels:
                 count = self.get_sellers_cash(city)
         if values and values[0] == 'country':
             values.remove('country')
-            country_find = Countries.query.filter(Countries.name_alpha2 == '-'.join(values)).first()
+            country_find = Countries.query.filter(Countries.description == '-'.join(values)).first()
             country_id_one = country_find.id
             count = self.get_buyers(country_id_one, None, None)
         if values and values[0] == 'payment':
