@@ -68,7 +68,7 @@ class ViewsModels:
         return render_template("stock_view/stock_exchange.html", title=name.title(), rates=exchange_rates,
                                date=date, name=name.title())
 
-    def buy_btc(self, buy_type, params):
+    def buy_btc(self, params):
         country = CountryRepository()
         methods = PaymentMethodRepository()
         currency = CurrencyRepository()
@@ -78,13 +78,16 @@ class ViewsModels:
         count = None
         country_id = country_id_cash = method_id = currency_id = city = None
         h = []
-        if buy_type == 'online':
+        values = []
+        if params is not None:
+            values = params.split('-')
+        if values and values[0] == 'online':
             country_id = request.form.get('country_id')
             method_id = request.form.get('payment_method_id')
             currency_id = request.form.get('currency_id')
             if country_id is not None or method_id is not None or currency_id is not None:
                 count = self.get_sellers(country_id, method_id, currency_id)
-        if buy_type == 'cash':
+        if values and values[0] == 'cash':
             country_id_cash = request.form.get('country_id_cash')
             country_find = Countries.query.filter(Countries.id == country_id_cash).first()
             cities_find = Cities.query.filter(Cities.country_code == country_find.name_alpha2).order_by(
@@ -94,16 +97,20 @@ class ViewsModels:
             city = request.form.get('city_id')
             if city is not None:
                 count = self.get_sellers_cash(city)
-        if buy_type == 'country':
-            country_find = Countries.query.filter(Countries.name_alpha2 == params).first()
+        if values and values[0] == 'country':
+            values.remove('country')
+            country_find = Countries.query.filter(Countries.description == '-'.join(values)).first()
             country_id_one = country_find.id
             count = self.get_sellers(country_id_one, None, None)
-        if buy_type == 'payment-method':
-            method_find = PaymentMethods.query.filter(PaymentMethods.slug == params).first()
+        if values and values[0] == 'payment':
+            values.remove('payment')
+            values.remove('method')
+            method_find = PaymentMethods.query.filter(PaymentMethods.slug == '-'.join(values)).first()
             method_id_one = method_find.id
             count = self.get_sellers(None, method_id_one, None)
-        if buy_type == 'currency':
-            currency_find = Currencies.query.filter(Currencies.slug == params).first()
+        if values and values[0] == 'currency':
+            values.remove('currency')
+            currency_find = Currencies.query.filter(Currencies.slug == '-'.join(values)).first()
             currency_id_one = currency_find.id
             count = self.get_sellers(None, None, currency_id_one)
         select = {'country': country_id, 'method': method_id, 'currency': currency_id, 'country_cash': country_id_cash,
@@ -111,7 +118,7 @@ class ViewsModels:
         return render_template("buy_currency.html", title='Buy Bitcoins', data=countries, methods=payment_methods,
                                currencies=currencies, count=count, select=select)
 
-    def sell_btc(self, sell_type, params):
+    def sell_btc(self, params):
         country = CountryRepository()
         methods = PaymentMethodRepository()
         currency = CurrencyRepository()
@@ -121,13 +128,16 @@ class ViewsModels:
         count = None
         country_id = country_id_cash = method_id = currency_id = city = None
         h = []
-        if sell_type == 'online':
+        values = []
+        if params is not None:
+            values = params.split('-')
+        if values and values[0] == 'online':
             country_id = request.form.get('country_id')
             method_id = request.form.get('payment_method_id')
             currency_id = request.form.get('currency_id')
             if country_id is not None or method_id is not None or currency_id is not None:
                 count = self.get_buyers(country_id, method_id, currency_id)
-        if sell_type == 'cash':
+        if values and values[0] == 'cash':
             country_id_cash = request.form.get('country_id_cash')
             country_find = Countries.query.filter(Countries.id == country_id_cash).first()
             cities_find = Cities.query.filter(Cities.country_code == country_find.name_alpha2).order_by(
@@ -137,16 +147,20 @@ class ViewsModels:
             city = request.form.get('city_id')
             if city is not None:
                 count = self.get_sellers_cash(city)
-        if sell_type == 'country':
-            country_find = Countries.query.filter(Countries.name_alpha2 == params).first()
+        if values and values[0] == 'country':
+            values.remove('country')
+            country_find = Countries.query.filter(Countries.name_alpha2 == '-'.join(values)).first()
             country_id_one = country_find.id
             count = self.get_buyers(country_id_one, None, None)
-        if sell_type == 'payment-method':
-            method_find = PaymentMethods.query.filter(PaymentMethods.slug == params).first()
+        if values and values[0] == 'payment':
+            values.remove('payment')
+            values.remove('method')
+            method_find = PaymentMethods.query.filter(PaymentMethods.slug == '-'.join(values)).first()
             method_id_one = method_find.id
             count = self.get_buyers(None, method_id_one, None)
-        if sell_type == 'currency':
-            currency_find = Currencies.query.filter(Currencies.slug == params).first()
+        if values and values[0] == 'currency':
+            values.remove('currency')
+            currency_find = Currencies.query.filter(Currencies.slug == '-'.join(values)).first()
             currency_id_one = currency_find.id
             count = self.get_buyers(None, None, currency_id_one)
         select = {'country': country_id, 'method': method_id, 'currency': currency_id, 'country_cash': country_id_cash,

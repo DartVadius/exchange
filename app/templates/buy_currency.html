@@ -66,7 +66,7 @@
             <h3>Buy Bitcoins in country</h3>
             {% for country in data %}
             {% if country.priority == 1 %}
-            <a href="/buy-btc/country/{{country.name_alpha2.lower()}}">{{ country.description.title().replace("-", " ")
+            <a href="/buy-btc-country-{{country.description.lower()}}">{{ country.description.title().replace("-", " ")
                 }}</a><br>
             {% endif %}
             {% endfor %}
@@ -75,7 +75,7 @@
                 <div>
                     {% for country in data %}
                     {% if country.priority != 1 %}
-                    <a href="/buy-btc/country/{{country.name_alpha2.lower()}}">{{
+                    <a href="/buy-btc-country-{{country.description.lower()}}">{{
                         country.description.title().replace("-", " ") }}</a><br>
                     {% endif %}
                     {% endfor %}
@@ -86,7 +86,7 @@
             <h3>Buy Bitcoins with payment method</h3>
             {% for method in methods %}
             {% if method.priority == 1 %}
-            <a href="/buy-btc/payment-method/{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+            <a href="/buy-btc-payment-method-{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
             {% endif %}
             {% endfor %}
             <div class="accordion">
@@ -94,7 +94,7 @@
                 <div>
                     {% for method in methods %}
                     {% if method.priority != 1 %}
-                    <a href="/buy-btc/payment-method/{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+                    <a href="/buy-btc-payment-method-{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -104,7 +104,7 @@
             <h3>Buy Bitcoins with currency</h3>
             {% for currency in currencies %}
             {% if currency.priority == 1 %}
-            <a href="/buy-btc/currency/{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+            <a href="/buy-btc-currency-{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
             {% endif %}
             {% endfor %}
             <div class="accordion">
@@ -112,7 +112,7 @@
                 <div>
                     {% for currency in currencies %}
                     {% if currency.priority != 1 %}
-                    <a href="/buy-btc/currency/{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+                    <a href="/buy-btc-currency-{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -157,14 +157,14 @@
             }
             if (param.length > 0) {
                 var param = param.join('-');
-                $('#buy-online').attr('action', '/buy-btc/online/' + param).submit();
+                $('#buy-online').attr('action', '/buy-btc-online-' + param).submit();
             }
         });
         $('.go_cash').click(function (e) {
             e.preventDefault();
             var city = $('.city option:selected').text();
             if (city != 'Select city') {
-                $('#buy-cash').attr('action', '/buy-btc/cash/' + city.trim().toLowerCase().split(' ').join('-')).submit();
+                $('#buy-cash').attr('action', '/buy-btc-cash-' + city.trim().toLowerCase().split(' ').join('-')).submit();
             }
         });
         $('.country_cash').change(function () {
