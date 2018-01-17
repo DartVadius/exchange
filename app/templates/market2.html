@@ -7,56 +7,101 @@
         <h1>{{ title }}</h1>
         <div>
             <form id="buy-online" method="post" action="" name="buy-online">
-                <h3>Buy Bitcoins online</h3>
-                <select class="country country_online" name="country_id">
-                    <option value="">Select Country</option>
-                    {% for country in data %}
-                    <option value="{{ country.id }}" {% if select.country|string()== country.id|string() %}
-                            selected="selected" {% endif %}>{{ country.description.title().replace("-", " ") }}
-                    </option>
+                <h3>{{market}} market</h3>
+                <h4>{{market}} {{cc}} price: ${{price}} ({{percent}}%)</h4>
+                <br>
+                <select class="cc" name="cc_id">
+                    <option value="">choose another cc in this market</option>
+                    {% for cc in ccs %}
+                    <option value="{{cc}}">{{ cc }}</option>
                     {% endfor %}
                 </select>
+                <button>BUY</button>
+                <button>SELL</button>
                 <br>
-                <select class="payment-method" name="payment_method_id">
-                    <option value="">Select payment method</option>
-                    {% for method in methods %}
-                    <option value="{{ method.id }}" {% if select.method|string()== method.id|string() %}
-                            selected="selected" {% endif %}>{{ method.name.title() }}
-                    </option>
+                <div>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</div>
+                <br>
+                <table style='border: 2px black;'>
+                    <tbody>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <select class="another_market" name="another_market_id">
+                    <option value="">choose another market with this currency</option>
+                    {% for market in markets %}
+                    <option value="{{ market }}">{{ market }}</option>
                     {% endfor %}
                 </select>
-                <br>
-                <select class="currency" name="currency_id">
-                    <option value="">Select currency</option>
-                    {% for currency in currencies %}
-                    <option value="{{ currency.id }}" {% if select.currency|string()== currency.id|string() %}
-                            selected="selected" {% endif %}>{{ currency.name }}
-                    </option>
-                    {% endfor %}
-                </select>
-                <br>
-                <button class="go">GO</button>
+
             </form>
         </div>
-        <div>
+    <!--        <div>
             <form method="post" action="" id="buy-cash" name="buy-cash">
                 <h3>Buy Bitcoins with cash</h3>
                 <select class="country country_cash" name="country_id_cash">
                     <option value="">Select Country</option>
+                    {#
                     {% for country in data %}
                     <option value="{{ country.id }}" {% if select.country_cash|string()== country.id|string() %}
                             selected="selected" {% endif %}>{{ country.description.title().replace("-", " ") }}
                     </option>
                     {% endfor %}
+                    #}
                 </select>
                 <br>
                 <select class="city" name="city_id">
                     <option value="">Select city</option>
+                    {#
                     {% for one_city in select.cities %}
                     <option value="{{ one_city.city_id }}" {% if select.city|string()== one_city.city_id|string() %}
                             selected="selected" {% endif %}>{{ one_city.city_name.title().replace("-", " ") }}
                     </option>
                     {% endfor %}
+                    #}
                 </select>
                 <br>
                 <button class="go_cash">GO</button>
@@ -64,21 +109,25 @@
         </div>
         <div class="country_one" name="country_one_id">
             <h3>Buy Bitcoins in country</h3>
+            {#
             {% for country in data %}
             {% if country.priority == 1 %}
             <a href="/buy-btc-country-{{country.description.lower()}}">{{ country.description.title().replace("-", " ")
                 }}</a><br>
             {% endif %}
             {% endfor %}
+            #}
             <div class="accordion">
                 <a href="#">Show more...</a>
                 <div>
+                    {#
                     {% for country in data %}
                     {% if country.priority != 1 %}
                     <a href="/buy-btc-country-{{country.description.lower()}}">{{
                         country.description.title().replace("-", " ") }}</a><br>
                     {% endif %}
                     {% endfor %}
+                    #}
                 </div>
             </div>
         </div>
@@ -122,7 +171,7 @@
             {% if count is not none %}
             <h2>Offers found: {{ count }}</h2>
             {% endif %}
-        </div>
+        </div> -->
     </div>
 </section>
 

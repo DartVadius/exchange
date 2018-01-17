@@ -215,6 +215,10 @@ def some_route(id):
     return merge_template('test.html', data=['data', 'from python'])
     # return '<h1>' + str(id) + '</h1>'
 
+@app.route("/market/cc")
+def market_cc():
+    return render_template("market2.html", market='Marketname.com', cc='BTC', price='15000', percent='4.05', ccs=['BTC','ETH'], markets=['bittrex', 'localbitcoins'])
+
 
 if __name__ == "__main__":
     app.run(debug=True)
