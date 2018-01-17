@@ -211,6 +211,7 @@ class LocalbitcoinsService:
     @staticmethod
     def get_sellers_dict(sellers):
         resp_dict = dict()
+        print(sellers)
         for value in sellers:
             if isinstance(value, list):
                 sellers_loc = [value[0]]

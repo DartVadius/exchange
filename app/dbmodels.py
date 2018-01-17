@@ -282,6 +282,7 @@ class StockExchanges(db.Model):
     id = Column(INTEGER, primary_key=True)
     name = Column(String(255), nullable=False, unique=True)
     url = Column(String(255), nullable=False)
+    refferal_link = Column(String(255), nullable=True)
     slug = Column(String(255), nullable=False, unique=True)
     meta_tags = Column(String(255), nullable=True, unique=False)
     meta_description = Column(Text(), nullable=True, unique=False)
@@ -530,11 +531,11 @@ class PaymentMethodsAdmin(AdminModelView):
 
 
 class StockExchangesAdmin(AdminModelView):
-    column_list = ('name', 'url', 'slug', 'type', 'active')
+    column_list = ('name', 'url', 'refferal_link', 'slug', 'type', 'active')
     # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'url', 'slug', 'meta_tags', 'meta_description', 'active', 'type', 'api_key', 'api_secret']
+    form_columns = ['name', 'url', 'refferal_link', 'slug', 'meta_tags', 'meta_description', 'active', 'type', 'api_key', 'api_secret']
     form_overrides = dict(
         active=Select2Field,
         type=Select2Field

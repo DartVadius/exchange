@@ -122,6 +122,11 @@
             {% if count is not none %}
             <h2>Offers found: {{ count }}</h2>
             {% endif %}
+            {% if refferals is not none %}
+                {% for refferal in refferals %}
+                    <a href="{{refferal.refferal_link}}">{{ refferal.name }}</a><br>
+                {% endfor %}
+            {% endif %}
         </div>
     </div>
 </section>

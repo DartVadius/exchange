@@ -69,6 +69,7 @@ class ViewsModels:
                                date=date, name=name.title())
 
     def buy_btc(self, params):
+        exchangeService = ExchangeService()
         country = CountryRepository()
         methods = PaymentMethodRepository()
         currency = CurrencyRepository()
@@ -79,6 +80,7 @@ class ViewsModels:
         country_id = country_id_cash = method_id = currency_id = city = None
         h = []
         values = []
+        refferals = []
         if params is not None:
             values = params.split('-')
         if values and values[0] == 'online':
@@ -87,6 +89,8 @@ class ViewsModels:
             currency_id = request.form.get('currency_id')
             if country_id is not None or method_id is not None or currency_id is not None:
                 count = self.get_sellers(country_id, method_id, currency_id)
+                refferals = exchangeService.get_refferals()
+                print(refferals)
         if values and values[0] == 'cash':
             country_id_cash = request.form.get('country_id_cash')
             country_find = Countries.query.filter(Countries.id == country_id_cash).first()
@@ -116,7 +120,7 @@ class ViewsModels:
         select = {'country': country_id, 'method': method_id, 'currency': currency_id, 'country_cash': country_id_cash,
                   'city': city, 'cities': h}
         return render_template("buy_currency.html", title='Buy Bitcoins', data=countries, methods=payment_methods,
-                               currencies=currencies, count=count, select=select)
+                               currencies=currencies, count=count, select=select, refferals=refferals)
 
     def sell_btc(self, params):
         country = CountryRepository()
