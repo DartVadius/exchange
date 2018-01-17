@@ -20,9 +20,11 @@ class ExchangeService:
         self.cache = SimpleCache()
         self.cache.set('market_count', self.stocks.count(self), timeout=60 * 60 * 24 * 30)
 
-    def get_refferals(self, method = 'online', param = None):
+    def get_refferals(self, method='online', param=None):
         if method == 'online':
             return self.stocks
+        if method == 'cash':
+            return StockExchanges.query.filter_by(is_cash=1).all()
         return None
 
     def set_rates(self):

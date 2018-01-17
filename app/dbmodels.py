@@ -290,6 +290,7 @@ class StockExchanges(db.Model):
     api_secret = Column(String(255), nullable=True)
     active = Column(INTEGER, nullable=True, default=1)
     type = Column(String(45), nullable=False, default='market')
+    is_cash = Column(INTEGER, nullable=True, default=0)
     exchange_rates = relationship('ExchangeRates', backref='stock_exchanges', lazy=True)
     exchange_history = relationship('ExchangeHistory', backref='stock_history', lazy=True)
     exchange_country = relationship("Countries", secondary='country_method', back_populates="stock_country")
@@ -531,20 +532,27 @@ class PaymentMethodsAdmin(AdminModelView):
 
 
 class StockExchangesAdmin(AdminModelView):
-    column_list = ('name', 'url', 'refferal_link', 'slug', 'type', 'active')
+    column_list = ('name', 'url', 'refferal_link', 'slug', 'type', 'active', 'is_cash')
     # column_formatters = dict(active=lambda name, url, api_secret, active: {1: 'Enable', 0: 'Disable'})
     column_hide_backrefs = True
     column_display_all_relations = False
-    form_columns = ['name', 'url', 'refferal_link', 'slug', 'meta_tags', 'meta_description', 'active', 'type', 'api_key', 'api_secret']
+    form_columns = ['name', 'url', 'refferal_link', 'slug', 'meta_tags', 'meta_description', 'active', 'is_cash', 'type', 'api_key', 'api_secret']
     form_overrides = dict(
         active=Select2Field,
-        type=Select2Field
+        type=Select2Field,
+        is_cash=Select2Field
     )
     form_args = dict(
         active=dict(
             choices=[
                 ('1', 'Enable'),
                 ('0', 'Disable')
+            ]
+        ),
+        is_cash=dict(
+            choices=[
+                ('1', 'Online and Cash'),
+                ('0', 'Only Online')
             ]
         ),
         type=dict(

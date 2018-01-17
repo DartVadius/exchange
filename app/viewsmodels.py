@@ -89,8 +89,7 @@ class ViewsModels:
             currency_id = request.form.get('currency_id')
             if country_id is not None or method_id is not None or currency_id is not None:
                 count = self.get_sellers(country_id, method_id, currency_id)
-                refferals = exchangeService.get_refferals()
-                print(refferals)
+                refferals = exchangeService.get_refferals('online')
         if values and values[0] == 'cash':
             country_id_cash = request.form.get('country_id_cash')
             country_find = Countries.query.filter(Countries.id == country_id_cash).first()
@@ -101,6 +100,7 @@ class ViewsModels:
             city = request.form.get('city_id')
             if city is not None:
                 count = self.get_sellers_cash(city)
+                refferals = exchangeService.get_refferals('cash')
         if values and values[0] == 'country':
             values.remove('country')
             country_find = Countries.query.filter(Countries.description == '-'.join(values)).first()
@@ -174,6 +174,7 @@ class ViewsModels:
 
     def get_cities(self):
         country_id = request.json['country_id']
+        print(country_id)
         country_find = Countries.query.filter(Countries.id == country_id).first()
         cities_find = Cities.query.filter(Cities.country_code == country_find.name_alpha2).order_by(
             Cities.city_name).all()

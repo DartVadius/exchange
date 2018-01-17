@@ -2,3 +2,6 @@ pip install Flask-Script
 
 # запуск скриптов из консоли
 python3 cli.py <название_метода> [<param 1> <param 2> etc.]
+
+ALTER TABLE `stock_exchanges` ADD COLUMN `refferal_link` VARCHAR(255) NULL AFTER `url`;
+ALTER TABLE `stock_exchanges` ADD COLUMN `is_cash` INT(11) NULL DEFAULT NULL AFTER `active`;
