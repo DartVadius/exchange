@@ -42,16 +42,17 @@
     <!-- Loading CSS End-->
     {% block extra_styles %}{% endblock %}
     {% block extra_scripts %}{% endblock %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <script src="/static/js/commons.js"></script>
+    <script src="/static/js/index.js"></script>
 </head>
 <body>
 {% block content %}{% endblock %}
 
 <!-- Custom HTML End-->
 <!-- Loading JS Start-->
-<script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
-<script defer src="/static/js/commons.js"></script>
-<script defer src="/static/js/index.js"></script>
 
 <!-- Loading JS End-->
 <!--  Google fonts cdn-->
@@ -65,6 +66,8 @@
         wf.async = 'true';
         var s = document.getElementsByTagName('script')[0];
         s.parentNode.insertBefore(wf, s);
+
+    $('select').material_select();
       })();
 
 

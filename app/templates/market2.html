@@ -1,0 +1,247 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% block header %}{% include "header.html" %}{% endblock %}
+<section>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <div>
+            <form id="buy-online" method="post" action="" name="buy-online">
+                <h3>{{market}} market</h3>
+                <h4>{{market}} {{cc}} price: ${{price}} ({{percent}}%)</h4>
+                <br>
+                <select class="cc" name="cc_id">
+                    <option value="">choose another cc in this market</option>
+                    {% for cc in ccs %}
+                    <option value="{{cc}}">{{ cc }}</option>
+                    {% endfor %}
+                </select>
+                <button>BUY</button>
+                <button>SELL</button>
+                <br>
+                <div>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</div>
+                <br>
+                <table style='border: 2px black;'>
+                    <tbody>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                            <td>
+                                lorem
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <select class="another_market" name="another_market_id">
+                    <option value="">choose another market with this currency</option>
+                    {% for market in markets %}
+                    <option value="{{ market }}">{{ market }}</option>
+                    {% endfor %}
+                </select>
+
+            </form>
+        </div>
+    <!--        <div>
+            <form method="post" action="" id="buy-cash" name="buy-cash">
+                <h3>Buy Bitcoins with cash</h3>
+                <select class="country country_cash" name="country_id_cash">
+                    <option value="">Select Country</option>
+                    {#
+                    {% for country in data %}
+                    <option value="{{ country.id }}" {% if select.country_cash|string()== country.id|string() %}
+                            selected="selected" {% endif %}>{{ country.description.title().replace("-", " ") }}
+                    </option>
+                    {% endfor %}
+                    #}
+                </select>
+                <br>
+                <select class="city" name="city_id">
+                    <option value="">Select city</option>
+                    {#
+                    {% for one_city in select.cities %}
+                    <option value="{{ one_city.city_id }}" {% if select.city|string()== one_city.city_id|string() %}
+                            selected="selected" {% endif %}>{{ one_city.city_name.title().replace("-", " ") }}
+                    </option>
+                    {% endfor %}
+                    #}
+                </select>
+                <br>
+                <button class="go_cash">GO</button>
+            </form>
+        </div>
+        <div class="country_one" name="country_one_id">
+            <h3>Buy Bitcoins in country</h3>
+            {#
+            {% for country in data %}
+            {% if country.priority == 1 %}
+            <a href="/buy-btc-country-{{country.description.lower()}}">{{ country.description.title().replace("-", " ")
+                }}</a><br>
+            {% endif %}
+            {% endfor %}
+            #}
+            <div class="accordion">
+                <a href="#">Show more...</a>
+                <div>
+                    {#
+                    {% for country in data %}
+                    {% if country.priority != 1 %}
+                    <a href="/buy-btc-country-{{country.description.lower()}}">{{
+                        country.description.title().replace("-", " ") }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                    #}
+                </div>
+            </div>
+        </div>
+        <div class="payment_method_one" name="payment_method_one_id">
+            <h3>Buy Bitcoins with payment method</h3>
+            {% for method in methods %}
+            {% if method.priority == 1 %}
+            <a href="/buy-btc-payment-method-{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+            {% endif %}
+            {% endfor %}
+            <div class="accordion">
+                <a href="#">Show more...</a>
+                <div>
+                    {% for method in methods %}
+                    {% if method.priority != 1 %}
+                    <a href="/buy-btc-payment-method-{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="currency_one" name="currency_one_id">
+            <h3>Buy Bitcoins with currency</h3>
+            {% for currency in currencies %}
+            {% if currency.priority == 1 %}
+            <a href="/buy-btc-currency-{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+            {% endif %}
+            {% endfor %}
+            <div class="accordion">
+                <a href="#">Show more...</a>
+                <div>
+                    {% for currency in currencies %}
+                    {% if currency.priority != 1 %}
+                    <a href="/buy-btc-currency-{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div id="count">
+            {% if count is not none %}
+            <h2>Offers found: {{ count }}</h2>
+            {% endif %}
+        </div> -->
+    </div>
+</section>
+
+{% block footer %}{% include "footer.html" %}{% endblock %}
+<script>
+    $(document).ready(function () {
+
+        $(".accordion a:first").addClass("active");
+        $(".accordion div").hide();
+
+        $(".accordion a").click(function () {
+            $(this).next("div").slideToggle("slow")
+                .siblings("div:visible").slideUp("slow");
+            $(this).toggleClass("active");
+            $(this).siblings("a").removeClass("active");
+        });
+
+        $('.go').click(function (e) {
+            e.preventDefault();
+            var param = [];
+            var country = $('.country_online option:selected').text();
+            var payment_method = $('.payment-method option:selected').text();
+            var currency = $('.currency option:selected').text();
+            if (country != 'Select Country') {
+                param.push(country.trim().toLowerCase().split(' ').join('-'))
+            }
+            if (payment_method != 'Select payment method') {
+                param.push(payment_method.trim().toLowerCase().split(' ').join('-'))
+            }
+            if (currency != 'Select currency') {
+                param.push(currency.trim().toLowerCase().split(' ').join('-'))
+            }
+            if (param.length > 0) {
+                var param = param.join('-');
+                $('#buy-online').attr('action', '/buy-btc-online-' + param).submit();
+            }
+        });
+        $('.go_cash').click(function (e) {
+            e.preventDefault();
+            var city = $('.city option:selected').text();
+            if (city != 'Select city') {
+                $('#buy-cash').attr('action', '/buy-btc-cash-' + city.trim().toLowerCase().split(' ').join('-')).submit();
+            }
+        });
+        $('.country_cash').change(function () {
+            $('.city').empty();
+            val = '<option value="">Select city</option>';
+            $('.city').append(val);
+            var country_id = $('.country_cash').val();
+            var val = {
+                country_id: country_id
+            }
+            $.ajax({
+                type: 'post',
+                data: JSON.stringify(val),
+                contentType: 'application/json',
+                url: '/get-cities',
+                success: function (response) {
+                    console.log(response);
+                    if (response !== null) {
+                        $.each(response, function (i, item) {
+                            val = '<option value="' + item.city_id + '">' + item.city_name + '</option>';
+                            $('.city').append(val);
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+</script>
+{% endblock %}
+
