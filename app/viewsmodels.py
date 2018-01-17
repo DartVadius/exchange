@@ -177,19 +177,6 @@ class ViewsModels:
             return 0
         return len(common_sellers.keys())
 
-    def get_sellers_cash(self, city_id):
-        model = LocalbitcoinsService()
-        cities_find = Cities.query.filter_by(id=city_id).first()
-        if cities_find.link_sellers is None:
-            url = model.get_users_cash_link(cities_find.lat, cities_find.lng)
-            cities_find.link_sellers = url['buy_local_url']
-            db.session.add(cities_find)
-            db.session.commit()
-        user_list = model.get_users_cash_list(cities_find.link_sellers)
-        # pprint.pprint(len(user_list.keys()))
-        # places = model.get_sellers_cash(data['lat'], data['lng'])
-        return len(user_list.keys())
-
     def get_buyers(self, country, method, currency):
         model = LocalbitcoinsService()
         country_find = CountryRepository.get_by_id(country)
@@ -203,9 +190,19 @@ class ViewsModels:
             return 0
         return len(common_sellers.keys())
 
-    def get_buyers_cash(self):
+    def get_sellers_cash(self, city_id):
         model = LocalbitcoinsService()
-        city_id = request.json['city_id']
+        cities_find = Cities.query.filter_by(id=city_id).first()
+        if cities_find.link_sellers is None:
+            url = model.get_users_cash_link(cities_find.lat, cities_find.lng)
+            cities_find.link_sellers = url['buy_local_url']
+            db.session.add(cities_find)
+            db.session.commit()
+        user_list = model.get_users_cash_list(cities_find.link_sellers)
+        return len(user_list.keys())
+
+    def get_buyers_cash(self, city_id):
+        model = LocalbitcoinsService()
         cities_find = Cities.query.filter_by(id=city_id).first()
         if cities_find.link_buyers is None:
             url = model.get_users_cash_link(cities_find.lat, cities_find.lng)
@@ -213,8 +210,7 @@ class ViewsModels:
             db.session.add(cities_find)
             db.session.commit()
         user_list = model.get_users_cash_list(cities_find.link_buyers)
-        # places = model.get_sellers_cash(data['lat'], data['lng'])
-        return jsonify(len(user_list.keys()))
+        return len(user_list.keys())
 
     @staticmethod
     def update_sellers_thread(country, method, currency):
