@@ -66,7 +66,7 @@
             <h3>Buy Bitcoins in country</h3>
             {% for country in data %}
             {% if country.priority == 1 %}
-            <a href="/sell-btc/country/{{country.name_alpha2.lower()}}">{{ country.description.title().replace("-", " ")
+            <a href="/sell-btc-country-{{country.description.lower()}}">{{ country.description.title().replace("-", " ")
                 }}</a><br>
             {% endif %}
             {% endfor %}
@@ -75,7 +75,7 @@
                 <div>
                     {% for country in data %}
                     {% if country.priority != 1 %}
-                    <a href="/sell-btc/country/{{country.name_alpha2.lower()}}">{{
+                    <a href="/sell-btc-ountry-{{country.description.lower()}}">{{
                         country.description.title().replace("-", " ") }}</a><br>
                     {% endif %}
                     {% endfor %}
@@ -86,7 +86,7 @@
             <h3>Buy Bitcoins with payment method</h3>
             {% for method in methods %}
             {% if method.priority == 1 %}
-            <a href="/sell-btc/payment-method/{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+            <a href="/sell-btc-payment-method-{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
             {% endif %}
             {% endfor %}
             <div class="accordion">
@@ -94,7 +94,7 @@
                 <div>
                     {% for method in methods %}
                     {% if method.priority != 1 %}
-                    <a href="/sell-btc/payment-method/{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
+                    <a href="/sell-btc-payment-method-{{method.slug.lower()}}">{{ method.name.title() }}</a><br>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -104,7 +104,7 @@
             <h3>Buy Bitcoins with currency</h3>
             {% for currency in currencies %}
             {% if currency.priority == 1 %}
-            <a href="/sell-btc/currency/{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+            <a href="/sell-btc-currency-{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
             {% endif %}
             {% endfor %}
             <div class="accordion">
@@ -112,7 +112,7 @@
                 <div>
                     {% for currency in currencies %}
                     {% if currency.priority != 1 %}
-                    <a href="/sell-btc/currency/{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
+                    <a href="/sell-btc-currency-{{currency.slug.lower()}}">{{ currency.name.upper() }}</a><br>
                     {% endif %}
                     {% endfor %}
                 </div>
@@ -152,23 +152,23 @@
                 param.push(country.trim().toLowerCase().split(' ').join('-'))
             }
             if (payment_method != 'Select payment method') {
-                param.push(payment_method.toLowerCase().split(' ').join('-'))
+                param.push(payment_method.trim().toLowerCase().split(' ').join('-'))
             }
             if (currency != 'Select currency') {
-                param.push(currency.toLowerCase().split(' ').join('-'))
+                param.push(currency.trim().toLowerCase().split(' ').join('-'))
             }
             var slug = '';
             if (param.length > 0) {
                 slug = param.join('-');
 
-                $('#sell-online').attr('action', '/sell-btc/online/' + slug).submit();
+                $('#sell-online').attr('action', '/sell-btc-online-' + slug).submit();
             }
         });
         $('.go_cash').click(function (e) {
             e.preventDefault();
             var city = $('.city option:selected').text();
             if (city != 'Select city') {
-                $('#sell-cash').attr('action', '/sell-btc/cash/' + city.trim().toLowerCase().split(' ').join('-')).submit();
+                $('#sell-cash').attr('action', '/sell-btc-cash-' + city.trim().toLowerCase().split(' ').join('-')).submit();
             }
         });
         $('.country_cash').change(function () {
